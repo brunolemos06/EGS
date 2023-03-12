@@ -44,19 +44,20 @@ INSTALLED_APPS = [
     'dj_rest_auth',
 
     #registration
-    'django.contrib.sites',
+    #'django.contrib.sites',
     'allauth',
     'allauth.account',
     #'allauth.socialaccount'
-    'dj_rest_auth.registration',
+    #'dj_rest_auth.registration',
 
     #social login
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.facebook',
 
 ]
 
-SITE_ID = 1
+#SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -149,9 +150,6 @@ REST_FRAMEWORK = {
 
 REST_AUTH = {
     'USE_JWT': True,
-}
-
-REST_AUTH = {
     'JWT_AUTH_COOKIE': 'auth_token',
     'JWT_AUTH_REFRESH_COOKIE': 'refresh_token',
 }
