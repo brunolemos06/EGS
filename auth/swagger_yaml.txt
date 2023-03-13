@@ -1,0 +1,165 @@
+openapi: 3.0.0
+info:
+  description: 'Api for users to register and/or sign in using third party auth'
+  version: "1.0.0"
+  title: SignIn OAuth2 API
+
+host: 127.0.0.1:8000
+schemes:
+  - http
+paths:
+  /auth/{provider}:
+    post:
+      parameters:
+        - in: path
+          name: provider   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: string
+            enum: [google, facebook, github]
+          description: Third Party OAuth2 Provider
+      summary: Signs In or Registers User
+      description: Registers and logs new user or logs in user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: The code used for requesting user info
+      responses:
+        '200':    # status code
+          description: Loggs in user with success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  uuid:
+                    type: string
+                    description: uuid provides by the 3rd party oauth2 service
+                  email:
+                    type: string
+                    description: email of the user
+                  first_name:
+                    type: string
+                    description: first name of the user
+                  last_name:
+                    type: string
+                    description: last name of the user
+                  token:
+                    type: string
+                    description: token for user to access resources
+        '201':    # status code
+          description: Created and logged in user with success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  uuid:
+                    type: string
+                    description: uuid provides by the 3rd party oauth2 service
+                  email:
+                    type: string
+                    description: email of the user
+                  first_name:
+                    type: string
+                    description: first name of the user
+                  last_name:
+                    type: string
+                    description: last name of the user
+                  token:
+                    type: string
+                    description: token for user to access resources
+        '400':    # status code
+          description: Failed to obtain access_token or user info
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: More detail about the error
+        '401':    # status code
+          description: User is already registered with another provider
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: More detail about the original provider
+        '404':    # status code
+          description: No code provided or invalid provider
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: More detail about the error
+  /user/info:
+    post:
+      security:
+        - bearerAuth: []
+      summary: Returns user's info
+      description: Uses token to verify user and returns it's info
+      responses:
+        '200':
+          description: Returns info about the user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  uuid:
+                    type: string
+                    description: uuid provides by the 3rd party oauth2 service
+                  email:
+                    type: string
+                    description: email of the user
+                  first_name:
+                    type: string
+                    description: first name of the user
+                  last_name:
+                    type: string
+                    description: last name of the user
+        '404':    # status code
+          description: Invalid auth token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: User not found
+  /user/logout:
+    post:
+      security:
+        - bearerAuth: []
+      summary: Log out user
+      description: Logs out user and deletes user's token
+      responses:
+        '200':    # status code
+          description: Loggs in user with success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Logged Out
+components:
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer

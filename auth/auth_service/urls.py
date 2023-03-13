@@ -1,4 +1,4 @@
-"""auth_app URL Configuration
+"""auth_service URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.1/topics/http/urls/
@@ -14,21 +14,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
 
-# from rest_framework_simplejwt.views import (
-#     TokenObtainPairView,
-#     TokenRefreshView,
-# )
-
-from .views import GoogleLogin, FacebookLogin
+from auth_service import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('auth/', include('dj_rest_auth.urls')),
-    #path('auth/registration/', include('dj_rest_auth.registration.urls')),
-    path('auth/google/', GoogleLogin.as_view(), name='google_login'),
-    path('auth/facebook/', FacebookLogin.as_view(), name='facebook_login'),
-    #path('auth/auth/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    #path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('auth/<provider>/', views.auth, name='auth'),
+    path('user/logout/', views.logout, name='logout'),
+    path('user/info/', views.info, name='info'),
 ]
