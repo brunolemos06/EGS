@@ -1,7 +1,6 @@
 from django.http import JsonResponse
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth import authenticate, login, logout
 
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
@@ -40,13 +39,13 @@ def auth(request, provider):
         
         return JsonResponse({"error" : 'Facebook auth not implemented yet.'}, status=501)
     elif provider == 'github':
-        user_data, status_code = github_auth(request)
+        user_data, email, status_code = github_auth(request)
         
         if status_code >= 400:
             return JsonResponse(user_data, status=status_code) 
         
         user['uuid'] = user_data.get('id')
-        user['email'] = user_data.get('email')
+        user['email'] = email
         user['first_name'] = user_data.get('name').split(' ')[0]
         user['last_name'] = user_data.get('name').split(' ')[1]
         user['provider'] = 'Github'
@@ -175,7 +174,7 @@ def github_auth(request):
     }
     headers = {'Accept': 'application/json'}
     response = requests.post(settings.GITHUB_ACCESS_TOKEN_URL, data=data, headers=headers)
-    
+
     access_token = response.json().get('access_token')
     if not access_token:
         return {"error": 'Failed to obtain access token'}, 400
@@ -184,10 +183,13 @@ def github_auth(request):
     
     if user_response.status_code != 200:
         return {"error": 'Failed to obtain user data'}, 400
-    
-    print(user_response.json())
 
-    return user_response.json(), 200
+    response = requests.get(settings.GITHUB_API_URL + 'user/emails', headers={'Authorization': f'token {access_token}'})
+
+    if response.status_code != 200:
+        return {"error": 'Failed to obtain user email'}, 400
+
+    return user_response.json(), response.json()[0].get('email'), 200
 
 class TokenAuthentication(TokenAuthentication):
     TokenAuthentication.keyword = 'Bearer'

@@ -131,6 +131,16 @@ paths:
                   last_name:
                     type: string
                     description: last name of the user
+        '401':    # status code
+          description: Invalid auth token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    description: Invalid Token
         '404':    # status code
           description: Invalid auth token
           content:
