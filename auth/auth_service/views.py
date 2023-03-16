@@ -62,11 +62,6 @@ def auth(request, provider):
             user = User.objects.get(email=user['email'])
             user_json = user.get_info()
             user_json['token'] = Token.objects.get_or_create(user=user)[0].key
-
-            # if Token.objects.get(user=User.objects.get(email=user['email'])).exists():
-            #     user['token'] = Token.objects.get(user=User.objects.get(email=user['email'])).key
-            # else:
-            #     user['token'] = Token.objects.create(user=User.objects.get(email=user['email'])).key
             
             return JsonResponse(user_json, status=200, safe=False)
         else :
@@ -74,9 +69,8 @@ def auth(request, provider):
     else:
         #create new user
         user = User.objects.create_user(**user)
-        token = Token.objects.create(user=user)
         user = user.get_info()
-        user['token'] = token.key
+        user['token'] = Token.objects.get_or_create(user=user)[0].key
         return JsonResponse(json.dumps(user), status=201)
     
 
@@ -175,16 +169,22 @@ def github_auth(request):
     headers = {'Accept': 'application/json'}
     response = requests.post(settings.GITHUB_ACCESS_TOKEN_URL, data=data, headers=headers)
 
+    print(response.json())
+
     access_token = response.json().get('access_token')
     if not access_token:
         return {"error": 'Failed to obtain access token'}, 400
     
     user_response = requests.get(settings.GITHUB_API_URL + 'user', headers={'Authorization': f'token {access_token}'})
+
+    print(user_response.json())
     
     if user_response.status_code != 200:
         return {"error": 'Failed to obtain user data'}, 400
 
     response = requests.get(settings.GITHUB_API_URL + 'user/emails', headers={'Authorization': f'token {access_token}'})
+
+    print(response.json())
 
     if response.status_code != 200:
         return {"error": 'Failed to obtain user email'}, 400

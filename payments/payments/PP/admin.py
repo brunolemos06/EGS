@@ -1,6 +1,5 @@
 from django.contrib import admin
-from .models import ongoing_payment, completed_payment
+from .models import payments
 
 # Register your models here.
-admin.site.register(ongoing_payment)
-admin.site.register(completed_payment)
+admin.site.register(payments)
