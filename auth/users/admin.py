@@ -4,9 +4,9 @@ from users.models import CustomUser
 
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
-    list_display = ['email', 'uuid', 'first_name', 'last_name', 'provider',]
-    search_fields = ['email', 'uuid', 'provider',]
-    readonly_fields = ['uuid', 'provider',]
-    ordering = ('email',)
+    list_display = ['provider_id', 'provider',]
+    search_fields = ['provider_id', 'provider',]
+    readonly_fields = ['provider_id', 'provider',]
+    ordering = ('id',)
 
 admin.site.register(CustomUser, CustomUserAdmin)

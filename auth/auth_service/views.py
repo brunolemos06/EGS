@@ -26,10 +26,7 @@ def auth(request, provider):
         if status_code >= 400:
             return JsonResponse(user_data, status=status_code) 
         
-        user['uuid'] = user_data.get('id')
-        user['email'] = user_data.get('email')
-        user['first_name'] = user_data.get('given_name')
-        user['last_name'] = user_data.get('family_name')
+        user['provider_id'] = user_data.get('id')
         user['provider'] = 'Google'
     elif provider == 'facebook':
         user_data, status_code = facebook_auth(request)
@@ -39,15 +36,12 @@ def auth(request, provider):
         
         return JsonResponse({"error" : 'Facebook auth not implemented yet.'}, status=501)
     elif provider == 'github':
-        user_data, email, status_code = github_auth(request)
+        user_data, status_code = github_auth(request)
         
         if status_code >= 400:
             return JsonResponse(user_data, status=status_code) 
         
-        user['uuid'] = user_data.get('id')
-        user['email'] = email
-        user['first_name'] = user_data.get('name').split(' ')[0]
-        user['last_name'] = user_data.get('name').split(' ')[1]
+        user['provider_id'] = user_data.get('id')
         user['provider'] = 'Github'
     else:
         return JsonResponse({"error" : 'Invalid provider.'}, status=404)
@@ -56,19 +50,17 @@ def auth(request, provider):
     if status_code >= 400:
         return JsonResponse(user_data, status=status_code)
 
-    if User.objects.filter(email=user['email']).exists():
-        if User.objects.get(email=user['email']).provider == user['provider']:
+    #print(user_data)
+    if User.objects.filter(provider_id=user['provider_id'], provider=user['provider']).exists():
+        
+        user = User.objects.get(provider_id=user['provider_id'], provider=user['provider'])
+        user_json = user.get_info()
+        user_json['token'] = Token.objects.get_or_create(user=user)[0].key
             
-            user = User.objects.get(email=user['email'])
-            user_json = user.get_info()
-            user_json['token'] = Token.objects.get_or_create(user=user)[0].key
-            
-            return JsonResponse(user_json, status=200, safe=False)
-        else :
-            return JsonResponse({"error" : 'User already exists with this email on '+ User.objects.get(email=user['email']).get_provider+'}'}, status=401)
+        return JsonResponse(user_json, status=200, safe=False)
     else:
         #create new user
-        user = User.objects.create_user(**user)
+        user = User.objects.create_user(provider_id=user['provider_id'], provider=user['provider'])
         user = user.get_info()
         user['token'] = Token.objects.get_or_create(user=user)[0].key
         return JsonResponse(json.dumps(user), status=201)
@@ -89,7 +81,6 @@ def info(request):
     if not user:
         return JsonResponse({"error" : "User not found"}, status=404)
     return JsonResponse(user, status=200, safe=False)
-    
     
 @csrf_exempt
 @permission_classes([AllowAny])
@@ -182,14 +173,7 @@ def github_auth(request):
     if user_response.status_code != 200:
         return {"error": 'Failed to obtain user data'}, 400
 
-    response = requests.get(settings.GITHUB_API_URL + 'user/emails', headers={'Authorization': f'token {access_token}'})
-
-    print(response.json())
-
-    if response.status_code != 200:
-        return {"error": 'Failed to obtain user email'}, 400
-
-    return user_response.json(), response.json()[0].get('email'), 200
+    return user_response.json(), 200
 
 class TokenAuthentication(TokenAuthentication):
     TokenAuthentication.keyword = 'Bearer'

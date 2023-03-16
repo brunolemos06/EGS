@@ -1,85 +1,64 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from django.utils import timezone
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
-from django.conf import settings
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, uuid, email, first_name, last_name, password=None, **extra_fields):
-        if not email:
-            raise ValueError('The Email field must be set')
-        if not uuid:
-            raise ValueError('The UUID field must be set')
+    def create_user(self, provider_id, provider, password=None, **extra_fields):
+        if not provider_id:
+            raise ValueError('The provider_id field must be set')
+        if not provider:
+            raise ValueError('The provider field must be set')
         
         user = self.model(
-            email=self.normalize_email(email),
-            uuid=uuid,
-            first_name=first_name,
-            last_name=last_name,
+            provider_id=provider_id,
+            provider=provider,
+            name = str(provider_id) + provider,
             **extra_fields
         )
         user.set_password(password)
         user.save(using=self._db)
 
-    def create_superuser(self, email, password=None):
+    def create_superuser(self, name, provider_id, provider, password=None):
         user = self.create_user(
-            email=self.normalize_email(email),
-            uuid='5aa479e4-2027-4e20-99ef-395dc21829c0',
-            first_name='admin',
-            last_name='admin',
-            password=password,
+            name='admin',
+            provider_id='0',
+            provider='Django',
             is_staff=True,
-            is_superuser=True
+            is_superuser=True,
         )
         Token.objects.create(user=user)
 
         
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    uuid = models.CharField(default='000000000000000000000', editable=False, max_length=255)
-    email = models.EmailField(unique=True, primary_key=True)
-    first_name = models.CharField(max_length=30, blank=True)
-    last_name = models.CharField(max_length=30, blank=True)
-    provider = models.CharField(max_length=30, blank=True, default='Django')
-    date_joined = models.DateTimeField(default=timezone.now)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    is_superuser = models.BooleanField(default=False)
+    id          = models.AutoField(verbose_name="id", primary_key=True)
+    name        = models.CharField(max_length=255, unique=True)
+    provider_id = models.CharField(editable=False, max_length=255)
+    provider    = models.CharField(default='Django', editable=False, max_length=255)
+
+    is_staff    = models.BooleanField(default=False)
+    is_active   = models.BooleanField(default=True)
+    is_superuser= models.BooleanField(default=False)
 
     objects = CustomUserManager()
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    USERNAME_FIELD = 'name'
+    REQUIRED_FIELDS = ['provider_id', 'provider']
 
     def __str__(self):
         return {
-            'uuid': self.uuid,
-            'email': self.email,
-            'first_name': self.first_name,
-            'last_name': self.last_name,
+            'provider_id': self.provider_id,
+            'provider': self.provider,
         }
     
     def get_info(self):
         return {
-            'uuid': self.uuid,
-            'email': self.email,
-            'first_name': self.first_name,
-            'last_name': self.last_name,
+            'provider_id': self.provider_id,
+            'provider': self.provider,
         }
-
-    def get_full_name(self):
-        return f'{self.first_name} {self.last_name}'
-
-    def get_short_name(self):
-        return self.first_name
     
-    def get_uuid(self):
-        return self.uuid
-    
-    def get_email(self):
-        return self.email
+    def get_provider_id(self):
+        return self.provider_id
     
     def get_provider(self):
         return self.provider
