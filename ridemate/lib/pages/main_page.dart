@@ -24,19 +24,7 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 9.0),
-            child : Icon(Icons.exit_to_app),
-          ),
-        ],
-      ),
-
       body: pages[_currentindex],
-
       bottomNavigationBar: Container(
         color: Colors.transparent,
         child: Padding(
