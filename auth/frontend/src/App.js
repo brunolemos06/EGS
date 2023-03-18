@@ -1,39 +1,41 @@
-import React, { useState } from 'react';
-import GoogleLogin from 'react-google-login';
+import React from 'react';
+import axios from 'axios';
+import { GoogleLogin } from 'react-google-login';
 
-const App = () => {
-  const [loggedIn, setLoggedIn] = useState(false);
+function App() {
+  const clientId = '810039849362-pocpopo5cpne4p0iga8d3fjaes8m5r7c.apps.googleusercontent.com';
 
-  const responseGoogle = (response) => {
-    // send the response.tokenId to your REST API for verification and authentication
-    fetch('/api/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ token: response.tokenId }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        localStorage.setItem('token', data.token);
-        setLoggedIn(true);
+  const onSuccess = (response) => {
+    // Handle successful sign-in
+    console.log('Google Sign-In successful:', response);
+
+    // Send authorization code to your REST API
+    const code = new URLSearchParams(response.code).get('code');
+    axios.post('http://127.0.0.1:8000/auth/google/', { code : code })
+      .then((response) => {
+        console.log('Authorization code sent successfully:', response);
+      })
+      .catch((error) => {
+        console.error('Error sending authorization code:', error);
       });
+  };
+
+  const onFailure = (error) => {
+    // Handle failed sign-in
+    console.log('Google Sign-In failed:', error);
   };
 
   return (
     <div>
-      {!loggedIn && (
-        <GoogleLogin
-          clientId="YOUR_CLIENT_ID"
-          buttonText="Login with Google"
-          onSuccess={responseGoogle}
-          onFailure={responseGoogle}
-          cookiePolicy={'single_host_origin'}
-        />
-      )}
-      {loggedIn && <p>You are logged in!</p>}
+      <GoogleLogin
+        clientId={clientId}
+        buttonText="Sign in with Google"
+        onSuccess={onSuccess}
+        onFailure={onFailure}
+        cookiePolicy={'single_host_origin'}
+      />
     </div>
   );
-};
+}
 
 export default App;
