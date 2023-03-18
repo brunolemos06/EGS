@@ -174,7 +174,9 @@ def github_auth(request):
         return {"error": 'Failed to obtain user data'}, 400
 
     return user_response.json(), 200
-
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([AllowAny])
 def redirect_login(request, provider):
     if provider == 'google':
         return redirect_login_google(request)

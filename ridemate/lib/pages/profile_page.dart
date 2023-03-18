@@ -13,25 +13,34 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  Future fetchData() async {
-    final response = await http.get(Uri.parse('https://localhost'));
-    if (response.statusCode == 200) {
-      // If the call to the server was successful, parse the JSON
-      final data = json.decode(response.body);
-      return data;
-    } else {
-      // If that call was not successful, throw an error.
-      throw Exception('Failed to load data');
-    }
+  List<Review> _reviews = [];
+  String _name = "";
+  String _id = "98221";
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
   }
-  List<Review> _reviews = [
-    Review(rating: 4.5, name: 'John Doe', title: 'Amazing Experience', description: 'I had an amazing time traveling with this company. The staff was friendly and professional.'),
-    Review(rating: 3.0, name: 'Jane Smith', title: 'Average Trip', description: 'The trip was average. It was not as exciting as I expected it to be.'),
-    Review(rating: 5.0, name: 'Alex Johnson', title: 'Best Vacation Ever', description: 'I had the best vacation ever with this company. The itinerary was well-planned and the staff was fantastic.'),
-    Review(rating: 1.0, name: 'Alex Johnson1', title: 'Best Vacation Ever1', description: 'I had the best vacation ever with this company. The itinerary was well-planned and the staff was fantastic.'),
-    Review(rating: 2.0, name: 'Alex Johnson2', title: 'Best Vacation Ever2', description: 'I had the best vacation ever with this company. The itinerary was well-planned and the staff was fantastic.'),
-    Review(rating: 3.0, name: 'Alex Johnson3', title: 'Best Vacation Ever3', description: 'I had the best vacation ever with this company. The itinerary was well-planned and the staff was fantastic.'),
-  ];
+
+  Future<void> fetchData() async {
+    final response = await http.get(Uri.parse('http://10.0.2.2:5000/api/v1/reviews/rating?personid=$_id'));
+    final response2 = await http.get(Uri.parse('http://10.0.2.2:5000/api/v1/reviews/?personid=$_id'));
+
+    final data = json.decode(response.body);
+    final data2 = json.decode(response2.body);
+    setState(() {
+      _name = data['reviews'][0]['rating'].toString();
+      for (var review in data2["reviews"]) {
+        var rating = review["rating"];
+        var name = review["personid"].toString(); // Replace with the name of the person who wrote the review
+        var title = review["title"];
+        var description = review["description"];
+
+        _reviews.add(Review(rating: rating, name: name, title: title, description: description));
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(appBar: AppBar(
@@ -66,7 +75,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               const SizedBox(height: 20),
               Text(
-                "John Doe",
+                "john doe",
                 style: Theme.of(context).textTheme.headline5,
               ),
               const SizedBox(height: 10),
@@ -82,7 +91,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
 
               Text(
-                'Avg rating : 3.5',
+                'Avg rating : $_name',
                 style: Theme.of(context).textTheme.headline6,
               ),
               const SizedBox(height: 15),
@@ -146,7 +155,7 @@ class _ProfilePageState extends State<ProfilePage> {
 }
 
 class Review {
-  final double rating;
+  final int rating;
   final String name;
   final String title;
   final String description;
