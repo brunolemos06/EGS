@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 
@@ -174,6 +174,23 @@ def github_auth(request):
         return {"error": 'Failed to obtain user data'}, 400
 
     return user_response.json(), 200
+
+def redirect_login(request, provider):
+    if provider == 'google':
+        return redirect_login_google(request)
+    elif provider == 'github':
+        return redirect_login_github(request)
+    else:
+        return JsonResponse({"error" : "Invalid provider"}, status=400)
+
+def redirect_login_google(request):
+    redirect_url = 'https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=http://127.0.0.1:8000/accounts/google/login/callback/&prompt=consent&response_type=code&client_id=810039849362-pocpopo5cpne4p0iga8d3fjaes8m5r7c.apps.googleusercontent.com&scope=openid%20email%20profile&access_type=offline'
+    return HttpResponseRedirect(redirect_url)
+
+def redirect_login_github(request):
+    redirect_url = 'https://github.com/login/oauth/authorize?client_id=61e17ec5a329b5e84b6e&redirect_uri=http://127.0.0.1:8000/accounts/github/login/callback/&scope=user:email'
+    return HttpResponseRedirect(redirect_url)
+
 
 class TokenAuthentication(TokenAuthentication):
     TokenAuthentication.keyword = 'Bearer'
