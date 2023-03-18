@@ -24,13 +24,20 @@ class _AddPageState extends State<AddPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Add a new travel'),
+      ),
+      body: Form(
       key: _formKey,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15.0,vertical: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 15.0,vertical: 5),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
+            SizedBox(
+                height: 10
+            ),
             Text(
               'Add a new travel',
               style: GoogleFonts.bebasNeue(
@@ -159,6 +166,7 @@ class _AddPageState extends State<AddPage> {
             ),
           ],
         ),
+      ),
       ),
     );
   }
