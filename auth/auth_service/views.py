@@ -1,11 +1,11 @@
-from django.http import JsonResponse, HttpResponseRedirect
+from django.http import JsonResponse
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.decorators import permission_classes, api_view
+from rest_framework.decorators import permission_classes, api_view, authentication_classes
 
 from users.models import CustomUser as User
 
@@ -28,13 +28,6 @@ def auth(request, provider):
         
         user['provider_id'] = user_data.get('id')
         user['provider'] = 'Google'
-    elif provider == 'facebook':
-        user_data, status_code = facebook_auth(request)
-
-        # if status_code >= 400:
-        #     return JsonResponse(user_data, status=status_code) 
-        
-        return JsonResponse({"error" : 'Facebook auth not implemented yet.'}, status=501)
     elif provider == 'github':
         user_data, status_code = github_auth(request)
         
@@ -67,15 +60,15 @@ def auth(request, provider):
     
 
 @csrf_exempt
-@permission_classes([IsAuthenticated])
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def logout(request):
     request.user.auth_token.delete()
     return JsonResponse({"message" : "logged out"}, status=200)
 
 @csrf_exempt
-@permission_classes([IsAuthenticated])
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def info(request):
     user = request.user.get_info()
     if not user:
@@ -83,6 +76,7 @@ def info(request):
     return JsonResponse(user, status=200, safe=False)
     
 @csrf_exempt
+@api_view(['POST'])
 @permission_classes([AllowAny])
 def google_auth(request):
     code = json.loads(request.body).get('code')
@@ -115,36 +109,7 @@ def google_auth(request):
     return json.loads(response.text), 200
 
 @csrf_exempt
-@permission_classes([AllowAny])
-def facebook_auth(request):
-    # get authorization code from Facebook
-    code = json.loads(request.body).get('code')
-    if not code:
-        return {'error': 'No code provided.'}, 404
-
-    # exchange authorization code for access token
-    data = {
-        'code': code,
-        'client_id': settings.FACEBOOK_AUTH_CLIENT_ID,
-        'client_secret': settings.FACEBOOK_AUTH_CLIENT_SECRET,
-        'redirect_uri': settings.FACEBOOK_AUTH_REDIRECT_URI,
-        'grant_type': 'authorization_code',
-    }
-    response = requests.get('https://graph.facebook.com/v16.0/oauth/access_token', params=data)
-    token_data = json.loads(response.text)
-    access_token = token_data.get('access_token')
-    if not access_token:
-        return {"error": 'Failed to obtain access token'}, 400
-
-    # use access token to get user info
-    response = requests.get('https://graph.facebook.com/v16.0/me?fields=id%2Cname',
-                            params={'access_token': access_token})
-    user_data = json.loads(response.text)
-    # do something with user_data, e.g. create a user
-
-    return user_data, 200
-
-@csrf_exempt
+@api_view(['POST'])
 @permission_classes([AllowAny])
 def github_auth(request):
     code = json.loads(request.body).get('code')
@@ -174,24 +139,29 @@ def github_auth(request):
         return {"error": 'Failed to obtain user data'}, 400
 
     return user_response.json(), 200
+
+
+
 @csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
-def redirect_login(request, provider):
+def login(request, provider):
     if provider == 'google':
-        return redirect_login_google(request)
+        url = 'https://accounts.google.com/o/oauth2/v2/auth?client_id={}&redirect_uri={}&response_type=code&scope=email%20profile'.format(settings.GOOGLE_AUTH_CLIENT_ID, settings.GOOGLE_AUTH_REDIRECT_URI)
+        response = requests.post(url)
+        print("Status code: ", response.status_code)
+        print("Headers:" , response.headers)
+        print("Response: ", response.text)
     elif provider == 'github':
-        return redirect_login_github(request)
+        pass
     else:
-        return JsonResponse({"error" : "Invalid provider"}, status=400)
+        return JsonResponse({"error" : 'Invalid provider.'}, status=404)
+    
 
-def redirect_login_google(request):
-    redirect_url = 'https://accounts.google.com/o/oauth2/v2/auth?redirect_uri=http://127.0.0.1:8000/accounts/google/login/callback/&prompt=consent&response_type=code&client_id=810039849362-pocpopo5cpne4p0iga8d3fjaes8m5r7c.apps.googleusercontent.com&scope=openid%20email%20profile&access_type=offline'
-    return HttpResponseRedirect(redirect_url)
 
-def redirect_login_github(request):
-    redirect_url = 'https://github.com/login/oauth/authorize?client_id=61e17ec5a329b5e84b6e&redirect_uri=http://127.0.0.1:8000/accounts/github/login/callback/&scope=user:email'
-    return HttpResponseRedirect(redirect_url)
+
+
+
 
 
 class TokenAuthentication(TokenAuthentication):

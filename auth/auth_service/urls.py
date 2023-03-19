@@ -20,9 +20,8 @@ from auth_service import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('login/<provider>/', views.login, name='login'),
     path('auth/<provider>/', views.auth, name='auth'),
-    path('login/<provider>/', views.redirect_login, name='login'),
     path('user/logout/', views.logout, name='logout'),
-    path('user/info/', views.info, name='info'),
 
 ]
