@@ -25,25 +25,32 @@ SECRET_KEY = 'django-insecure-0b*y@46g0y%5g3^lieijbt(amkt**k!f2ishbgc(_h5^8awc5l
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
+
+    'users',
+
+    'rest_framework',
+    'rest_framework.authtoken',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    'rest_framework',
-    'rest_framework.authtoken',
-    'users',
 ]
 
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -51,6 +58,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'auth_service.urls'
@@ -130,7 +138,7 @@ AUTH_USER_MODEL = 'users.CustomUser'
 
 GOOGLE_AUTH_CLIENT_ID = '810039849362-pocpopo5cpne4p0iga8d3fjaes8m5r7c.apps.googleusercontent.com'
 GOOGLE_AUTH_CLIENT_SECRET = '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'
-GOOGLE_AUTH_REDIRECT_URI = 'http://127.0.0.1:8000/accounts/google/login/callback/'
+GOOGLE_AUTH_REDIRECT_URI = 'http://localhost:3000/login/callback/'
 
 FACEBOOK_AUTH_CLIENT_ID = '1247746872498521'
 FACEBOOK_AUTH_CLIENT_SECRET = '0419677100ebeb0b40a2819f6e3f9a48'
@@ -138,7 +146,7 @@ FACEBOOK_AUTH_REDIRECT_URI = 'http://127.0.0.1:8000/accounts/facebook/login/call
 
 GITHUB_CLIENT_ID = '61e17ec5a329b5e84b6e'
 GITHUB_CLIENT_SECRET = 'cf42e47bd13cf99a12fae4abfb0fd4c7ab5c5fa2'
-GITHUB_ACCESS_TOKEN_URL = 'https://github.com/login/oauth/access_token'
+GITHUB_ACCESS_TOKEN_URL = 'http://localhost:3000/login/callback/'
 GITHUB_API_URL = 'https://api.github.com/'
 
 REST_FRAMEWORK = {
