@@ -1,20 +1,18 @@
 import React from 'react';
-import MyPage from './DefaultPage';
-import GoogleSocialAuth from './GoogleSocialLogin';
-import PostButton from './PostButton';
+import GoogleLoginButton from './GoogleLoginButton';
+import GithubLoginButton from './GithubLoginButton';
+
+import './ButtonDiv.css';
 
 function App() {
   return (
-    // <div>
-    //     <MyPage />
-    // </div>
-
-    // <div>
-    //     <GoogleSocialAuth />
-    // </div>
-
-    <div>
-        <PostButton />
+    <div className='ButtonDiv'>
+        <div>
+          <GoogleLoginButton />
+        </div>
+        <div>
+          <GithubLoginButton />
+        </div>
     </div>
   );
 }
