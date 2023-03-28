@@ -1,6 +1,8 @@
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 
+import 'catalogo_page.dart';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key:key);
@@ -9,7 +11,10 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
+
+
 class _HomePageState extends State<HomePage> {
+
 
   @override
   Widget build(BuildContext context) {
@@ -86,12 +91,15 @@ class _HomePageState extends State<HomePage> {
           padding: EdgeInsets.only(left: 295.0),
           child: ElevatedButton(
             onPressed: () {
-              // add button action here
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => catalogo_page()),
+              );
             },
             child: Icon(
-                Icons.search,
-                color: Colors.white,
-            )
+              Icons.search,
+              color: Colors.white,
+            ),
           ),
         ),
 
