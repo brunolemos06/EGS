@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:ridemate/pages/main_page.dart';
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  debugPrint('Starting app with custom logging level');
+
   runApp(const MyApp());
 }
 
