@@ -14,7 +14,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   List<Review> _reviews = [];
-  String _name = "";
+  String _rating = "";
   String _id = "98221";
   @override
   void initState() {
@@ -29,7 +29,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final data = json.decode(response.body);
     final data2 = json.decode(response2.body);
     setState(() {
-      _name = data['reviews'][0]['rating'].toString();
+      _rating = data['reviews'][0]['rating'].toString();
       for (var review in data2["reviews"]) {
         var rating = review["rating"];
         var name = review["personid"].toString(); // Replace with the name of the person who wrote the review
@@ -91,7 +91,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
 
               Text(
-                'Avg rating : $_name',
+                'Avg rating : $_rating',
                 style: Theme.of(context).textTheme.headline6,
               ),
               const SizedBox(height: 15),
