@@ -1,0 +1,323 @@
+from django.http import JsonResponse
+from maps_api.settings import GOOGLE_DIRECTIONS_API_KEY
+import requests
+import datetime
+from directions.models import Trip, Participant
+from datetime import datetime
+from rest_framework.decorators import APIView
+import json
+
+url = 'https://maps.googleapis.com/maps/api/directions/json'
+
+class TripView(APIView):
+    # '''
+    # post:
+    # Create a new trip.
+    # ---
+    #     parameters:
+    #     - name: id
+    #         required: true
+    #         type: Unique identifier
+    #     - name: origin
+    #         required: true
+    #         type: string
+    #     - name: destination
+    #         required: true
+    #         type: string
+    #     - name: owner_id
+    #         required: true
+    #         type: Unique identifier
+    #     - name: starting_date
+    #         required: true
+    #         type: datetimestamp
+    #     - name: available_sits
+    #         required: true
+    #         type: integer
+    # ---
+
+    # get:
+    # Get a list of all trips.
+    # ---
+    #     parameters:
+    #     - name: id
+    #         required: false
+    #         type: Unique identifier
+
+    # delete:
+    # Delete a trip.
+    # ---
+    #     parameters:
+    #     - name: id
+    #         required: true
+    #         type: Unique identifier
+
+    # '''
+
+    def post(self, request):
+        id = request.GET.get('id')
+        origin = request.GET.get('origin')
+        destination = request.GET.get('destination')
+        owner_id = request.GET.get('owner_id')
+        starting_date = datetime.fromtimestamp(int(request.GET.get('starting_date')))
+        available_sits = request.GET.get('available_sits')
+
+        params = {
+            'origin': origin,
+            'destination': destination,
+            'key': GOOGLE_DIRECTIONS_API_KEY
+        }
+
+        info = requests.get(url, params=params)
+
+        # owner = Owner.objects.filter(id=owner_id)
+        # if not owner.exists():
+        #     owner = Owner(id=owner_id, trip_id=id)
+        #     owner.save()
+        #     print('Owner created successfully.')
+
+        # owner = Owner.objects.get(id=owner_id)
+
+        trip = Trip(id=id, origin=origin, destination=destination, owner_id=owner_id, starting_date=starting_date, available_sits=available_sits, info=info.json())
+        trip.save()
+        return JsonResponse({'v': True, 'msg':'Trip created successfully.'}, status = 201)
+
+    def get(self, request):
+        query_set = Trip.objects.all()
+        id = request.GET.get('id')
+        if id is not None:
+            query_set = query_set.filter(id=id)
+
+        if query_set is None:
+            return JsonResponse({'v': False, 'error': 'Cannot get Trip.'}, status = 404)
+        else:
+            # query_set = jsonpickle.dumps(list(query_set))
+            query_set = list(query_set.values())
+            
+            return JsonResponse({'v': True, 'msg': query_set}, status = 200)
+
+    def delete(self, request):
+        id = request.GET.get('id')
+        if id is None:
+            return JsonResponse({'v': False, 'error': 'Id not provided.'}, status = 404)
+        trip = Trip.objects.get(id=id)
+        if trip is not None:
+            trip.delete()
+            
+            return JsonResponse({'v': True, 'msg': f'Trip {id} removed successfully'}, status = 200)
+        return JsonResponse({'v': False, 'error': f'No Trip with id {id}'}, status = 404)
+
+class OwnerView(APIView):
+
+    # '''
+    #     get:
+    #     Get a list of all owners.
+    #     ---
+    #         parameters:
+    #         - name: id
+    #             required: false
+    #             type: Unique identifier
+    # '''
+
+    def get(self, request):
+        query_set = Trip.objects.all()
+        owner_id = request.GET.get('id')
+        print(list(query_set.values('owner_id').distinct()))
+        res = {}
+        if owner_id is None:
+            for trip in query_set.values():
+                '''
+                    res = [
+                        {
+                            'owner_id': id,
+                            'trips': []
+                    ]
+                '''
+                if str(trip['owner_id']) not in list(res.keys()):
+                    res[str(trip['owner_id'])] = []
+                res[str(trip['owner_id'])].append({'id': trip['id'], 'origin': trip['origin'], 'destination': trip['destination'], 'starting_date': trip['starting_date'], 'available_sits': trip['available_sits']})
+            return JsonResponse({'v': True, 'msg': res}, status = 200)
+            
+        query_set = query_set.filter(owner_id=owner_id)
+
+        if query_set is None:
+            return JsonResponse({'v': False, 'error': 'Cannot get Owner.'}, status = 404)
+
+        for trip in query_set.values():
+            if str(trip['owner_id']) not in list(res.keys()):
+                res[str(trip['owner_id'])] = []
+            res[str(trip['owner_id'])].append({'id': trip['id'], 'origin': trip['origin'], 'destination': trip['destination'], 'starting_date': trip['starting_date'], 'available_sits': trip['available_sits']})
+        return JsonResponse({'v': True, 'msg': res}, status = 200)
+    
+    # def get(self, request):
+        # query_set = Owner.objects.all()
+        # id = request.GET.get('id')
+        # if id is not None:
+        #     query_set = query_set.filter(id=id)
+
+        # if query_set is None:
+        #     return JsonResponse({'v': False, 'error': 'Cannot get Owner.'}, status = 404)
+        # else:
+        #     query_set = list(query_set.values())
+        #     return JsonResponse({'v': True, 'msg': query_set}, status = 200)
+    
+class ParticipantView(APIView):
+
+    # '''
+    #     post:
+    #     Add a participant to a trip.
+    #     ---
+    #         parameters:
+    #         - name: id
+    #             required: true
+    #             type: Unique identifier
+    #         - name: trip_id
+    #             required: true
+    #             type: Unique identifier
+    #         - name: pickup_location
+    #             required: true
+    #             type: string
+    #     ---
+    #     get:
+    #     Get a list of all participants.
+    #     ---
+    #         parameters:
+    #         - name: id
+    #             required: false
+    #             type: Unique identifier
+    #     ---
+    #     delete:
+    #     Delete a participant from a trip.
+    #     ---
+    #         parameters:
+    #         - name: id
+    #             required: true
+    #             type: Unique identifier
+    #     ---
+    # '''
+
+    def post(self, request):
+        id = request.GET.get('id')
+        trip_id = request.GET.get('trip_id')
+        pickup_location = request.GET.get('pickup_location')
+
+        trip = Trip.objects.get(id=trip_id)
+        if trip is None:
+            return JsonResponse({'v': False, 'error': f'No Trip with id {trip_id}'}, status = 404)
+        
+        if trip.available_sits == 0:
+            return JsonResponse({'v': False, 'error': f'No available sits in Trip {trip_id}'}, status = 404)
+        
+        trip.available_sits -= 1
+        
+        
+        trip.save()
+
+        participant = Participant(id=id, trip_id=trip, pickup_location=pickup_location)
+        participant.save()
+
+        participant = Participant.objects.get(id=id)
+        participant.price = self.get_price(id)
+        participant.save()
+
+
+        pickup_locations = []
+        for p in Participant.objects.filter(trip_id=trip_id):
+            pickup_locations.append(p.pickup_location)
+
+        params = {
+            'origin': trip.origin,
+            'destination': trip.destination,
+            'waypoints': '|'.join(pickup_locations),
+            'key': GOOGLE_DIRECTIONS_API_KEY
+        }
+
+        info = requests.get(url, params=params)
+        trip.info = info.json()
+        trip.save()
+    
+        return JsonResponse({'v': True, 'msg': f'Participant {id} added to Trip {trip_id} successfully.'}, status = 201)
+    
+    def get(self, request):
+        query_set = Participant.objects.all()
+        id = request.GET.get('id')
+        if id is not None:
+            query_set = query_set.filter(id=id)
+
+        if query_set is None:
+            return JsonResponse({'v': False, 'error': 'Cannot get Participant.'}, status = 404)
+        else:
+            query_set = list(query_set.values())
+            return JsonResponse({'v': True, 'msg': query_set}, status = 200)
+    
+    def delete(self, request):
+        id = request.GET.get('id')
+        if id is None:
+            return JsonResponse({'v': False, 'error': 'Id not provided.'}, status = 404)
+        participant = Participant.objects.get(id=id)
+        if participant is not None:
+            trip = Trip.objects.get(id=participant.trip_id.id)
+            if trip is not None:
+                trip.available_sits += 1
+                trip.save()
+            participant.delete()
+
+            pickup_locations = []
+            for p in Participant.objects.filter(trip_id=trip.id):
+                pickup_locations.append(p.pickup_location)
+
+            params = {
+                'origin': trip.origin,
+                'destination': trip.destination,
+                'waypoints': '|'.join(pickup_locations),
+                'key': GOOGLE_DIRECTIONS_API_KEY
+            }
+
+            info = requests.get(url, params=params)
+            trip.info = info.json()
+            trip.save()
+
+            return JsonResponse({'v': True, 'msg': f'Participant {id} removed successfully'}, status = 200)
+        return JsonResponse({'v': False, 'error': f'No Participant with id {id}'}, status = 404)
+
+    # get the total distance between the participant pickup location and the trip origin plus the distance
+    # between the pickup location and the trip destination
+    def get_distance(self, participant_id):
+        participant = Participant.objects.get(id=participant_id)
+        trip = Trip.objects.get(id=participant.trip_id.id)
+
+        origin = trip.origin
+        destination = trip.destination
+
+        # calculate the distance between the origin and the pickup location
+        params = {
+            'origin': origin,
+            'destination': participant.pickup_location,
+            'key': GOOGLE_DIRECTIONS_API_KEY
+        }
+
+        request = requests.get(url, params=params)
+        response = request.json()
+        distance = 0
+        for route in response['routes']:
+            for leg in route['legs']:
+                distance += leg['distance']['value']
+        
+        # calculate the distance between the pickup location and the destination
+        params = {
+            'origin': participant.pickup_location,
+            'destination': destination,
+            'key': GOOGLE_DIRECTIONS_API_KEY
+        }
+
+        request = requests.get(url, params=params)
+        response = request.json()
+        for route in response['routes']:
+            for leg in route['legs']:
+                distance += leg['distance']['value']
+        
+        return distance
+
+    # get the price of the trip for the participant
+    def get_price(self, participant_id):
+        distance = self.get_distance(participant_id)
+        return distance * 0.0001
