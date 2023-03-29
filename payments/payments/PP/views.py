@@ -62,8 +62,8 @@ class CreateOrderViewRemote(APIView):
                     "brand_name": "RideMate",
                     "landing_page": "LOGIN",
                     "user_action": "PAY_NOW",
-                    "return_url": "https://example.com/returnUrl",  #change this later to the actual return url
-                    "cancel_url": "https://example.com/cancelUrl"
+                    "return_url": "http://10.0.2.2:8000/paypal/finish",  #change this later to the actual return url
+                    "cancel_url": "http://10.0.2.2:8000/paypal/finish"
                 }
                 }
             }
@@ -111,3 +111,8 @@ class CaptureOrderView(APIView):
             return HttpResponse(json.dumps({'status': 'success'}), status=201)
         else:
             return HttpResponse(json.dumps({'error': 'something went wrong with order capture'}), status=400)
+
+class FinishPaymentView(APIView):
+    def get(self, request):
+        # render the page with the payment status
+        return render(request, 'finish.html')
