@@ -1,31 +1,19 @@
-import json, sqlite3
+from flask import Flask, redirect, url_for, jsonify, request, make_response
 
-from flask import Flask, redirect, url_for, jsonify
+from werkzeug.security import generate_password_hash, check_password_hash
+from authlib.integrations.flask_client import OAuth
+from datetime import datetime, timedelta
+from functools import wraps
 
+import json, uuid, jwt
 #from flask_cors import CORS, cross_origin
 
-from flask_login import (
-    LoginManager,
-    current_user,
-    login_required,
-    login_user,
-    logout_user,
-)
-
-from authlib.integrations.flask_client import OAuth
-
-# Project imports
-from db import init_db_command
-from user import User
+from user import create_user, get_user, get_user_by_id, create_social_user, get_social_user, get_social_user_by_id
 
 app = Flask(__name__)
 
 # Enable CORS
 #CORS(app)
-
-# Setup flask-login
-login_manager = LoginManager()
-login_manager.init_app(app)
 
 # Authlib setup
 oauth = OAuth(app)
@@ -35,16 +23,14 @@ with open('client_secret_google.json') as f:
     google_credentials = json.load(f)['web']
 
 app.config['SECRET_KEY'] = "OH NO ANYWAYS"
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+
 app.config['GOOGLE_CLIENT_ID'] = google_credentials['client_id']
 app.config['GOOGLE_CLIENT_SECRET'] = google_credentials['client_secret']
 app.config['GITHUB_CLIENT_ID'] = "61e17ec5a329b5e84b6e"
 app.config['GITHUB_CLIENT_SECRET'] = "da7a7cf6beb5c94ba5378f588a2f2162d8eb8453"
-
-#DB setup
-try:
-    init_db_command()
-except sqlite3.OperationalError:
-    pass  # Assume it's already been created
 
 google = oauth.register(
     name = 'google',
@@ -72,17 +58,41 @@ github = oauth.register (
     client_kwargs = {'scope': 'user:email'},
 )
 
-@login_manager.user_loader
-def load_user(user_id):
-    return User.get(user_id)
+#############################################################################################################################################
 
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        if 'x-access-token' in request.headers:
+            token = request.headers['x-access-token']
+        # return 401 if token is not passed
+        if not token:
+            return jsonify({'message' : 'Token is missing !!'}), 401
+  
+        try:
+            data = jwt.decode(token, app.config['SECRET_KEY'])
+            print(data)
+            #get user with public_id or socialUser with provider_id
+            if data['provider_id']:
+                current_user = get_social_user_by_id(data['provider_id'])
+            else:
+                current_user = get_user_by_id(data['public_id'])
+        except:
+            return jsonify({ 'message' : 'Token is invalid !!' }), 401
+        # returns the current logged in users context to the routes
+        return  f(current_user, *args, **kwargs)
+  
+    return decorated
+
+#############################################################################################################################################
 
 # Default route
 @app.route('/')
 def home():
   return "root"
 
-@app.route('/google')
+@app.route('/google', methods=['GET'])
 #@cross_origin()
 def google():
     return redirect('/login/google')
@@ -106,22 +116,25 @@ def google_callback():
 
     print(resp)
 
-    user = User(
-        id_=str(resp['id']) + 'google',
-        provider_id=str(resp['id']),
-        provider='google'
-    )
+    user_data = get_social_user(resp['id'], 'google')
 
-    if not User.get(resp['id'], 'google'):
-        print("User not found, creating new user")
-        user = User.create(str(resp['id'])+'google', resp['id'], 'google')
-        user = User.get(resp['id'], 'google')
+    print(user_data)
 
-    login_user(user)
+    if not user_data:
+        if not create_social_user(resp['id'], 'google', resp['email'], resp['given_name'], resp['family_name']):
+            return jsonify({'message' : 'Something went wrong'}, 500)
+        return jsonify({'message' : 'Successfully registered'}, 201)
+    
+    else:
+        # generates the JWT Token
+        token = jwt.encode({
+            'provider_id': user_data[1],
+            'exp' : datetime.utcnow() + timedelta(minutes = 30)
+        }, app.config['SECRET_KEY'])
+  
+        return jsonify({'token' : token.decode('UTF-8')}, 202)
 
-    return jsonify({'message': 'Logged in successfully'}), 200
-
-@app.route('/github')
+@app.route('/github', methods=['GET'])
 #@cross_origin()
 def github():
     return redirect('/login/github')
@@ -143,30 +156,75 @@ def github_callback():
     token = github.authorize_access_token()
     resp = github.get('/user').json()
     
-    # print(f"\n{resp}\n")
+    email = github.get('/user/emails').json()
+    resp['email'] = email[0]['email']
+    
+    print(f"\n{resp}\n")
 
-    user = User(
-        id_=str(resp['id']) + 'github',
-        provider_id=str(resp['id']),
-        provider='github'
-    )
+    user_data = get_social_user(resp['id'], 'github')
 
-    if not User.get(resp['id'], 'github'):
-        print("User not found, creating new user")
-        user = User.create(str(resp['id'])+'github', resp['id'], 'github')
-        user = User.get(resp['id'], 'github')
+    print(user_data)
 
-    login_user(user)
+    if not user_data:
+        if not create_social_user(resp['id'], 'github', resp['email'], resp['name'].split(' ')[0], resp['name'].split(' ')[1]):
+            return jsonify({'message' : 'Something went wrong'}, 500)
+        return jsonify({'message' : 'Successfully registered'}, 201)
+    
+    else:
+        # generates the JWT Token
+        token = jwt.encode({
+            'provider_id': user_data[1],
+            'exp' : datetime.utcnow() + timedelta(minutes = 30)
+        }, app.config['SECRET_KEY'])
+  
+        return jsonify({'token' : token.decode('UTF-8')}, 202)
 
-    return "You are successfully logged in", 200
-
-@app.route('/logout')
+@app.route('/register', methods=['POST'])
 #@cross_origin()
-@login_required
-def logout():
-   logout_user()
-   return "You are successfully logged out", 200
+def register():
+    data = request.get_json()
 
+    hashed_password = generate_password_hash(data['password'], method='sha256')
+
+    user = get_user(data['email'])
+
+    public_id = str(uuid.uuid4())
+    if len(public_id) > 50:
+        public_id = public_id[:50]
+
+    if not user:
+        if not create_user(public_id, data['firstName'], data['lastName'], data['email'], hashed_password):
+            return jsonify({'message' : 'Something went wrong'}, 500)
+        return jsonify({'message' : 'Successfully registered'}, 201)
+    else:
+        return jsonify({'message' : 'User already exists'}, 202)
+    
+@app.route('/login', methods=['POST'])
+#@cross_origin()
+def login():
+    data = request.get_json()
+
+    user_data = get_user(data['email'])
+    if not user_data:
+        return jsonify({'message' : 'Couldn\'t verify'}, 401)
+    
+    print(user_data)
+    
+    if check_password_hash(user_data[5], data['password']):
+        token = jwt.encode({
+            'public_id': user_data[1],
+            'exp' : datetime.utcnow() + timedelta(minutes = 30)
+        }, app.config['SECRET_KEY'])
+
+        return jsonify({'token' : token.decode('UTF-8')}, 202)
+    else:
+        return jsonify({'message' : 'Couldn\'t verify'}, 401)
+
+@app.route('/logout', methods=['POST'])
+#@cross_origin()
+@token_required
+def logout():
+   return jsonify({'message' : 'Successfully logged out'}, 200)
 
 if __name__ == '__main__':
   app.run(debug=True)

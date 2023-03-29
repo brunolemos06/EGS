@@ -1,42 +1,105 @@
-from flask_login import UserMixin
+import sqlite3 as sql
 
-from db import get_db
-
-class User(UserMixin):
-    def __init__(self, id_, provider_id, provider):
-        self.id = id_
-        self.provider_id = provider_id
-        self.provider = provider
-
-    @staticmethod
-    def get(provider_id, provider):
-        db = get_db()
-        user = db.execute(
-            "SELECT * FROM user WHERE provider_id = ? AND provider = ?", (provider_id, provider)
-        ).fetchone()
-        if not user:
-            return None
-
-        user = User(
-            id_=user[0], provider_id=user[1], provider=user[2]
-        )
-        return user
-
-    @staticmethod
-    def create(id_, provider_id, provider):
-        db = get_db()
-        db.execute(
-            "INSERT INTO user (id, provider_id, provider) "
-            "VALUES (?, ?, ?)",
-            (id_, provider_id, provider),
-        )
-        db.commit()
-
-    def is_active(self):
-        return True
+def create_user(public_id, firstName, lastName, email, password):
+    try:
+        with sql.connect("users.db") as con:
+            cur = con.cursor()
+            cur.execute("INSERT INTO User (public_id, firstName, lastName, email, password) VALUES (?,?,?,?,?)", (public_id, firstName, lastName, email, password))
+            con.commit()
+            success = True
+    except:
+        con.rollback()
+        success = False
+    finally:
+        con.close()
+        return success
     
-    def is_anonymous(self):
-        return False
+def get_user(email):
+    try:
+        with sql.connect("users.db") as con:
+            cur = con.cursor()
+            cur.execute("SELECT * FROM User WHERE email = ?", (email,))
+            user = cur.fetchone()
+            if not user:
+                return None
+            return user
+    except:
+        con.rollback()
+        return None
+    finally:
+        con.close()
+
+def get_user_by_id(public_id):
+    try:
+        with sql.connect("users.db") as con:
+            cur = con.cursor()
+            cur.execute("SELECT * FROM User WHERE public_id = ?", (public_id,))
+            user = cur.fetchone()
+            if not user:
+                return None
+            return user
+    except:
+        con.rollback()
+        return None
+    finally:
+        con.close()
+
+def get_or_create_user(email, firstName, lastName):
+    user = get_user(email)
+    if not user:
+        create_user(email, firstName, lastName)
+        user = get_user(email)
+    return user
+
+
+
+def create_social_user(provider_id, provider, email, firstName, lastName):
+    try:
+        with sql.connect("users.db") as con:
+            cur = con.cursor()
+            cur.execute("INSERT INTO SocialUser (provider_id, provider, email, firstName, lastName) VALUES (?,?,?,?,?)", (provider_id, provider, email, firstName, lastName))
+            con.commit()
+            success = True
+    except:
+        con.rollback()
+        success = False
+    finally:
+        con.close()
+        return success
     
-    def get_id(self):
-        return self.id
+def get_social_user(provider_id, provider):
+    try:
+        with sql.connect("users.db") as con:
+            cur = con.cursor()
+            cur.execute("SELECT * FROM SocialUser WHERE provider_id = ? AND provider = ?", (provider_id, provider))
+            user = cur.fetchone()
+            if not user:
+                return None
+            return user
+    except:
+        con.rollback()
+        return None
+    finally:
+        con.close()
+
+def get_social_user_by_id(provider_id):
+    try:
+        with sql.connect("users.db") as con:
+            cur = con.cursor()
+            cur.execute("SELECT * FROM SocialUser WHERE provider_id = ?", (provider_id,))
+            user = cur.fetchone()
+            if not user:
+                return None
+            return user
+    except:
+        con.rollback()
+        return None
+    finally:
+        con.close()
+
+def get_or_create_social_user(provider_id, provider, email, firstName, lastName):
+    user = get_social_user(provider_id, provider)
+    if not user:
+        create_social_user(provider_id, provider, email, firstName, lastName)
+        user = get_social_user(provider_id, provider)
+    return user
