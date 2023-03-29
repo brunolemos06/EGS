@@ -24,9 +24,6 @@ with open('client_secret_google.json') as f:
 
 app.config['SECRET_KEY'] = "OH NO ANYWAYS"
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-
 app.config['GOOGLE_CLIENT_ID'] = google_credentials['client_id']
 app.config['GOOGLE_CLIENT_SECRET'] = google_credentials['client_secret']
 app.config['GITHUB_CLIENT_ID'] = "61e17ec5a329b5e84b6e"
@@ -73,14 +70,13 @@ def token_required(f):
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'])
             print(data)
-            #get user with public_id or socialUser with provider_id
-            if data['provider_id']:
+            if 'provider_id' in data:
                 current_user = get_social_user_by_id(data['provider_id'])
             else:
                 current_user = get_user_by_id(data['public_id'])
         except:
             return jsonify({ 'message' : 'Token is invalid !!' }), 401
-        # returns the current logged in users context to the routes
+        #returns the current logged in users context to the routes
         return  f(current_user, *args, **kwargs)
   
     return decorated
@@ -123,16 +119,17 @@ def google_callback():
     if not user_data:
         if not create_social_user(resp['id'], 'google', resp['email'], resp['given_name'], resp['family_name']):
             return jsonify({'message' : 'Something went wrong'}, 500)
-        return jsonify({'message' : 'Successfully registered'}, 201)
-    
-    else:
-        # generates the JWT Token
-        token = jwt.encode({
-            'provider_id': user_data[1],
-            'exp' : datetime.utcnow() + timedelta(minutes = 30)
-        }, app.config['SECRET_KEY'])
-  
-        return jsonify({'token' : token.decode('UTF-8')}, 202)
+
+    #get user 
+    user_data = get_social_user(resp['id'], 'google')
+
+    # generates the JWT Token
+    token = jwt.encode({
+        'provider_id': user_data[1],
+        'exp' : datetime.utcnow() + timedelta(minutes = 30)
+    }, app.config['SECRET_KEY'])
+
+    return jsonify({'token' : token.decode('UTF-8')}, 202)
 
 @app.route('/github', methods=['GET'])
 #@cross_origin()
@@ -168,16 +165,17 @@ def github_callback():
     if not user_data:
         if not create_social_user(resp['id'], 'github', resp['email'], resp['name'].split(' ')[0], resp['name'].split(' ')[1]):
             return jsonify({'message' : 'Something went wrong'}, 500)
-        return jsonify({'message' : 'Successfully registered'}, 201)
-    
-    else:
-        # generates the JWT Token
-        token = jwt.encode({
-            'provider_id': user_data[1],
-            'exp' : datetime.utcnow() + timedelta(minutes = 30)
-        }, app.config['SECRET_KEY'])
-  
-        return jsonify({'token' : token.decode('UTF-8')}, 202)
+        
+    #get user 
+    user_data = get_social_user(resp['id'], 'github')
+
+    # generates the JWT Token
+    token = jwt.encode({
+        'provider_id': user_data[1],
+        'exp' : datetime.utcnow() + timedelta(minutes = 30)
+    }, app.config['SECRET_KEY'])
+
+    return jsonify({'token' : token.decode('UTF-8')}, 202)
 
 @app.route('/register', methods=['POST'])
 #@cross_origin()
@@ -223,7 +221,7 @@ def login():
 @app.route('/logout', methods=['POST'])
 #@cross_origin()
 @token_required
-def logout():
+def logout(current_user):
    return jsonify({'message' : 'Successfully logged out'}, 200)
 
 if __name__ == '__main__':
