@@ -3,5 +3,6 @@ from . import views
 
 urlpatterns = [
     path('paypal/create/order', views.CreateOrderViewRemote.as_view(), name='ordercreate'),
-    path('paypal/capture/order', views.CaptureOrderView.as_view(), name='captureorder')
+    path('paypal/capture/order', views.CaptureOrderView.as_view(), name='captureorder'),
+    path('paypal/payment', views.FinishPaymentView.as_view(), name='finishpayment')
 ]
