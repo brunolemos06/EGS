@@ -14,49 +14,6 @@ from drf_yasg import openapi
 url = 'https://maps.googleapis.com/maps/api/directions/json'
 
 class TripView(APIView):
-    # '''
-    # post:
-    # Create a new trip.
-    # ---
-    #     parameters:
-    #     - name: id
-    #         required: true
-    #         type: Unique identifier
-    #     - name: origin
-    #         required: true
-    #         type: string
-    #     - name: destination
-    #         required: true
-    #         type: string
-    #     - name: owner_id
-    #         required: true
-    #         type: Unique identifier
-    #     - name: starting_date
-    #         required: true
-    #         type: datetimestamp
-    #     - name: available_sits
-    #         required: true
-    #         type: integer
-    # ---
-
-    # get:
-    # Get a list of all trips.
-    # ---
-    #     parameters:
-    #     - name: id
-    #         required: false
-    #         type: Unique identifier
-
-    # delete:
-    # Delete a trip.
-    # ---
-    #     parameters:
-    #     - name: id
-    #         required: true
-    #         type: Unique identifier
-
-    # '''
-
     @swagger_auto_schema(query_serializer=TripSerializer, responses={201: '{v: True, msg: Trip created successfully.}'})
     def post(self, request):
         id = request.GET.get('id')
@@ -73,14 +30,6 @@ class TripView(APIView):
         }
 
         info = requests.get(url, params=params)
-
-        # owner = Owner.objects.filter(id=owner_id)
-        # if not owner.exists():
-        #     owner = Owner(id=owner_id, trip_id=id)
-        #     owner.save()
-        #     print('Owner created successfully.')
-
-        # owner = Owner.objects.get(id=owner_id)
 
         trip = Trip(id=id, origin=origin, destination=destination, owner_id=owner_id, starting_date=starting_date, available_sits=available_sits, info=info.json())
         trip.save()
@@ -117,16 +66,6 @@ class TripView(APIView):
         return JsonResponse({'v': False, 'error': f'No Trip with id {id}'}, status = 404)
 
 class OwnerView(APIView):
-
-    # '''
-    #     get:
-    #     Get a list of all owners.
-    #     ---
-    #         parameters:
-    #         - name: id
-    #             required: false
-    #             type: Unique identifier
-    # '''
     id_param = openapi.Parameter('id', openapi.IN_QUERY, description="owner id", type=openapi.TYPE_STRING)
     owner_response = openapi.Response('response description', OwnerSerializer)
     @swagger_auto_schema(manual_parameters=[id_param], responses={200: owner_response, 404: '{v: False, error: Cannot get Owner.}'})
@@ -162,43 +101,10 @@ class OwnerView(APIView):
     
 
 class ParticipantView(APIView):
-
-    # '''
-    #     post:
-    #     Add a participant to a trip.
-    #     ---
-    #         parameters:
-    #         - name: id
-    #             required: true
-    #             type: Unique identifier
-    #         - name: trip_id
-    #             required: true
-    #             type: Unique identifier
-    #         - name: pickup_location
-    #             required: true
-    #             type: string
-    #     ---
-    #     get:
-    #     Get a list of all participants.
-    #     ---
-    #         parameters:
-    #         - name: id
-    #             required: false
-    #             type: Unique identifier
-    #     ---
-    #     delete:
-    #     Delete a participant from a trip.
-    #     ---
-    #         parameters:
-    #         - name: id
-    #             required: true
-    #             type: Unique identifier
-    #     ---
-    # '''
-    
     id_param = openapi.Parameter('id', openapi.IN_QUERY, description="participant id", type=openapi.TYPE_STRING)
     trip_id_param = openapi.Parameter('trip_id', openapi.IN_QUERY, description="trip id", type=openapi.TYPE_STRING)
     pickup_location_param = openapi.Parameter('pickup_location', openapi.IN_QUERY, description="pickup location", type=openapi.TYPE_STRING)
+    
     @swagger_auto_schema(manual_parameters=[id_param, trip_id_param, pickup_location_param], responses={200: '{v: True, msg: Participant created successfully}', 404: '{v: False, error: Cannot get Trip.}'})
     def post(self, request):
         id = request.GET.get('id')
@@ -245,7 +151,6 @@ class ParticipantView(APIView):
     # @swagger_auto_schema(query_serializer=ParticipantSerializer)
     id_param = openapi.Parameter('id', openapi.IN_QUERY, description="participant id", type=openapi.TYPE_STRING)
     participant_response = openapi.Response('response description', ParticipantSerializer)
-    # participant_response_404 = openapi.Response('response description', '{v: False, error: Cannot get Participant.}')
     @swagger_auto_schema(manual_parameters=[id_param], responses={200: participant_response, 404: '{v: False, error: Cannot get Participant.}'})
     def get(self, request):
         query_set = Participant.objects.all()
