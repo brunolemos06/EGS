@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from authlib.integrations.flask_client import OAuth
 from datetime import datetime, timedelta
 from functools import wraps
+from flasgger import Swagger
 
 import json, uuid, jwt
 #from flask_cors import CORS, cross_origin
@@ -17,6 +18,9 @@ app = Flask(__name__)
 
 # Authlib setup
 oauth = OAuth(app)
+
+# Swagger setup
+swagger = Swagger(app)
 
 #CONFIGS
 with open('client_secret_google.json') as f:
@@ -65,7 +69,7 @@ def token_required(f):
             token = request.headers['x-access-token']
         # return 401 if token is not passed
         if not token:
-            return jsonify({'message' : 'Token is missing !!'}), 401
+            return make_response(jsonify({'message' : 'Token is missing !!'}), 401)
   
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'])
@@ -75,7 +79,7 @@ def token_required(f):
             else:
                 current_user = get_user_by_id(data['public_id'])
         except:
-            return jsonify({ 'message' : 'Token is invalid !!' }), 401
+            return make_response(jsonify({ 'message' : 'Token is invalid !!' }), 401)
         #returns the current logged in users context to the routes
         return  f(current_user, *args, **kwargs)
   
@@ -91,6 +95,11 @@ def home():
 @app.route('/google', methods=['GET'])
 #@cross_origin()
 def google():
+    """This method redirects the user to the Google login page
+    ---
+    tags:
+      - Social Accounts
+    """
     return redirect('/login/google')
 
 # Google login route
@@ -106,6 +115,26 @@ def google_login():
 @app.route('/login/google/callback')
 #@cross_origin()
 def google_callback():
+    """This method is called after the user has logged in to Google, DO NOT CALL THIS METHOD DIRECTLY
+    ---
+    tags:
+      - Callbacks
+    responses:
+      202:
+        description: User logged in successfully
+        schema:
+          properties:
+            token:
+              type: string
+              description: JWT Token
+      500:
+        description: Something went wrong
+        schema:
+          properties:
+            message:
+              type: string
+              description: Error message
+                    """
     google = oauth.create_client('google')
     token = google.authorize_access_token()
     resp = google.get('userinfo').json()
@@ -118,7 +147,7 @@ def google_callback():
 
     if not user_data:
         if not create_social_user(resp['id'], 'google', resp['email'], resp['given_name'], resp['family_name']):
-            return jsonify({'message' : 'Something went wrong'}, 500)
+            return make_response(jsonify({'message' : 'Something went wrong'}), 500)
 
     #get user 
     user_data = get_social_user(resp['id'], 'google')
@@ -129,11 +158,16 @@ def google_callback():
         'exp' : datetime.utcnow() + timedelta(minutes = 30)
     }, app.config['SECRET_KEY'])
 
-    return jsonify({'token' : token.decode('UTF-8')}, 202)
+    return make_response(jsonify({'token' : token.decode('UTF-8')}), 202)
 
 @app.route('/github', methods=['GET'])
 #@cross_origin()
 def github():
+    """This method redirects the user to the Github login page
+    ---
+    tags:
+      - Social Accounts
+    """
     return redirect('/login/github')
 
 # Github login route
@@ -149,6 +183,26 @@ def github_login():
 @app.route('/login/github/callback')
 #@cross_origin()
 def github_callback():
+    """This method is called after the user has logged in to Github, DO NOT CALL THIS METHOD DIRECTLY
+    ---
+    tags:
+      - Callbacks
+    responses:
+      202:
+        description: User logged in successfully
+        schema:
+          properties:
+            token:
+              type: string
+              description: JWT Token
+      500:
+        description: Something went wrong
+        schema:
+          properties:
+            message:
+              type: string
+              description: Error message
+                    """
     github = oauth.create_client('github')
     token = github.authorize_access_token()
     resp = github.get('/user').json()
@@ -164,7 +218,7 @@ def github_callback():
 
     if not user_data:
         if not create_social_user(resp['id'], 'github', resp['email'], resp['name'].split(' ')[0], resp['name'].split(' ')[1]):
-            return jsonify({'message' : 'Something went wrong'}, 500)
+            return make_response(jsonify({'message' : 'Something went wrong'}), 500)
         
     #get user 
     user_data = get_social_user(resp['id'], 'github')
@@ -175,11 +229,60 @@ def github_callback():
         'exp' : datetime.utcnow() + timedelta(minutes = 30)
     }, app.config['SECRET_KEY'])
 
-    return jsonify({'token' : token.decode('UTF-8')}, 202)
+    return make_response(jsonify({'token' : token.decode('UTF-8')}), 202)
 
 @app.route('/register', methods=['POST'])
 #@cross_origin()
 def register():
+    """This method is called for user registration
+    ---
+    tags:
+      - Normal Account
+    parameters:
+      - in: body
+        name: body
+        schema:
+          required:
+            - firstName
+            - lastName
+            - email
+            - password
+          properties:
+            firstName:
+              type: string
+              description: First name of the user
+            lastName:
+              type: string
+              description: Last name of the user
+            email:
+              type: string
+              description: Email of the user
+            password:
+              type: string
+              description: Password of the user
+    responses:
+      201:
+        description: User registered successfully
+        schema:
+          properties:
+            message:
+              type: string
+              description: Success message
+      202:
+        description: User already exists
+        schema:
+          properties:
+            message:
+              type: string
+              description: Error message
+      500:
+        description: Something went wrong
+        schema:
+          properties:
+            message:
+              type: string
+              description: Error message
+                    """
     data = request.get_json()
 
     hashed_password = generate_password_hash(data['password'], method='sha256')
@@ -193,18 +296,52 @@ def register():
     if not user:
         if not create_user(public_id, data['firstName'], data['lastName'], data['email'], hashed_password):
             return jsonify({'message' : 'Something went wrong'}, 500)
-        return jsonify({'message' : 'Successfully registered'}, 201)
+        return make_response(jsonify({'message' : 'Successfully registered'}), 201)
     else:
-        return jsonify({'message' : 'User already exists'}, 202)
+        return make_response(jsonify({'message' : 'User already exists'}), 202)
     
 @app.route('/login', methods=['POST'])
 #@cross_origin()
 def login():
+    """This method is called for our user login (normal login, not social login)
+    ---
+    tags:
+      - Normal Account
+    parameters:
+      - in: body
+        name: body
+        schema:
+          required:
+            - email
+            - password
+          properties:
+            email:
+              type: string
+              description: Email of the user
+            password:
+              type: string
+              description: Password of the user
+    responses:
+        202:
+          description: User logged in successfully
+          schema:
+            properties:
+              token:
+                type: string
+                description: JWT Token
+        401:
+          description: Couldn't verify
+          schema:
+            properties:
+              message:
+                type: string
+                description: Error message
+    """
     data = request.get_json()
 
     user_data = get_user(data['email'])
     if not user_data:
-        return jsonify({'message' : 'Couldn\'t verify'}, 401)
+        return make_response(jsonify({'message' : 'Couldn\'t verify'}), 401)
     
     print(user_data)
     
@@ -214,15 +351,43 @@ def login():
             'exp' : datetime.utcnow() + timedelta(minutes = 30)
         }, app.config['SECRET_KEY'])
 
-        return jsonify({'token' : token.decode('UTF-8')}, 202)
+        return make_response(jsonify({'token' : token.decode('UTF-8')}), 202)
     else:
-        return jsonify({'message' : 'Couldn\'t verify'}, 401)
+        return make_response(jsonify({'message' : 'Couldn\'t verify'}), 401)
 
-@app.route('/logout', methods=['POST'])
+@app.route('/auth', methods=['POST'])
 #@cross_origin()
 @token_required
-def logout(current_user):
-   return jsonify({'message' : 'Successfully logged out'}, 200)
+def auth(current_user):
+   """This method is called to check if the user is authenticated
+    ---
+    parameters:
+      - in: header
+        name: Authorization
+        schema:
+          required:
+            - x-access-token
+          properties:
+            x-access-token:
+              type: string
+              description: JWT Token
+    responses:
+      200:
+        description: User is authenticated
+        schema:
+          properties:
+            message:
+              type: string
+              description: Success message
+      401:
+        description: Missing Authorization Token or Token Is Invalid
+        schema:
+          properties:
+            message:
+              type: string
+              description: Error message
+          """
+   return make_response(jsonify({'message' : 'Is authenticated'}), 200)
 
 if __name__ == '__main__':
   app.run(debug=True)
