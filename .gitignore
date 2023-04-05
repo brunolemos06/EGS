@@ -535,5 +535,7 @@ pip-selfcheck.json
 *.logs
 *.bin
 .vscode
+*.db
 
 # End of https://www.toptal.com/developers/gitignore/api/cmake,python,java,c++,visualstudiocode,virtualenv,executable,linux,django,flask
+
