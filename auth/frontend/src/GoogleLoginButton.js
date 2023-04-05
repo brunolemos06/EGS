@@ -4,7 +4,7 @@ import googleLogo from './images/GoogleLogo.png';
 
 function GoogleLoginButton() {
   function handleClick() {
-     window.location.href = 'http://127.0.0.1:5000/google';
+     window.location.href = 'http://10.0.2.2:5000/google';
   }
 
   return ( 
