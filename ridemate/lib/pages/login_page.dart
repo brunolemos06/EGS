@@ -92,13 +92,13 @@ class _LoginPageState extends State<LoginPage> {
                   setState(() {
                     _shouldShowLoginForm = false;
                   });
-                }else if(url.contains("callback")){
-                  //here
-                  // ..
                 }else {
                   setState(() {
                     _shouldShowLoginForm = true;
                   });
+                }
+                if(url.contains("callback")){
+                  debugPrint("ola eu sou o bruno", wrapWidth: 1024);
                 }
               },
             ),
