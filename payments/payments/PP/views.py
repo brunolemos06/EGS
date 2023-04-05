@@ -14,6 +14,8 @@ import base64
 import random
 import string
 
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 def PaypalToken(client_ID, client_Secret):
 
@@ -34,7 +36,8 @@ def PaypalToken(client_ID, client_Secret):
 
 #on request add reference_id, description, custom_id, soft_descriptor, amount: currency_code, value
 class CreateOrderViewRemote(APIView):
-
+    amount_param = openapi.Parameter('amount', openapi.IN_QUERY, description="amount of order in EUR", type=openapi.TYPE_STRING)
+    @swagger_auto_schema(manual_parameters=[amount_param], responses={200: '{order_id: integer, linkForPayment: Link for paypal payment page}', 400: '{error: error message}', 422: '{error: error message}'})
     def post(self, request):
         token = PaypalToken(CLIENT_ID, CLIENT_SECRET)
         headers = {
@@ -85,6 +88,8 @@ class CreateOrderViewRemote(APIView):
 
 class CaptureOrderView(APIView):
     #capture order aims to check whether the user has authorized payment.
+    id_param = openapi.Parameter('id', openapi.IN_QUERY, description="order id", type=openapi.TYPE_STRING)
+    @swagger_auto_schema(manual_parameters=[id_param], responses={201: '{status: success}', 400: '{error: error message}'})
     def post(self, request):
         #check if the id exists and payment is not payed
         if payments.objects.filter(order_id=request.data.get('id'), payed=False).exists():
@@ -111,8 +116,3 @@ class CaptureOrderView(APIView):
             return HttpResponse(json.dumps({'status': 'success'}), status=201)
         else:
             return HttpResponse(json.dumps({'error': 'something went wrong with order capture'}), status=400)
-
-class FinishPaymentView(APIView):
-    def get(self, request):
-        # render the page with the payment status
-        return render(request, 'finish.html')
