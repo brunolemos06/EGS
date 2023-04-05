@@ -50,21 +50,6 @@ class _HomePageState extends State<HomePage> {
 
         SizedBox(height: 10),
 // search bar ponto de partida
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.0),
-          child: TextField(
-            decoration: InputDecoration(
-              hintText: 'Select your starting point',
-              prefixIcon: Icon(Icons.gps_not_fixed),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.green),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey),
-              ),
-            ),
-          ),
-        ),
 
         SizedBox(height: 15),
 
@@ -73,7 +58,7 @@ class _HomePageState extends State<HomePage> {
           padding: EdgeInsets.symmetric(horizontal: 16.0),
           child: TextField(
             decoration: InputDecoration(
-              hintText: 'Select your destination',
+              hintText: 'Search your destination',
               prefixIcon: Icon(Icons.where_to_vote_rounded),
               focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(color: Colors.green),

@@ -23,8 +23,8 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> fetchData() async {
-    final response = await http.get(Uri.parse('http://10.0.2.2:5000/api/v1/reviews/rating?personid=$_id'));
-    final response2 = await http.get(Uri.parse('http://10.0.2.2:5000/api/v1/reviews/?personid=$_id'));
+    final response = await http.get(Uri.parse('http://10.0.2.2:5005/api/v1/reviews/rating?personid=$_id'));
+    final response2 = await http.get(Uri.parse('http://10.0.2.2:5005/api/v1/reviews/?personid=$_id'));
 
     final data = json.decode(response.body);
     final data2 = json.decode(response2.body);
