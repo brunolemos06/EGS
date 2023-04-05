@@ -44,15 +44,6 @@ def get_user_by_id(public_id):
     finally:
         con.close()
 
-def get_or_create_user(email, firstName, lastName):
-    user = get_user(email)
-    if not user:
-        create_user(email, firstName, lastName)
-        user = get_user(email)
-    return user
-
-
-
 def create_social_user(provider_id, provider, email, firstName, lastName):
     try:
         with sql.connect("users.db") as con:
@@ -96,10 +87,3 @@ def get_social_user_by_id(provider_id):
         return None
     finally:
         con.close()
-
-def get_or_create_social_user(provider_id, provider, email, firstName, lastName):
-    user = get_social_user(provider_id, provider)
-    if not user:
-        create_social_user(provider_id, provider, email, firstName, lastName)
-        user = get_social_user(provider_id, provider)
-    return user

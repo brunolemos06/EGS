@@ -74,14 +74,23 @@ def token_required(f):
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'])
             print(data)
+            user_firstname = None
+            user_lastname = None
+            user_email = None
             if 'provider_id' in data:
                 current_user = get_social_user_by_id(data['provider_id'])
+                user_firstname = current_user[4]
+                user_lastname = current_user[5]
+                user_email = current_user[3]
             else:
                 current_user = get_user_by_id(data['public_id'])
+                user_firstname = current_user[2]
+                user_lastname = current_user[3]
+                user_email = current_user[4]
         except:
             return make_response(jsonify({ 'message' : 'Token is invalid !!' }), 401)
         #returns the current logged in users context to the routes
-        return  f(current_user, *args, **kwargs)
+        return  f(current_user, user_firstname, user_lastname, user_email, *args, **kwargs)
   
     return decorated
 
@@ -358,12 +367,12 @@ def login():
 @app.route('/auth', methods=['POST'])
 #@cross_origin()
 @token_required
-def auth(current_user):
+def auth(current_user, user_firstname, user_lastname, user_email):
    """This method is called to check if the user is authenticated
     ---
     parameters:
       - in: header
-        name: Authorization
+        name: x-access-token
         schema:
           required:
             - x-access-token
@@ -388,6 +397,46 @@ def auth(current_user):
               description: Error message
           """
    return make_response(jsonify({'message' : 'Is authenticated'}), 200)
+
+@app.route('/info', methods=['POST'])
+#@cross_origin()
+@token_required
+def info(current_user, user_firstname, user_lastname, user_email):
+    """This method is called to get the user info
+    ---
+    parameters:
+      - in: header
+        name: x-access-token
+        schema:
+          required:
+            - x-access-token
+          properties:
+            x-access-token:
+              type: string
+              description: JWT Token
+    responses:
+      200:
+        description: User info
+        schema:
+          properties:
+            fname:
+              type: string
+              description: First name of the user
+            lname:
+              type: string
+              description: Last name of the user
+            email:
+              type: string
+              description: Email of the user
+      401:
+        description: Missing Authorization Token or Token Is Invalid
+        schema:
+          properties:
+            message:
+              type: string
+              description: Error message
+    """
+    return make_response(jsonify({'fname' : user_firstname, 'lname' : user_lastname, 'email' : user_email}), 200)
 
 if __name__ == '__main__':
   app.run(debug=True)
