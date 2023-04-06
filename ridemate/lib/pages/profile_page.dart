@@ -67,10 +67,11 @@ class _ProfilePageState extends State<ProfilePage> {
         debugPrint("Name -> $name", wrapWidth: 1024);
         debugPrint("Lname -> $lname", wrapWidth: 1024);
         debugPrint("Email -> $email", wrapWidth: 1024);
-        _fname = name;
-        _lname = lname;
-        _email = email;
-        
+        setState(() {
+          _fname = name;
+          _lname = lname;
+          _email = email;
+        });        
       } else {
         debugPrint('Error: ${response.statusCode}', wrapWidth: 1024);
       }

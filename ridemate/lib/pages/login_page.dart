@@ -37,7 +37,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: TextField(
                     controller: _usernameController,
                     decoration: InputDecoration(
-                      labelText: 'Username',
+                      labelText: 'Email',
                     ),
                   ),
                 ),
@@ -60,7 +60,70 @@ class _LoginPageState extends State<LoginPage> {
                       width: 150,
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () async {
+                          // get username and password
+                          final username = _usernameController.text;
+                          final password = _passwordController.text;
+                          // required username and password
+                          if (username.isEmpty || password.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  "Username and password are required!",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                            return;
+                          }
+
+                          // send request to server
+                          final String url = 'http://10.0.2.2:5000/login';
+                          final response = await http.post(
+                            Uri.parse(url),
+                            headers: {
+                              'Content-Type': 'application/json',
+                            },
+                            body: jsonEncode({
+                              'email': username,
+                              'password': password,
+                            }),
+                          );
+                          // check response
+                          if (response.statusCode == 202){
+                            // save token
+                            final token = jsonDecode(response.body)['token'];
+                            debugPrint(token, wrapWidth: 1024);
+                            // save token to secure storage
+                            _storage.write(key: 'token', value: token);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => MainPage()),
+                            );
+                            // show success message
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  "Logged in successfully!",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                          }else{
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  "Email or password is incorrect!",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                            return;
+                          }
+                        },
                         child: Text('Login'),
                       ),
                     ),
@@ -97,6 +160,9 @@ class _LoginPageState extends State<LoginPage> {
                   final statusPage = await _webViewController.currentUrl();
                   if (statusPage != null && statusPage.contains("error")) {
                     // exit webview
+                    // clear all cookies and cache
+                    WebView.platform.clearCookies();
+
                     Navigator.of(context).pop();
                     
                     // show not sucess message
@@ -120,6 +186,8 @@ class _LoginPageState extends State<LoginPage> {
                     debugPrint("Token -> " + token, wrapWidth: 1024);
                     // save token to secure storage
                     await _storage.write(key: 'token', value: token);
+                    WebView.platform.clearCookies();
+                    // close webview
                     Navigator.of(context).pop();
                     Navigator.pushAndRemoveUntil(
                       context,
@@ -151,15 +219,18 @@ class _LoginPageState extends State<LoginPage> {
                       final String name = responseJson['fname'];
                       final String lname = responseJson['lname'];
                       final String email = responseJson['email'];
+                      final String avatar = responseJson['avatar_url'];
                       debugPrint("Name -> $name", wrapWidth: 1024);
                       debugPrint("Lname -> $lname", wrapWidth: 1024);
                       debugPrint("Email -> $email", wrapWidth: 1024);
-                      
+                 
                     } else {
                       debugPrint('Error: ${response.statusCode}', wrapWidth: 1024);
                     }
+                    _webViewController.clearCache();
                   }
                 }
+                // clear cache
 
 
                 if (url.contains("google") || url.contains("github")) {
@@ -187,7 +258,7 @@ class _LoginPageState extends State<LoginPage> {
                 final storage = FlutterSecureStorage();
                 final String tokenKey = 'token';
                 final String? token = await storage.read(key: tokenKey);
-
+                 WebView.platform.clearCookies();
                 Navigator.of(context).pop();
                 if (token == null) {
                   Navigator.pushAndRemoveUntil(
