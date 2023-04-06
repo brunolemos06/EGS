@@ -22,6 +22,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String _fname = "";
   String _lname = "";
   String _email = "";
+  String _avatar = "";
   @override
   void initState() {
     super.initState();
@@ -61,16 +62,34 @@ class _ProfilePageState extends State<ProfilePage> {
 
       if (response.statusCode == 200) {
         final responseJson = json.decode(response.body);
+        debugPrint('Response: ${response.body}', wrapWidth: 1024);
         final String name = responseJson['fname'];
         final String lname = responseJson['lname'];
         final String email = responseJson['email'];
-        debugPrint("Name -> $name", wrapWidth: 1024);
-        debugPrint("Lname -> $lname", wrapWidth: 1024);
-        debugPrint("Email -> $email", wrapWidth: 1024);
+
+        
+
+
+
         setState(() {
           _fname = name;
           _lname = lname;
           _email = email;
+          try{
+            final int size = responseJson['avatar'].length;
+            _avatar = responseJson['avatar'];
+          }
+          catch(e){
+            // do nothing
+            debugPrint('Error: ${e}', wrapWidth: 1024);
+            _avatar = "http://www.gravatar.com/avatar/?d=mp";
+          }
+
+          debugPrint("Name -> $_fname", wrapWidth: 1024);
+          debugPrint("LName -> $_lname", wrapWidth: 1024);
+          debugPrint("Email -> $_email", wrapWidth: 1024);
+          debugPrint("Avatar -> $_avatar", wrapWidth: 1024);
+          
         });        
       } else {
         debugPrint('Error: ${response.statusCode}', wrapWidth: 1024);
@@ -144,8 +163,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 width: 120, height: 120,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(100),
-                  child: const Image(
-                    image: AssetImage("assets/images/avatar.jpg"),
+                  child: Image(
+                    image: NetworkImage(_avatar),
                     fit: BoxFit.cover,
                   ),
                 ),

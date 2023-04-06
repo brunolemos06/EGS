@@ -219,10 +219,12 @@ class _LoginPageState extends State<LoginPage> {
                       final String name = responseJson['fname'];
                       final String lname = responseJson['lname'];
                       final String email = responseJson['email'];
-                      final String avatar = responseJson['avatar_url'];
+                      final String avatar = responseJson['avatar'];
+
                       debugPrint("Name -> $name", wrapWidth: 1024);
                       debugPrint("Lname -> $lname", wrapWidth: 1024);
                       debugPrint("Email -> $email", wrapWidth: 1024);
+                      debugPrint("Avatar -> $avatar", wrapWidth: 1024);
                  
                     } else {
                       debugPrint('Error: ${response.statusCode}', wrapWidth: 1024);

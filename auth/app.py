@@ -227,7 +227,7 @@ def github_callback():
     print(user_data)
 
     if not user_data:
-        if not create_social_user(resp['id'], 'github', resp['email'], resp['name'].split(' ')[0], resp['name'].split(' ')[1]):
+        if not create_social_user(resp['id'], 'github', resp['email'], resp['name'].split(' ')[0], resp['name'].split(' ')[1], resp['avatar_url']):
             return make_response(jsonify({'message' : 'Something went wrong'}), 500)
         
     #get user 
