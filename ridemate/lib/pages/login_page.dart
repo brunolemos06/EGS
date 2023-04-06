@@ -18,6 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _shouldShowLoginForm = true;
+  bool _isLoading = false; // add this line
   final _storage = FlutterSecureStorage();
 
   late WebViewController _webViewController;
@@ -97,11 +98,13 @@ class _LoginPageState extends State<LoginPage> {
                             debugPrint(token, wrapWidth: 1024);
                             // save token to secure storage
                             _storage.write(key: 'token', value: token);
-                            Navigator.push(
+                            Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(builder: (context) => MainPage()),
+                              (route) => false,
                             );
                             // show success message
+                           
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
@@ -147,6 +150,7 @@ class _LoginPageState extends State<LoginPage> {
               ],
             ),
           ),
+          if (_isLoading) CircularProgressIndicator(), // add this line
           Expanded(
             child: WebView(
               initialUrl: _url,
@@ -181,11 +185,33 @@ class _LoginPageState extends State<LoginPage> {
                     final jsonData = jsonDecode(jsonString);
                     
                     final res = jsonData.toString();
+                    debugPrint(res, wrapWidth: 1024);
                     final out = res.split(" ");
                     final token = out[3].replaceAll('"', '').replaceAll('}', '').replaceAll('\n', '');
                     debugPrint("Token -> " + token, wrapWidth: 1024);
                     // save token to secure storage
                     await _storage.write(key: 'token', value: token);
+                    final String url2 = 'http://10.0.2.2:5000/auth';
+                    final Map<String, String> headers2 = {
+                      'Content-Type': 'application/json',
+                      'Accept': 'application/json',
+                      'x-access-token': token 
+                    };
+                    final response3 = await http.post(Uri.parse(url2), headers: headers2);
+                    if (response3.statusCode != 200) {
+                        debugPrint('Token not valid', wrapWidth: 1024);
+                        // go to login page
+                        ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            "Login Failed! Please try again",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      return ;
+                    }
                     WebView.platform.clearCookies();
                     // close webview
                     Navigator.of(context).pop();
@@ -194,6 +220,8 @@ class _LoginPageState extends State<LoginPage> {
                       MaterialPageRoute(builder: (context) => MainPage()),
                       (route) => false,
                     );
+                    //  loading waiting 2 seconds with animation
+                    // here
 
                     // show success message
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -260,15 +288,13 @@ class _LoginPageState extends State<LoginPage> {
                 final storage = FlutterSecureStorage();
                 final String tokenKey = 'token';
                 final String? token = await storage.read(key: tokenKey);
-                 WebView.platform.clearCookies();
+                WebView.platform.clearCookies();
                 Navigator.of(context).pop();
-                if (token == null) {
-                  Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => MainPage()),
-                  (route) => false,
-                );
-                }
+                Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => MainPage()),
+                (route) => false,
+              );
               },
             ),
           ],
