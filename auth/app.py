@@ -77,11 +77,13 @@ def token_required(f):
             user_firstname = None
             user_lastname = None
             user_email = None
+            user_avatar = None
             if 'provider_id' in data:
                 current_user = get_social_user_by_id(data['provider_id'])
                 user_firstname = current_user[4]
                 user_lastname = current_user[5]
                 user_email = current_user[3]
+                user_avatar = current_user[6]
             else:
                 current_user = get_user_by_id(data['public_id'])
                 user_firstname = current_user[2]
@@ -90,7 +92,7 @@ def token_required(f):
         except:
             return make_response(jsonify({ 'message' : 'Token is invalid !!' }), 401)
         #returns the current logged in users context to the routes
-        return  f(current_user, user_firstname, user_lastname, user_email, *args, **kwargs)
+        return  f(current_user, user_firstname, user_lastname, user_email, user_avatar, *args, **kwargs)
   
     return decorated
 
@@ -118,7 +120,6 @@ def google_login():
     google = oauth.create_client('google')
     redirect_uri = url_for('google_callback', _external=True)
     return google.authorize_redirect(redirect_uri)
-
 
 # Google callback route
 @app.route('/login/google/callback')
@@ -155,7 +156,7 @@ def google_callback():
     print(user_data)
 
     if not user_data:
-        if not create_social_user(resp['id'], 'google', resp['email'], resp['given_name'], resp['family_name']):
+        if not create_social_user(resp['id'], 'google', resp['email'], resp['given_name'], resp['family_name'], resp['picture']):
             return make_response(jsonify({'message' : 'Something went wrong'}), 500)
 
     #get user 
@@ -367,7 +368,7 @@ def login():
 @app.route('/auth', methods=['POST'])
 #@cross_origin()
 @token_required
-def auth(current_user, user_firstname, user_lastname, user_email):
+def auth(current_user, user_firstname, user_lastname, user_email, user_avatar):
    """This method is called to check if the user is authenticated
     ---
     parameters:
@@ -401,7 +402,7 @@ def auth(current_user, user_firstname, user_lastname, user_email):
 @app.route('/info', methods=['POST'])
 #@cross_origin()
 @token_required
-def info(current_user, user_firstname, user_lastname, user_email):
+def info(current_user, user_firstname, user_lastname, user_email, user_avatar):
     """This method is called to get the user info
     ---
     parameters:
@@ -428,6 +429,9 @@ def info(current_user, user_firstname, user_lastname, user_email):
             email:
               type: string
               description: Email of the user
+            avatar:
+              type: string
+              description: URL of the user avatar
       401:
         description: Missing Authorization Token or Token Is Invalid
         schema:
@@ -436,7 +440,7 @@ def info(current_user, user_firstname, user_lastname, user_email):
               type: string
               description: Error message
     """
-    return make_response(jsonify({'fname' : user_firstname, 'lname' : user_lastname, 'email' : user_email}), 200)
+    return make_response(jsonify({'fname' : user_firstname, 'lname' : user_lastname, 'email' : user_email, 'avatar' : user_avatar}), 200)
 
 if __name__ == '__main__':
   app.run(debug=True)

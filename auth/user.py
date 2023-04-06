@@ -44,11 +44,12 @@ def get_user_by_id(public_id):
     finally:
         con.close()
 
-def create_social_user(provider_id, provider, email, firstName, lastName):
+
+def create_social_user(provider_id, provider, email, firstName, lastName, avatar):
     try:
         with sql.connect("users.db") as con:
             cur = con.cursor()
-            cur.execute("INSERT INTO SocialUser (provider_id, provider, email, firstName, lastName) VALUES (?,?,?,?,?)", (provider_id, provider, email, firstName, lastName))
+            cur.execute("INSERT INTO SocialUser (provider_id, provider, email, firstName, lastName, avatar) VALUES (?,?,?,?,?,?)", (provider_id, provider, email, firstName, lastName, avatar))
             con.commit()
             success = True
     except:
