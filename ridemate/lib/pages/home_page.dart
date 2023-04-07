@@ -14,7 +14,9 @@ class HomePage extends StatefulWidget {
 
 
 class _HomePageState extends State<HomePage> {
+  String? _destination;
 
+  final List<String> _destinations = [    'All','Lisboa',    'Porto',    'Madrid',    'Coimbra',    'Braga',    'Faro',  ];
 
   @override
   Widget build(BuildContext context) {
@@ -49,26 +51,39 @@ class _HomePageState extends State<HomePage> {
         ),
 
         SizedBox(height: 10),
-// search bar ponto de partida
+      // search bar ponto de partida
 
         SizedBox(height: 15),
 
         // search bar destino
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.0),
-          child: TextField(
-            decoration: InputDecoration(
-              hintText: 'Search your destination',
-              prefixIcon: Icon(Icons.where_to_vote_rounded),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.green),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey),
-              ),
+        Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: DropdownButtonFormField<String>(
+          value: _destination,
+          decoration: InputDecoration(
+            labelText: 'Ponto de Chegada',
+            labelStyle: TextStyle(color: Colors.white),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
             ),
           ),
+          style: TextStyle(color: Colors.white),
+          onChanged: (newValue) {
+            setState(() {
+              _destination = newValue;
+            });
+          },
+          items: _destinations
+              .map(
+                (destination) => DropdownMenuItem(
+                  value: destination,
+                  child: Text(destination),
+                ),
+              )
+              .toList(),
         ),
+      ),
+
 
         SizedBox(height: 5),
 
@@ -78,13 +93,14 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => catalogo_page()),
+                MaterialPageRoute(
+                  builder: (context) => catalogo_page(
+                    pontodechegada: _destination,
+                  ),
+                ),
               );
             },
-            child: Icon(
-              Icons.search,
-              color: Colors.white,
-            ),
+            child: Text('Search'),
           ),
         ),
 
