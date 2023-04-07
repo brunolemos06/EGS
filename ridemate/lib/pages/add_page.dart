@@ -1,5 +1,7 @@
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:intl/intl.dart';
 
 
 class AddPage extends StatefulWidget {
@@ -14,6 +16,10 @@ class _AddPageState extends State<AddPage> {
   final _destination = TextEditingController();
   final _brandcar = TextEditingController();
   final _npassager = TextEditingController();
+  final _startdate = TextEditingController();
+  final _aditionalinfo = TextEditingController();
+  int _selectedPassengerCount = 1;
+  List<int> get passengerCountOptions => [1, 2, 3, 4, 5, 6,7,8,9,10];
 
   bool _arcondicionado = false;
   bool _wifi = false;
@@ -21,6 +27,8 @@ class _AddPageState extends State<AddPage> {
   bool _eat = false;
 
   final _formKey = GlobalKey<FormState>();
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -72,57 +80,57 @@ class _AddPageState extends State<AddPage> {
                 return null;
               },
             ),
+            DropdownButtonFormField<int>(
+              value: _selectedPassengerCount,
+              items: passengerCountOptions
+                  .map<DropdownMenuItem<int>>((int value) {
+                    return DropdownMenuItem<int>(
+                      value: value,
+                      child: Text(value.toString()),
+                    );
+                  }).toList(),
+              onChanged: (int? newValue) {
+                if (newValue != null) {
+                  setState(() {
+                    _selectedPassengerCount = newValue;
+                  });
+                }
+              },
+            ),
+            // startimg date
+            // dateinput
+            DateTimeField(
+              decoration: const InputDecoration(
+                hintText: 'Start date',
+              ),
+              format: DateFormat("yyyy-MM-dd HH:mm"),
+              onShowPicker: (context, currentValue) async {
+                final date = await showDatePicker(
+                    context: context,
+                    firstDate: DateTime(1900),
+                    initialDate: currentValue ?? DateTime.now(),
+                    lastDate: DateTime(2100));
+                if (date != null) {
+                  final time = await showTimePicker(
+                    context: context,
+                    initialTime:
+                        TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
+                  );
+                  return DateTimeField.combine(date, time);
+                } else {
+                  return currentValue;
+                }
+              },
+            ),
             TextFormField(
               decoration: const InputDecoration(
-                hintText: 'Car brand',
+                hintText: 'Aditional information',
               ),
               controller: _brandcar,
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Please enter valid brand';
-                }
-                return null;
-              },
+              // can be empty
             ),
-            TextFormField(
-              decoration: const InputDecoration(
-                hintText: 'Number of passagers',
-              ),
-              controller: _npassager,
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Please enter valid number';
-                }
-                return null;
-              },
-            ),
-            CheckboxListTile(
-              title: const Text('Ar condicionado'),
-              secondary: const Icon(Icons.air),
-              autofocus: false,
-              activeColor: Colors.green,
-              checkColor: Colors.white,
-              selected: _arcondicionado,
-              value: _arcondicionado,
-              onChanged: (arcondicionado) {
-                setState(() {
-                  _arcondicionado = arcondicionado!;
-                });
-              },
-            ),
-            CheckboxListTile(
-              title: const Text('Free Wifi'),
-              secondary: const Icon(Icons.wifi),
-              autofocus: false,
-              activeColor: Colors.green,
-              checkColor: Colors.white,
-              selected: _wifi,
-              value: _wifi,
-              onChanged: (wifi) {
-                setState(() {
-                  _wifi = wifi!;
-                });
-              },
+            SizedBox(
+                height: 30
             ),
             CheckboxListTile(
               title: const Text('Allow animals'),
@@ -152,7 +160,9 @@ class _AddPageState extends State<AddPage> {
                 });
               },
             ),
-
+            SizedBox(
+                height: 10
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),
               child: ElevatedButton(
