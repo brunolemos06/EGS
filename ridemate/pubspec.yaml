@@ -47,6 +47,7 @@ dependencies:
   flutter_map: ^0.14.0
   latlong: any
   device_info: ^2.0.2
+  flutter_polyline_points: ^1.0.0
 
 
 dev_dependencies:
