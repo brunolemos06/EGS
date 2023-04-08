@@ -29,7 +29,7 @@ GOOGLE_DIRECTIONS_API_KEY = 'AIzaSyC-3rzrF8RVVZn1zgbijNvcqIiNbnKXfVo'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition

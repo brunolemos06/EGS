@@ -48,8 +48,6 @@ dependencies:
   latlong: any
   device_info: ^2.0.2
   datetime_picker_formfield: ^2.0.0
-  # flutter_polyline_points: ^0.2.3
-
 
 dev_dependencies:
   flutter_test:

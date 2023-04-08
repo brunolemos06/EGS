@@ -10,19 +10,24 @@ import json
 from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from django.utils.dateparse import parse_datetime
+import uuid
 
 url = 'https://maps.googleapis.com/maps/api/directions/json'
 
 class TripView(APIView):
     @swagger_auto_schema(query_serializer=TripSerializer, responses={201: '{v: True, msg: Trip created successfully.}'})
     def post(self, request):
-        id = request.GET.get('id')
-        origin = request.GET.get('origin')
-        destination = request.GET.get('destination')
-        owner_id = request.GET.get('owner_id')
-        starting_date = datetime.fromtimestamp(int(request.GET.get('starting_date')))
-        available_sits = request.GET.get('available_sits')
-
+        # id = request.data.get('id')
+        id = uuid.uuid4()
+        origin = request.data.get('origin')
+        destination = request.data.get('destination')
+        owner_id = uuid.UUID(request.data.get('owner_id'))
+        # starting_date = datetime.fromtimestamp(int(request.data.get('starting_date')))
+        starting_date = parse_datetime(request.data.get('starting_date'))
+        available_sits = int(request.data.get('available_sits'))
+        print(starting_date)
+        print(request.data.get('starting_date'))
         params = {
             'origin': origin,
             'destination': destination,
