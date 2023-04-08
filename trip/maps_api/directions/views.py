@@ -26,8 +26,6 @@ class TripView(APIView):
         # starting_date = datetime.fromtimestamp(int(request.data.get('starting_date')))
         starting_date = parse_datetime(request.data.get('starting_date'))
         available_sits = int(request.data.get('available_sits'))
-        print(starting_date)
-        print(request.data.get('starting_date'))
         params = {
             'origin': origin,
             'destination': destination,
