@@ -78,21 +78,24 @@ def token_required(f):
             user_lastname = None
             user_email = None
             user_avatar = None
+            user_id = None
             if 'provider_id' in data:
                 current_user = get_social_user_by_id(data['provider_id'])
                 user_firstname = current_user[4]
                 user_lastname = current_user[5]
                 user_email = current_user[3]
                 user_avatar = current_user[6]
+                user_id = current_user[1]
             else:
                 current_user = get_user_by_id(data['public_id'])
                 user_firstname = current_user[2]
                 user_lastname = current_user[3]
                 user_email = current_user[4]
+                user_id = current_user[1]
         except:
             return make_response(jsonify({ 'message' : 'Token is invalid !!' }), 401)
         #returns the current logged in users context to the routes
-        return  f(user_firstname, user_lastname, user_email, user_avatar, *args, **kwargs)
+        return  f(user_firstname, user_lastname, user_email, user_avatar, user_id, *args, **kwargs)
   
     return decorated
 
@@ -137,9 +140,6 @@ def google_callback():
             token:
               type: string
               description: JWT Token
-            id:
-              type: string
-              description: User ID on the provider
       500:
         description: Something went wrong
         schema:
@@ -171,7 +171,7 @@ def google_callback():
         'exp' : datetime.utcnow() + timedelta(minutes = 30)
     }, app.config['SECRET_KEY'])
 
-    return make_response(jsonify({'token' : token.decode('UTF-8'), 'id' : user_data[1]}), 202)
+    return make_response(jsonify({'token' : token.decode('UTF-8')}), 202)
 
 @app.route('/github', methods=['GET'])
 #@cross_origin()
@@ -208,9 +208,6 @@ def github_callback():
             token:
               type: string
               description: JWT Token
-            id:
-              type: string
-              description: ID of the user on the provider
       500:
         description: Something went wrong
         schema:
@@ -245,7 +242,7 @@ def github_callback():
         'exp' : datetime.utcnow() + timedelta(minutes = 30)
     }, app.config['SECRET_KEY'])
 
-    return make_response(jsonify({'token' : token.decode('UTF-8'), 'id' : user_data[1]}), 202)
+    return make_response(jsonify({'token' : token.decode('UTF-8')}), 202)
 
 @app.route('/register', methods=['POST'])
 #@cross_origin()
@@ -345,9 +342,6 @@ def login():
               token:
                 type: string
                 description: JWT Token
-              id:
-                type: string
-                description: Public ID of the user
         401:
           description: Couldn't verify
           schema:
@@ -370,14 +364,14 @@ def login():
             'exp' : datetime.utcnow() + timedelta(minutes = 30)
         }, app.config['SECRET_KEY'])
 
-        return make_response(jsonify({'token' : token.decode('UTF-8'), 'id' : user_data[1]}), 202)
+        return make_response(jsonify({'token' : token.decode('UTF-8')}), 202)
     else:
         return make_response(jsonify({'message' : 'Couldn\'t verify'}), 401)
 
 @app.route('/auth', methods=['POST'])
 #@cross_origin()
 @token_required
-def auth(user_firstname, user_lastname, user_email, user_avatar):
+def auth(user_firstname, user_lastname, user_email, user_avatar, user_id):
    """This method is called to check if the user is authenticated
     ---
     parameters:
@@ -411,7 +405,7 @@ def auth(user_firstname, user_lastname, user_email, user_avatar):
 @app.route('/info', methods=['POST'])
 #@cross_origin()
 @token_required
-def info(user_firstname, user_lastname, user_email, user_avatar):
+def info(user_firstname, user_lastname, user_email, user_avatar, user_id):
     """This method is called to get the user info
     ---
     parameters:
@@ -441,6 +435,9 @@ def info(user_firstname, user_lastname, user_email, user_avatar):
             avatar:
               type: string
               description: URL of the user avatar
+            id:
+              type: string
+              description: ID of the user
       401:
         description: Missing Authorization Token or Token Is Invalid
         schema:
@@ -449,7 +446,7 @@ def info(user_firstname, user_lastname, user_email, user_avatar):
               type: string
               description: Error message
     """
-    return make_response(jsonify({'fname' : user_firstname, 'lname' : user_lastname, 'email' : user_email, 'avatar' : user_avatar}), 200)
+    return make_response(jsonify({'fname' : user_firstname, 'lname' : user_lastname, 'email' : user_email, 'avatar' : user_avatar, 'id' : user_id}), 200)
 
 if __name__ == '__main__':
   app.run(debug=True)
