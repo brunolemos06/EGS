@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:date_field/date_field.dart';
 
 class AddPage extends StatefulWidget {
   const AddPage({Key? key}) : super(key: key);
@@ -19,7 +20,7 @@ class _AddPageState extends State<AddPage> {
   final _destination = TextEditingController();
   final _brandcar = TextEditingController();
   final _npassager = TextEditingController();
-  late var _startdate = TextEditingController();
+  late var _startdate;
   final _aditionalinfo = TextEditingController();
   int _selectedPassengerCount = 1;
   List<int> get passengerCountOptions => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -94,16 +95,57 @@ class _AddPageState extends State<AddPage> {
                   }
                 },
               ),
+
               // startimg date
               // dateinput
+              // DateTimeField(
+              //   decoration: const InputDecoration(
+              //     hintText: 'Start date',
+              //   ),
+              //
+              //   format: DateFormat("yyyy-MM-dd HH:mm"),
+              //   onShowPicker: (context, currentValue) async {
+              //     final date = await showDatePicker(
+              //       context: context,
+              //       firstDate: DateTime(1900),
+              //       initialDate: currentValue ?? DateTime.now(),
+              //       lastDate: DateTime(2100));
+              //     if (date != null) {
+              //       final time = await showTimePicker(
+              //         context: context,
+              //         initialTime:
+              //         TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
+              //       );
+              //       debugPrint("helloHELLO1");
+              //       _startdate = DateTimeField.combine(date, time);
+              //       return DateTimeField.combine(date, time);
+              //     } else {
+              //       debugPrint("HEllohello2");
+              //       _startdate = currentValue;
+              //       return currentValue;
+              //     }
+              //   },
+              //
+              // ),
 
-              TextFormField(
+              DateTimeFormField(
                 decoration: const InputDecoration(
-                  hintText: 'Starting Date',
+                  hintStyle: TextStyle(color: Colors.black45),
+                  errorStyle: TextStyle(color: Colors.redAccent),
+                  border: OutlineInputBorder(),
+                  suffixIcon: Icon(Icons.event_note),
+                  labelText: 'Only time',
                 ),
-                controller: _startdate,
-                // can be empty
+                mode: DateTimeFieldPickerMode.dateAndTime,
+                autovalidateMode: AutovalidateMode.always,
+                validator: (e) =>
+                    (e?.day ?? 0) == 1 ? 'Please not the first day' : null,
+                onDateSelected: (DateTime value) {
+                  print(value);
+                  _startdate = value;
+                },
               ),
+
               TextFormField(
                 decoration: const InputDecoration(
                   hintText: 'Aditional information',
@@ -147,7 +189,7 @@ class _AddPageState extends State<AddPage> {
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       debugPrint('Validated!');
-                      debugPrint(_startdate.text);
+
                       final String url =
                           'http://10.0.2.2:5015/directions/trip/';
                       final response = await http.post(
@@ -160,7 +202,9 @@ class _AddPageState extends State<AddPage> {
                           "origin": _pontodepartida.text,
                           "destination": _destination.text,
                           "available_sits": _selectedPassengerCount,
-                          "starting_date": _startdate.text,
+                          "starting_date": _startdate == null
+                              ? null
+                              : _startdate.toIso8601String(),
                           "owner_id": '5b77bdbade7b4fcb838f8111b68e18ae'
                         }),
                       );
