@@ -18,7 +18,7 @@ class _AddPageState extends State<AddPage> {
   final _id = TextEditingController();
   final _pontodepartida = TextEditingController();
   final _destination = TextEditingController();
-  final _brandcar = TextEditingController();
+  final _additionalInfo = TextEditingController();
   final _npassager = TextEditingController();
   late var _startdate;
   final _aditionalinfo = TextEditingController();
@@ -96,38 +96,6 @@ class _AddPageState extends State<AddPage> {
                 },
               ),
 
-              // startimg date
-              // dateinput
-              // DateTimeField(
-              //   decoration: const InputDecoration(
-              //     hintText: 'Start date',
-              //   ),
-              //
-              //   format: DateFormat("yyyy-MM-dd HH:mm"),
-              //   onShowPicker: (context, currentValue) async {
-              //     final date = await showDatePicker(
-              //       context: context,
-              //       firstDate: DateTime(1900),
-              //       initialDate: currentValue ?? DateTime.now(),
-              //       lastDate: DateTime(2100));
-              //     if (date != null) {
-              //       final time = await showTimePicker(
-              //         context: context,
-              //         initialTime:
-              //         TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
-              //       );
-              //       debugPrint("helloHELLO1");
-              //       _startdate = DateTimeField.combine(date, time);
-              //       return DateTimeField.combine(date, time);
-              //     } else {
-              //       debugPrint("HEllohello2");
-              //       _startdate = currentValue;
-              //       return currentValue;
-              //     }
-              //   },
-              //
-              // ),
-
               DateTimeFormField(
                 decoration: const InputDecoration(
                   hintStyle: TextStyle(color: Colors.black45),
@@ -150,7 +118,7 @@ class _AddPageState extends State<AddPage> {
                 decoration: const InputDecoration(
                   hintText: 'Aditional information',
                 ),
-                controller: _brandcar,
+                controller: _additionalInfo,
                 // can be empty
               ),
               SizedBox(height: 30),

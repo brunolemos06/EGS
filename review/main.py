@@ -34,6 +34,15 @@ def index():
 @app.route(appendurl+'/reviews/', methods=['GET', 'POST','PUT','DELETE'])
 def reviews():
     if request.method == 'POST':
+        # verify if requestfrom is valid
+        try:
+            if  (request.form['personid'] is None or request.form['title'] is None or request.form['description'] is None or request.form['rating'] is None):
+                # all fields are required
+                return jsonify({'error': 'personid, title, description, rating are required'}), 400
+        except:
+            return jsonify({'error': 'personid, title, description, rating are required'}), 400
+
+
         conn = sqlite3.connect('database.db')
         # insert the data into the database with x-www-form-urlencoded
         conn.execute('INSERT INTO reviews (personid, title, description, rating) VALUES (?, ?, ?, ?)', (request.form['personid'], request.form['title'], request.form['description'], request.form['rating']))

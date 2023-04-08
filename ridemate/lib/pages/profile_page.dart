@@ -69,7 +69,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
         
 
-
+        // get id for reviews
+        // .
+        // .
+        
 
         setState(() {
           _fname = name;
@@ -85,10 +88,10 @@ class _ProfilePageState extends State<ProfilePage> {
             _avatar = "http://www.gravatar.com/avatar/?d=mp";
           }
 
-          debugPrint("Name -> $_fname", wrapWidth: 1024);
-          debugPrint("LName -> $_lname", wrapWidth: 1024);
-          debugPrint("Email -> $_email", wrapWidth: 1024);
-          debugPrint("Avatar -> $_avatar", wrapWidth: 1024);
+          debugPrint("Name    -> $_fname", wrapWidth: 1024);
+          debugPrint("LName   -> $_lname", wrapWidth: 1024);
+          debugPrint("Email   -> $_email", wrapWidth: 1024);
+          debugPrint("Avatar  -> $_avatar", wrapWidth: 1024);
           
         });        
       } else {
@@ -105,14 +108,17 @@ class _ProfilePageState extends State<ProfilePage> {
       );
     }
 
-    final response = await http.get(Uri.parse('http://10.0.2.2:5005/api/v1/reviews/rating?personid=$_id'));
-    final response2 = await http.get(Uri.parse('http://10.0.2.2:5005/api/v1/reviews/?personid=$_id'));
+    final response = await http.get(Uri.parse('http://10.0.2.2:8080/service-review/v1/review/rating?personid=$_id'));
+    final response2 = await http.get(Uri.parse('http://10.0.2.2:8080/service-review/v1/review?personid=$_id'));
 
     final data = json.decode(response.body);
     final data2 = json.decode(response2.body);
 
     setState(() {
-      _rating = data['reviews'][0]['rating'].toString();
+      
+      var rat = data['reviews'][0]['rating'].toString();
+      // if rat = "3.15432" then _rating = "3.15"
+      _rating = rat.substring(0, 4);
       for (var review in data2["reviews"]) {
         var rating = review["rating"];
         var name = review["personid"].toString(); // Replace with the name of the person who wrote the review
@@ -185,11 +191,28 @@ class _ProfilePageState extends State<ProfilePage> {
 
                 style: Theme.of(context).textTheme.headline6,
               ),
-
-              Text(
-                'Avg rating : $_rating',
-                style: Theme.of(context).textTheme.headline6,
+              // rating
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Rating: ',
+                    style: Theme.of(context).textTheme.headline6,
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Text(
+                    _rating,
+                    style: Theme.of(context).textTheme.headline6,
+                  ),
+                  Icon(
+                    Icons.star,
+                    color: Colors.yellow,
+                  ),
+                ],
               ),
+              // icon 
               const SizedBox(height: 15),
               ListView.builder(
                   shrinkWrap: true,
@@ -202,27 +225,23 @@ class _ProfilePageState extends State<ProfilePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
+                            // put _reviews[index].rating.toString() number of stars
+                            // others are grey
                             children: [
-                              Icon(
-                                Icons.star,
-                                color: Colors.yellow,
-                              ),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Text(
-                                _reviews[index].rating.toString(),
-                                style: Theme.of(context).textTheme.bodyText1,
-                              ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Text(
-                                _reviews[index].name,
-                                style: Theme.of(context).textTheme.subtitle1,
-                              ),
-                            ],
+                              for (var i = 0; i <5; i++)
+                                if (i < _reviews[index].rating)
+                                  Icon(
+                                    Icons.star,
+                                    color: Colors.yellow,
+                                  )
+                                else
+                                  Icon(
+                                    Icons.star,
+                                    color: Colors.grey,
+                                  ),
+                            ]
                           ),
+
                           SizedBox(
                             height: 5,
                           ),
