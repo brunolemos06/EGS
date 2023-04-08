@@ -92,7 +92,7 @@ def token_required(f):
         except:
             return make_response(jsonify({ 'message' : 'Token is invalid !!' }), 401)
         #returns the current logged in users context to the routes
-        return  f(current_user, user_firstname, user_lastname, user_email, user_avatar, *args, **kwargs)
+        return  f(user_firstname, user_lastname, user_email, user_avatar, *args, **kwargs)
   
     return decorated
 
@@ -137,6 +137,9 @@ def google_callback():
             token:
               type: string
               description: JWT Token
+            id:
+              type: string
+              description: User ID on the provider
       500:
         description: Something went wrong
         schema:
@@ -168,7 +171,7 @@ def google_callback():
         'exp' : datetime.utcnow() + timedelta(minutes = 30)
     }, app.config['SECRET_KEY'])
 
-    return make_response(jsonify({'token' : token.decode('UTF-8')}), 202)
+    return make_response(jsonify({'token' : token.decode('UTF-8'), 'id' : user_data[1]}), 202)
 
 @app.route('/github', methods=['GET'])
 #@cross_origin()
@@ -205,6 +208,9 @@ def github_callback():
             token:
               type: string
               description: JWT Token
+            id:
+              type: string
+              description: ID of the user on the provider
       500:
         description: Something went wrong
         schema:
@@ -239,7 +245,7 @@ def github_callback():
         'exp' : datetime.utcnow() + timedelta(minutes = 30)
     }, app.config['SECRET_KEY'])
 
-    return make_response(jsonify({'token' : token.decode('UTF-8')}), 202)
+    return make_response(jsonify({'token' : token.decode('UTF-8'), 'id' : user_data[1]}), 202)
 
 @app.route('/register', methods=['POST'])
 #@cross_origin()
@@ -339,6 +345,9 @@ def login():
               token:
                 type: string
                 description: JWT Token
+              id:
+                type: string
+                description: Public ID of the user
         401:
           description: Couldn't verify
           schema:
@@ -361,14 +370,14 @@ def login():
             'exp' : datetime.utcnow() + timedelta(minutes = 30)
         }, app.config['SECRET_KEY'])
 
-        return make_response(jsonify({'token' : token.decode('UTF-8')}), 202)
+        return make_response(jsonify({'token' : token.decode('UTF-8'), 'id' : user_data[1]}), 202)
     else:
         return make_response(jsonify({'message' : 'Couldn\'t verify'}), 401)
 
 @app.route('/auth', methods=['POST'])
 #@cross_origin()
 @token_required
-def auth(current_user, user_firstname, user_lastname, user_email, user_avatar):
+def auth(user_firstname, user_lastname, user_email, user_avatar):
    """This method is called to check if the user is authenticated
     ---
     parameters:
@@ -402,7 +411,7 @@ def auth(current_user, user_firstname, user_lastname, user_email, user_avatar):
 @app.route('/info', methods=['POST'])
 #@cross_origin()
 @token_required
-def info(current_user, user_firstname, user_lastname, user_email, user_avatar):
+def info(user_firstname, user_lastname, user_email, user_avatar):
     """This method is called to get the user info
     ---
     parameters:
