@@ -9,7 +9,6 @@ import 'package:latlong2/latlong.dart';
 import 'package:flutter_map/flutter_map.dart' show getBoundsZoomLevel;
 import 'login_page.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
 class Travel {
   final String id;
@@ -21,7 +20,6 @@ class Travel {
   final int money;
   final LatLng origin_coords;
   final LatLng destination_coords;
-  final List<PointLatLng> polyline;
 
   Travel(
       {required this.id,
@@ -32,8 +30,7 @@ class Travel {
       required this.owner_id,
       required this.money,
       required this.origin_coords,
-      required this.destination_coords,
-      required this.polyline});
+      required this.destination_coords});
 }
 
 class catalogo_page extends StatefulWidget {
@@ -48,81 +45,7 @@ class catalogo_page extends StatefulWidget {
 class _catalogoPageState extends State<catalogo_page> {
   final _storage = FlutterSecureStorage();
   final List<Travel> travels = [];
-  // final List<Travel> travels = [
-  //   Travel(
-  //     partida_name: 'Aveiro',
-  //     chegada_name: 'Porto',
-  //     time: '1 hora',
-  //     money: '7',
-  //     pay: 'Pay Now',
-  //     partida: LatLng(40.644270, -8.645540), // aveiro
-  //     chegada: LatLng(41.157944, -8.629105), // porto
-  //   ),
-  //   Travel(
-  //     partida_name: 'Guarda',
-  //     chegada_name: 'Braga',
-  //     time: '2 horas',
-  //     money: '10',
-  //     pay: 'Pay Now',
-  //     partida: LatLng(40.537500, -7.263611), // guarda
-  //     chegada: LatLng(41.557800, -8.420500), // braga
-  //   ),
-  //   Travel(
-  //     partida_name: 'Lisboa',
-  //     chegada_name: 'Madrid',
-  //     time: '5 horas',
-  //     money: '30',
-  //     pay: 'Pay Now',
-  //     partida: LatLng(38.722252, -9.139337), // lisboa
-  //     chegada: LatLng(40.416775, -3.703790), // madrid
-  //   ),
-  //   Travel(
-  //     partida_name: 'Porto',
-  //     chegada_name: 'Lisboa',
-  //     time: '3 horas',
-  //     money: '80',
-  //     pay: 'Pay Now',
-  //     // porto lisboa cordenadas
-  //     partida : LatLng(41.157944, -8.629105), // porto
-  //     chegada : LatLng(38.722252, -9.139337), // lisboa
-  //   ),
-  //   Travel(
-  //     partida_name: 'Lisboa',
-  //     chegada_name: 'Porto',
-  //     time: '7 horas',
-  //     money: '36',
-  //     pay: 'Pay Now',
-  //     partida: LatLng(40.644270, -8.645540), // coimbra
-  //     chegada: LatLng(37.089072, -8.247880), // albufeira
-  //   ),
-  //   Travel(
-  //     partida_name: 'Lisboa',
-  //     chegada_name: 'Faro',
-  //     time: '4 horas',
-  //     money: '20',
-  //     pay: 'Pay Now',
-  //     partida: LatLng(38.722252, -9.139337), // lisboa
-  //     chegada: LatLng(37.089072, -8.247880), // faro
-  //   ),
-  //   Travel(
-  //     partida_name: 'Porto',
-  //     chegada_name: 'Faro',
-  //     time: '5 horas',
-  //     money: '25',
-  //     pay: 'Pay Now',
-  //     partida: LatLng(41.157944, -8.629105), // porto
-  //     chegada: LatLng(37.089072, -8.247880), // faro
-  //   ),
-  //   Travel(
-  //     partida_name: 'Lisboa',
-  //     chegada_name: 'Coimbra',
-  //     time: '2 horas',
-  //     money: '10',
-  //     pay: 'Pay Now',
-  //     partida: LatLng(38.722252, -9.139337), // lisboa
-  //     chegada: LatLng(40.644270, -8.645540), // coimbra
-  //   )
-  // ];
+
   final flutterWebviewPlugin = FlutterWebviewPlugin();
 
   String order_id = '';
@@ -149,13 +72,6 @@ class _catalogoPageState extends State<catalogo_page> {
         var destination_coords = LatLng(
             trip['info']['routes'][0]['bounds']['southwest']['lat'],
             trip['info']['routes'][0]['bounds']['southwest']['lng']);
-        PolylinePoints polylinePoints = PolylinePoints();
-        var polyline = polylinePoints.decodePolyline(
-            trip['info']['routes'][0]['overview_polyline']['points']);
-        // List<LatLng> polyline = polylinePoints
-        //     .decodePolyline(
-        //         trip['info']['routes'][0]['overview_polyline']['points'])
-        //     .cast<LatLng>();
         travels.add(Travel(
             id: id,
             origin: origin,
@@ -165,8 +81,7 @@ class _catalogoPageState extends State<catalogo_page> {
             owner_id: owner_id,
             money: money,
             origin_coords: origin_coords,
-            destination_coords: destination_coords,
-            polyline: polyline));
+            destination_coords: destination_coords));
       }
     });
   }
