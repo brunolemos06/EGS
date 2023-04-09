@@ -81,7 +81,7 @@ class _LoginPageState extends State<LoginPage> {
                           }
 
                           // send request to server
-                          final String url = 'http://10.0.2.2:5000/login';
+                          final String url = 'http://10.0.2.2:8080/service-review/v1/auth/login';
                           final response = await http.post(
                             Uri.parse(url),
                             headers: {
@@ -192,7 +192,7 @@ class _LoginPageState extends State<LoginPage> {
                     debugPrint("Token -> " + token, wrapWidth: 1024);
                     // save token to secure storage
                     await _storage.write(key: 'token', value: token);
-                    final String url2 = 'http://10.0.2.2:5000/auth';
+                    final String url2 = 'http://10.0.2.2:8080/service-review/v1/auth/auth';
                     final Map<String, String> headers2 = {
                       'Content-Type': 'application/json',
                       'Accept': 'application/json',
@@ -235,25 +235,32 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     );
 
-                    final String url = 'http://10.0.2.2:5000/info';
+
+
+                    final String url = 'http://10.0.2.2:8080/service-review/v1/auth/info';
                     final Map<String, String> headers = {
                       'Content-Type': 'application/json',
                       'Accept': 'application/json',
                       'x-access-token': token,
                     };
                     final response = await http.post(Uri.parse(url), headers: headers);
-
+                    debugPrint("STT -> ${response.statusCode}");
                     if (response.statusCode == 200) {
                       final responseJson = json.decode(response.body);
                       final String name = responseJson['fname'];
                       final String lname = responseJson['lname'];
                       final String email = responseJson['email'];
                       final String avatar = responseJson['avatar'];
+                      final String id = responseJson['id'];
+
+
 
                       debugPrint("Name -> $name", wrapWidth: 1024);
                       debugPrint("Lname -> $lname", wrapWidth: 1024);
                       debugPrint("Email -> $email", wrapWidth: 1024);
                       debugPrint("Avatar -> $avatar", wrapWidth: 1024);
+                      debugPrint("ID -> $id", wrapWidth: 1024);
+                      
                  
                     } else {
                       debugPrint('Error: ${response.statusCode}', wrapWidth: 1024);

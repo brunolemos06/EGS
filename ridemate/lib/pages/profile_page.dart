@@ -17,8 +17,8 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   final storage = FlutterSecureStorage();
   List<Review> _reviews = [];
-  String _rating = "";
-  String _id = "98221";
+  String _rating = "?";
+  String _id = "";
   String _fname = "";
   String _lname = "";
   String _email = "";
@@ -41,8 +41,8 @@ class _ProfilePageState extends State<ProfilePage> {
     if (token != null) {
       // Perform API request with token here
         
-      final String url = 'http://10.0.2.2:5000/info';
-      final String url2 = 'http://10.0.2.2:5000/auth';
+      final String url = 'http://10.0.2.2:8080/service-review/v1/auth/info';
+      final String url2 = 'http://10.0.2.2:8080/service-review/v1/auth/auth';
       final Map<String, String> headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -66,14 +66,39 @@ class _ProfilePageState extends State<ProfilePage> {
         final String name = responseJson['fname'];
         final String lname = responseJson['lname'];
         final String email = responseJson['email'];
+        final String id = responseJson['id'];
 
         
 
         // get id for reviews
-        // .
+        final String url = 'http://10.0.2.2:8080/service-review/v1/auth/fetchdata';
+        final responsefetch = await http.post(
+          Uri.parse(url),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode({
+            "auth_id": id,
+            "email": email,
+          }),
+        );
+
+        debugPrint('Response: ${responsefetch.body}', wrapWidth: 1024);
+        if(responsefetch.statusCode == 200){
+          debugPrint('Fetch success', wrapWidth: 1024);
+          final responseJson = json.decode(responsefetch.body);
+          final int id = responseJson["reviewid"];
+          debugPrint('ID: $id', wrapWidth: 1024);
+          setState(() {
+            _id = id.toString();
+          });
+        }
+        else{
+          debugPrint('Fetch fail', wrapWidth: 1024);
+        }
         // .
         
-
+      debugPrint('MUAHAHHAHHAHAHA', wrapWidth: 1024);
         setState(() {
           _fname = name;
           _lname = lname;
@@ -83,8 +108,6 @@ class _ProfilePageState extends State<ProfilePage> {
             _avatar = responseJson['avatar'];
           }
           catch(e){
-            // do nothing
-            debugPrint('Error: ${e}', wrapWidth: 1024);
             _avatar = "http://www.gravatar.com/avatar/?d=mp";
           }
 
@@ -113,12 +136,17 @@ class _ProfilePageState extends State<ProfilePage> {
 
     final data = json.decode(response.body);
     final data2 = json.decode(response2.body);
-
+    debugPrint('Response: ${response.body}', wrapWidth: 1024);
     setState(() {
       
       var rat = data['reviews'][0]['rating'].toString();
       // if rat = "3.15432" then _rating = "3.15"
-      _rating = rat.substring(0, 4);
+      try{
+        _rating = rat.substring(0, 4);
+      }
+      catch(e){
+        _rating = rat;
+      }
       for (var review in data2["reviews"]) {
         var rating = review["rating"];
         var name = review["personid"].toString(); // Replace with the name of the person who wrote the review
@@ -128,6 +156,8 @@ class _ProfilePageState extends State<ProfilePage> {
         _reviews.add(Review(rating: rating, name: name, title: title, description: description));
       }
     });
+    // refresh page
+
   }
 
   @override

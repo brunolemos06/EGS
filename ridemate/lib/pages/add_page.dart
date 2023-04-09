@@ -6,6 +6,7 @@ import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:date_field/date_field.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AddPage extends StatefulWidget {
   const AddPage({Key? key}) : super(key: key);
@@ -24,6 +25,8 @@ class _AddPageState extends State<AddPage> {
   final _aditionalinfo = TextEditingController();
   int _selectedPassengerCount = 1;
   List<int> get passengerCountOptions => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+  final _storage = FlutterSecureStorage();
 
   bool _arcondicionado = false;
   bool _wifi = false;
@@ -156,8 +159,9 @@ class _AddPageState extends State<AddPage> {
                 child: ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      debugPrint('Validated!');
+                    
 
+                      debugPrint('Validated!');
                       final String url =
                           'http://10.0.2.2:5015/directions/trip/';
                       final response = await http.post(

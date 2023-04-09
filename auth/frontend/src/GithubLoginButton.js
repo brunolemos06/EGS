@@ -4,7 +4,7 @@ import githubLogo from './images/GithubLogo.png';
 
 function GithubLoginButton() {
   function handleClick() {
-     window.location.href = 'http://10.0.2.2:5000/github';
+     window.location.href = 'http://10.0.2.2:8080/service-review/v1/auth/github';
   }
 
   return ( 

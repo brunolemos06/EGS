@@ -499,7 +499,8 @@ def new_user():
                     .list()
     for u in users:
         if u.identity == identity:
-            return {'message': 'The user is already in the database'}
+            return {'message': 'The user is already in the database',
+                    'UID': u.sid}
         
     user = client.conversations \
                         .v1 \
