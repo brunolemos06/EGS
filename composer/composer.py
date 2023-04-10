@@ -286,12 +286,11 @@ def conversations():
         
         author=request.args.get("author");
         url=f'http://{ip}:5010/conversations?author={author}'
-        response = requests.get(url)
-        print('RESPONSSE DO TWILIO');
+        response = requests.get(url);
         print(response.json());
     elif request.method == 'DELETE':
         print("delete")
-    return response.json(), response.status_code
+    return jsonify(response.json()), response.status_code
 
 @app.route(appendurl + '/new_conversation', methods=['POST'])
 def new_conversation():

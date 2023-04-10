@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'login_page.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:ridemate/pages/main_page.dart';
 
 class Message {
   String sender;
-  String recipient;
+  String conversa;
   String message;
 
   Message({
     required this.sender,
-    required this.recipient,
+    required this.conversa,
     required this.message,
   });
 }
@@ -20,53 +25,89 @@ class MessagePage extends StatefulWidget {
 }
 
 class _MessagePageState extends State<MessagePage> {
-  final List<Message> _messages = [
-    Message(
-      sender: "Alice",
-      recipient: "Bob",
-      message: "Hey there, how's it going?",
-    ),
-    Message(
-      sender: "Alice",
-      recipient: "Bob",
-      message: "I'm doing well, thanks for asking!",
-    ),
-    Message(
-      sender: "Alice",
-      recipient: "Bob",
-      message: "What have you been up to lately?",
-    ),
-    Message(
-      sender: "Alice",
-      recipient: "Bob",
-      message: "Not much, just working and hanging out with friends. You?",
-    ),
-    Message(
-      sender: "Renato",
-      recipient: "Bob",
-      message: "Same here, just trying to stay busy!",
-    ),
-    Message(
-      sender: "Bruno",
-      recipient: "Bob",
-      message: "Oi frontend é uma seca",
-    ),
-    Message(
-      sender: "Tiago",
-      recipient: "Bob",
-      message: "Adoro backend!",
-    ),
-    Message(
-      sender: "Claudio",
-      recipient: "Bob",
-      message: "Adoro Jupyter!",
-    ),
-    Message(
-      sender: "Hugo",
-      recipient: "Bob",
-      message: "HUGAAAAAAAA",
-    ),
-  ];
+  final List<Message> _messages = [];
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    final storage = FlutterSecureStorage();
+    // token
+    final String tokenKey = 'token';
+    final String? token = await storage.read(key: tokenKey);
+    if (token != null) {
+      final String url = 'http://10.0.2.2:8080/service-review/v1/auth/info';
+      final String url2 = 'http://10.0.2.2:8080/service-review/v1/auth/auth';
+      final Map<String, String> headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'x-access-token': token
+      };
+      final response3 = await http.post(Uri.parse(url2), headers: headers);
+      if (response3.statusCode != 200) {
+        debugPrint('Token not valid', wrapWidth: 1024);
+        // go to login page
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => LoginPage()),
+        );
+        return;
+      }
+      final response = await http.post(Uri.parse(url), headers: headers);
+
+      if (response.statusCode == 200) {
+        final responseJson = json.decode(response.body);
+        debugPrint('Response: ${response.body}', wrapWidth: 1024);
+        final String name = responseJson['fname'];
+        final String lname = responseJson['lname'];
+        final String email = responseJson['email'];
+        final String id = responseJson['id'];
+
+        // get id for chat
+        final String url =
+            'http://10.0.2.2:8080/service-review/v1/auth/fetchdata';
+        final responsefetch = await http.post(
+          Uri.parse(url),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode({
+            "auth_id": id,
+            "email": email,
+          }),
+        );
+
+        debugPrint('Response: ${responsefetch.body}', wrapWidth: 1024);
+        if (responsefetch.statusCode == 200) {
+          final responseJson = json.decode(responsefetch.body);
+          final String chatid = responseJson['chat_id'];
+          final responsechat = await http.get(Uri.parse(
+              'http://10.0.2.2:8080/service-review/v1/conversations?author=US1a381f88799a4768bd58018d0b64cb66'));
+          if (responsechat.statusCode == 200) {
+            final responseJson = json.decode(responsechat.body);
+            debugPrint('Response: ${responsechat.body}', wrapWidth: 1024);
+            //get the messages array in the jsonresponse;
+            final messages = responseJson[0]['messages'];
+            //add the messages to the list
+            setState(() {
+              for (var message in messages) {
+                _messages.add(Message(
+                    sender: message['author'],
+                    conversa: 'conversa',
+                    message: message['body']));
+              }
+            });
+
+            debugPrint(_messages.toString(), wrapWidth: 1024);
+          }
+        }
+
+        //request to get chat to composer
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,8 +115,8 @@ class _MessagePageState extends State<MessagePage> {
 
 // Loop through messages and add unique senders to the set
     for (var message in _messages) {
-      if (!uniqueSenders.contains(message.sender)) {
-        uniqueSenders.add(message.sender);
+      if (!uniqueSenders.contains(message.conversa)) {
+        uniqueSenders.add(message.conversa);
       }
     }
     return Scaffold(
@@ -89,7 +130,8 @@ class _MessagePageState extends State<MessagePage> {
           String sender = uniqueSenders.elementAt(index);
 
           // Find the first message with the current sender
-          Message firstMessage = _messages.firstWhere((message) => message.sender == sender);
+          Message firstMessage =
+              _messages.firstWhere((message) => message.conversa == sender);
 
           return ListTile(
             title: Container(
@@ -106,7 +148,8 @@ class _MessagePageState extends State<MessagePage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MessageConversationPage(sender: firstMessage.sender),
+                  builder: (context) =>
+                      MessageConversationPage(sender: firstMessage.sender),
                 ),
               );
             },
@@ -120,20 +163,27 @@ class _MessagePageState extends State<MessagePage> {
 class MessageConversationPage extends StatefulWidget {
   final String sender;
 
-  const MessageConversationPage({Key? key, required this.sender}) : super(key: key);
+  const MessageConversationPage({Key? key, required this.sender})
+      : super(key: key);
 
   @override
-  State<MessageConversationPage> createState() => _MessageConversationPageState();
+  State<MessageConversationPage> createState() =>
+      _MessageConversationPageState();
 }
 
 class _MessageConversationPageState extends State<MessageConversationPage> {
   final List<Message> _messages = [
-    Message(
-      sender: "Bruno",
-      recipient: "Tiago",
-      message: "Oi frontend é uma seca",
-    ),
-    Message(      sender: "Tiago",      recipient: "Bruno",      message: "eu gosto!",    ),  ];
+    // Message(
+    //   sender: "Bruno",
+    //   recipient: "Tiago",
+    //   message: "Oi frontend é uma seca",
+    // ),
+    // Message(
+    //   sender: "Tiago",
+    //   recipient: "Bruno",
+    //   message: "eu gosto!",
+    // ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -150,11 +200,13 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
           final textAlign = isSender ? TextAlign.start : TextAlign.end;
           return ListTile(
             title: Align(
-              alignment: isSender ? Alignment.centerLeft : Alignment.centerRight,
+              alignment:
+                  isSender ? Alignment.centerLeft : Alignment.centerRight,
               child: Text(message.message, textAlign: textAlign),
             ),
             subtitle: Align(
-              alignment: isSender ? Alignment.centerLeft : Alignment.centerRight,
+              alignment:
+                  isSender ? Alignment.centerLeft : Alignment.centerRight,
               child: Text(
                 message.sender,
                 style: TextStyle(
@@ -172,12 +224,13 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
-                  decoration: const InputDecoration(hintText: "Type a message..."),
+                  decoration:
+                      const InputDecoration(hintText: "Type a message..."),
                   onFieldSubmitted: (value) {
                     setState(() {
                       _messages.add(Message(
                         sender: widget.sender,
-                        recipient: "",
+                        conversa: "",
                         message: value,
                       ));
                     });
