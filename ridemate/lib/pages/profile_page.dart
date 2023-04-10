@@ -39,6 +39,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final List<Travel> _trips = [];
 
   Future<void> fetchData() async {
+    _trips.clear();
     // token
     final String tokenKey = 'token';
     final String? token = await storage.read(key: tokenKey);
@@ -391,15 +392,18 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                               ElevatedButton(
                                 onPressed: () async {
+                                  debugPrint(_trips[index].id.toString());
                                   final String url =
                                       'http://10.0.2.2:8080/trip/';
-                                  final response =
-                                      await http.delete(Uri.parse(url),
-                                          headers: {
-                                            'Content-Type': 'application/json',
-                                          },
-                                          body: jsonEncode({'id': trip_id}));
-                                  if (response.statusCode == 201) {
+                                  final response = await http.delete(
+                                      Uri.parse(url),
+                                      headers: {
+                                        'Content-Type': 'application/json',
+                                      },
+                                      body:
+                                          jsonEncode({'id': _trips[index].id}));
+                                  if (response.statusCode == 200) {
+                                    fetchData();
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(

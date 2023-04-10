@@ -75,9 +75,11 @@ def trip():
         print(params)
         response = requests.post(url, data=params)
     elif (request.method == 'DELETE'):
-        id = request.args.get('id')
+        id = json.loads(request.data.decode('utf-8'))['id']
+        print(id)
         params = {'id': id}
         response = requests.delete(url, data=params)
+    print(response.status_code)
     return response.json(), response.status_code
 
 @app.route('/participant/', methods=['GET', 'POST', 'DELETE'])
