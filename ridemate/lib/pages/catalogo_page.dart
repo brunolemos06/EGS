@@ -251,78 +251,119 @@ class _catalogoPageState extends State<catalogo_page> {
                         Text(travels[index].money.toString() + "€"),
                         ElevatedButton(
                           onPressed: () async {
-                            // you need to be logged in to make a payment
-                            // if you are not logged in, you will be redirected to the login page
-                            // if you are logged in, you will be redirected to the payment page
-                            // get token from local storage
-                            final String tokenKey = 'token';
-                            final String? token =
-                                await _storage.read(key: tokenKey);
-                            if (token == null) {
-                              debugPrint('Token not found', wrapWidth: 1024);
-                              // go to login page
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => LoginPage()),
-                              );
-                              return;
-                            }
-                            final String url2 =
-                                'http://10.0.2.2:8080/service-review/v1/auth/auth';
-                            final Map<String, String> headers2 = {
-                              'Content-Type': 'application/json',
-                              'Accept': 'application/json',
-                              'x-access-token': token
-                            };
-                            final response3 = await http.post(Uri.parse(url2),
-                                headers: headers2);
-                            if (response3.statusCode != 200) {
-                              debugPrint('Token not valid', wrapWidth: 1024);
-                              // go to login page
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => LoginPage()),
-                              );
-                              // message to user that to pay you need to be logged in
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    "To pay you need to be logged in !!",
-                                    style: TextStyle(color: Colors.white),
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("Pick a Location"),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      TextField(
+                                        decoration: InputDecoration(
+                                          hintText: "Enter location",
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                              return;
-                            }
+                                  actions: <Widget>[
+                                    ElevatedButton(
+                                      child: Text('PAY NOW'),
+                                      onPressed: () async{
 
-                            final url = Uri.parse(
-                                'http://10.0.2.2:8000/paypal/create/order');
-                            final headers = {
-                              'Content-Type': 'application/json'
-                            };
-                            final payload = {'amount': travels[index].money};
-                            final response = await http.post(url,
-                                headers: headers, body: json.encode(payload));
-                            final errorMessage =
-                                'Status: ${response.statusCode.toString()}';
-                            debugPrint(errorMessage, wrapWidth: 1024);
-                            if (response.statusCode == 201) {
-                              final jsonResponse = jsonDecode(response.body);
-                              final linkForPayment =
-                                  jsonResponse['linkForPayment'];
-                              // save the order_id in class variable
-                              order_id = jsonResponse['order_id'];
 
-                              // lauch the linkForPayment in a webview until the url contains the string 'http://10.0.2.2:8000/paypal/finish'
-                              flutterWebviewPlugin.launch(linkForPayment);
-                            } else {
-                              // Handle the failure response
-                            }
+                                        // you need to be logged in to make a payment
+                                        // if you are not logged in, you will be redirected to the login page
+                                        // if you are logged in, you will be redirected to the payment page
+                                        // get token from local storage
+                                        final String tokenKey = 'token';
+                                        final String? token =
+                                            await _storage.read(key: tokenKey);
+                                        if (token == null) {
+                                          debugPrint('Token not found', wrapWidth: 1024);
+                                          // go to login page
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) => LoginPage()),
+                                          );
+                                          return;
+                                        }
+
+
+                                        // verify if the pick up location is in the route
+
+
+
+                                        //
+                                        final String url2 =
+                                            'http://10.0.2.2:8080/service-review/v1/auth/auth';
+                                        final Map<String, String> headers2 = {
+                                          'Content-Type': 'application/json',
+                                          'Accept': 'application/json',
+                                          'x-access-token': token
+                                        };
+                                        final response3 = await http.post(Uri.parse(url2),
+                                            headers: headers2);
+                                        if (response3.statusCode != 200) {
+                                          debugPrint('Token not valid', wrapWidth: 1024);
+                                          // go to login page
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) => LoginPage()),
+                                          );
+                                          // message to user that to pay you need to be logged in
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "To pay you need to be logged in !!",
+                                                style: TextStyle(color: Colors.white),
+                                              ),
+                                              backgroundColor: Colors.red,
+                                            ),
+                                          );
+                                          return;
+                                        }
+
+                                        final url = Uri.parse(
+                                            'http://10.0.2.2:8000/paypal/create/order');
+                                        final headers = {
+                                          'Content-Type': 'application/json'
+                                        };
+                                        final payload = {'amount': travels[index].money};
+                                        final response = await http.post(url,
+                                            headers: headers, body: json.encode(payload));
+                                        final errorMessage =
+                                            'Status: ${response.statusCode.toString()}';
+                                        debugPrint(errorMessage, wrapWidth: 1024);
+                                        if (response.statusCode == 201) {
+                                          final jsonResponse = jsonDecode(response.body);
+                                          final linkForPayment =
+                                              jsonResponse['linkForPayment'];
+                                          // save the order_id in class variable
+                                          order_id = jsonResponse['order_id'];
+
+                                          // lauch the linkForPayment in a webview until the url contains the string 'http://10.0.2.2:8000/paypal/finish'
+                                          flutterWebviewPlugin.launch(linkForPayment);
+                                        } else {
+                                          // Handle the failure response
+                                        }
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                    ElevatedButton(
+                                      child: Text('Cancel'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
                           },
-                          child: Text("Pay Now"),
+                          child: Text("Participate"),
                         ),
                       ],
                     ),
