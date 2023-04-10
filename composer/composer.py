@@ -57,9 +57,12 @@ def trip():
     print('ON TRIP METHOD')
     url = f'http://{ip}:5015/directions/trip/'
     if (request.method == 'GET'):
-        trip_id = request.data.get('id')
-        params = {'id': trip_id}
-        response = requests.get(url, data=params)
+        trip_id = request.args.get('id')
+        if (trip_id == None):
+            response = requests.get(url)
+        else:
+            params = {'id': trip_id}
+            response = requests.get(url, data=params)
     elif (request.method == 'POST'):
         request.data = request.json
         id = request.data.get('id')
@@ -94,6 +97,18 @@ def participant():
         id = request.args.get('id')
         params = {'id': id}
         response = requests.delete(url, data=params)
+    return response.json(), response.status_code
+
+@app.route('/owner/', methods=['GET'])
+def owner():
+    url = f'http://{ip}:5015/directions/owner/'
+    owner_id = request.args.get('id')
+    if (request.method == 'GET'):
+        if (owner_id == None):
+            response = requests.get(url)
+        else:
+            params = {'id': owner_id}
+            response = requests.get(url, data=params)
     return response.json(), response.status_code
 
 # -

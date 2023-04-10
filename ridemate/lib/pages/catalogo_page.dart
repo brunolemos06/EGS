@@ -51,8 +51,8 @@ class _catalogoPageState extends State<catalogo_page> {
   String order_id = '';
 
   Future<void> fetchData() async {
-    final String url = 'http://10.0.2.2:5015/directions/trip/';
-    final response = (await http.get(Uri.parse(url)));
+    final String url = 'http://10.0.2.2:8080/trip/';
+    final response = await http.get(Uri.parse(url));
     final data = json.decode(response.body);
 
     setState(() {
