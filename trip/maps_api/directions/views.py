@@ -36,6 +36,8 @@ class TripView(APIView):
         }
 
         info = requests.get(url, params=params)
+        if (info.json().get('status')) != 'OK':
+            return JsonResponse({'v': False, 'error': 'Cannot get directions.'}, status = 404)
 
         trip = Trip(id=id, origin=origin, destination=destination, owner_id=owner_id, starting_date=starting_date, available_sits=available_sits, info=info.json())
         trip.save()
@@ -61,7 +63,8 @@ class TripView(APIView):
     id_param = openapi.Parameter('id', openapi.IN_QUERY, description="trip id", type=openapi.TYPE_STRING)
     @swagger_auto_schema(manual_parameters=[id_param], responses={200: '{v: True, msg: Trip removed successfully}', 404: '{v: False, error: Cannot get Trip.}'})
     def delete(self, request):
-        id = request.GET.get('id')
+        id = request.data.get('id')
+        print(id)
         if id is None:
             return JsonResponse({'v': False, 'error': 'Id not provided.'}, status = 404)
         trip = Trip.objects.get(id=id)
