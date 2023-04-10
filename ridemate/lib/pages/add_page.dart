@@ -220,7 +220,8 @@ class _AddPageState extends State<AddPage> {
                             debugPrint('Fetch success', wrapWidth: 1024);
                             final responseJson =
                                 json.decode(responsefetch.body);
-                            final int id = responseJson["trip_id"];
+                            // debugPrint(responseJson.toString());
+                            final String id = responseJson["trip_id"];
                             debugPrint('ID: $id', wrapWidth: 1024);
                             setState(() {
                               _owner_id = id.toString();

@@ -22,7 +22,6 @@ class TripView(APIView):
         id = uuid.uuid4()
         origin = request.data.get('origin')
         destination = request.data.get('destination')
-        print(request.content_params)
         print(request.data)
         print(request)
         owner_id = uuid.UUID(request.data.get('owner_id'))

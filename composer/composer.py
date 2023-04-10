@@ -54,6 +54,7 @@ def index():
 
 @app.route('/trip/', methods=['GET', 'POST', 'DELETE'])
 def trip():
+    print('ON TRIP METHOD')
     url = f'http://{ip}:5015/directions/trip/'
     if (request.method == 'GET'):
         trip_id = request.data.get('id')
