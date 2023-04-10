@@ -104,7 +104,6 @@ class OwnerView(APIView):
                 res[str(trip['owner_id'])] = []
             res[str(trip['owner_id'])].append({'id': trip['id'], 'origin': trip['origin'], 'destination': trip['destination'], 'starting_date': trip['starting_date'], 'available_sits': trip['available_sits']})
         return JsonResponse({'v': True, 'msg': res}, status = 200)
-    
 
 class ParticipantView(APIView):
     id_param = openapi.Parameter('id', openapi.IN_QUERY, description="participant id", type=openapi.TYPE_STRING)
