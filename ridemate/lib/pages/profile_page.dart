@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:ridemate/pages/main_page.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key:key);
@@ -16,6 +17,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final storage = FlutterSecureStorage();
+  int _publishrating = 0;
   List<Review> _reviews = [];
   String _rating = "?";
   String _id = "";
@@ -28,6 +30,11 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
     fetchData();
   }
+
+  // create trip 
+  final List<Trip> _trips = [
+    Trip(destination: 'Tokyo', departure: 'New York', time: '9:00 AM'),
+  ];
 
   Future<void> fetchData() async {
 
@@ -242,7 +249,125 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ],
               ),
-              // icon 
+              // icon
+              SizedBox(
+                height: 20,
+              ), 
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey[600],
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: const EdgeInsets.all(10),
+                  margin: const EdgeInsets.symmetric(vertical: 10),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: _trips.length,
+                    physics: BouncingScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _trips[index].destination,
+                              style: Theme.of(context).textTheme.headline6,
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Text(
+                              'Departure: ${_trips[index].departure}, Time: ${_trips[index].time}',
+                              style: Theme.of(context).textTheme.bodyText1,
+                            ),
+                            // button
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Row(
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () async {
+                                    // Show dialog with form to submit review
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text('Submit Review'),
+                                          content: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              TextFormField(
+                                                decoration: InputDecoration(
+                                                  labelText: 'Title',
+                                                ),
+                                              ),
+                                              TextFormField(
+                                                decoration: InputDecoration(
+                                                  labelText: 'Description',
+                                                ),
+                                                maxLines: null,
+                                              ),
+                                              SizedBox(height: 16),
+                                              RatingBar.builder(
+                                                initialRating: 0,
+                                                minRating: 1,
+                                                direction: Axis.horizontal,
+                                                allowHalfRating: false,
+                                                itemCount: 5,
+                                                itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                                                itemBuilder: (context, _) => Icon(
+                                                  Icons.star,
+                                                  color: Colors.amber,
+                                                ),
+                                                onRatingUpdate: (rating) {
+                                                  _publishrating = rating.toInt();
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                // Dismiss dialog
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: Text('Cancel'),
+                                            ),
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                // Submit review
+                                              },
+                                              child: Text('Submit'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                  style: ButtonStyle(
+                                    backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+                                  ),
+                                  child: Text('Feedback'),
+                                ),
+
+                                // sizebox to separate buttons to secound button go to end of the row
+                                SizedBox(
+                                  width: 150,
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {},
+                                  child: Text('Finish'),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
               const SizedBox(height: 15),
               ListView.builder(
                   shrinkWrap: true,
@@ -311,4 +436,11 @@ class Review {
     required this.title,
     required this.description,
   });
+}
+class Trip {
+  final String destination;
+  final String departure;
+  final String time;
+
+  Trip({required this.destination, required this.departure, required this.time});
 }
