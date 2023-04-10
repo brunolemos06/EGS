@@ -54,43 +54,46 @@ def index():
 
 @app.route('/trip/', methods=['GET', 'POST', 'DELETE'])
 def trip():
+    print('ON TRIP METHOD')
     url = f'http://{ip}:5015/directions/trip/'
     if (request.method == 'GET'):
-        trip_id = request.args.get('id')
+        trip_id = request.data.get('id')
         params = {'id': trip_id}
-        response = requests.get(url, params=params)
+        response = requests.get(url, data=params)
     elif (request.method == 'POST'):
-        id = request.args.get('id')
-        origin = request.args.get('origin')
-        destination = request.args.get('destination')
-        available_sits = request.args.get('available_sits')
-        starting_date = request.args.get('starting_date')
-        owner_id = request.args.get('owner_id')
+        request.data = request.json
+        id = request.data.get('id')
+        origin = request.data.get('origin')
+        destination = request.data.get('destination')
+        available_sits = request.data.get('available_sits')
+        starting_date = request.data.get('starting_date')
+        owner_id = request.data.get('owner_id')
         params = {'id': id, 'origin': origin, 'destination': destination, 'available_sits': available_sits, 'starting_date': starting_date, 'owner_id': owner_id}
-        response = requests.post(url, params=params)
+        print(params)
+        response = requests.post(url, data=params)
     elif (request.method == 'DELETE'):
         id = request.args.get('id')
         params = {'id': id}
-        response = requests.delete(url, params=params)
+        response = requests.delete(url, data=params)
     return response.json(), response.status_code
 
-@app.route('/participant', methods=['GET', 'POST', 'DELETE'])
+@app.route('/participant/', methods=['GET', 'POST', 'DELETE'])
 def participant():
-    url = f'http://{ip}:5015/directions/participant'
+    url = f'http://{ip}:5015/directions/participant/'
     if (request.method == 'GET'):
         id = request.args.get('id')
         params = {'id': id}
-        response = requests.get(url, params=params)
+        response = requests.get(url, data=params)
     elif (request.method == 'POST'):
         id = request.args.get('id')
         trip_id = request.args.get('trip_id')
         pickup_location = request.args.get('pickup_location')
         params = {'id': id, 'trip_id': trip_id, 'pickup_location': pickup_location}
-        response = requests.post(url, params=params)
+        response = requests.post(url, data=params)
     elif (request.method == 'DELETE'):
         id = request.args.get('id')
         params = {'id': id}
-        response = requests.delete(url, params=params)
+        response = requests.delete(url, data=params)
     return response.json(), response.status_code
 
 # -
