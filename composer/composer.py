@@ -15,6 +15,8 @@ from flask_swagger_ui import get_swaggerui_blueprint
 import requests
 from flask import redirect
 import json
+import uuid
+
 
 # import file located in the same directory
 from db_func import *
@@ -50,9 +52,9 @@ def index():
 # TRIP
 # -
 
-@app.route('/trip', methods=['GET', 'POST', 'DELETE'])
+@app.route('/trip/', methods=['GET', 'POST', 'DELETE'])
 def trip():
-    url = f'http://{ip}:5015/directions/trip'
+    url = f'http://{ip}:5015/directions/trip/'
     if (request.method == 'GET'):
         trip_id = request.args.get('id')
         params = {'id': trip_id}
@@ -176,8 +178,9 @@ def login():
                 while(check_free_review_id(reviewid) == False):
                     reviewid += 1
                     print(reviewid)
-                print(create_full_entry(str(authid), str(UID),reviewid,str(UID)))
-                print("authid: " + str(authid) + " UID: " + str(UID) + " reviewid: " + str(reviewid))
+                uidTRIP = uuid.uuid4()
+                print(create_full_entry(str(authid), str(UID),reviewid,str(uidTRIP)))
+                print("authid: " + str(authid) + " UID: " + str(UID) + " reviewid: " + str(reviewid) + " TRIPID: " + uidTRIP)
 
             # print entry
             print(get_entry(str(authid)))
@@ -242,7 +245,8 @@ def fetchdata():
             while(check_free_review_id(reviewid) == False):
                 reviewid += 1
                 print(reviewid)
-            print(create_full_entry(str(authid), str(UID),reviewid,str(UID)))
+            uidTRIP = uuid.uuid4()
+            print(create_full_entry(str(authid), str(UID),reviewid,str(uidTRIP)))
             print("authid: " + str(authid) + " UID: " + str(UID) + " reviewid: " + str(reviewid))
 
         # print entry
@@ -254,7 +258,7 @@ def fetchdata():
     # entry to json
     entry = get_entry(str(authid))
     print(entry)
-    return jsonify({"authid": entry[0], "chat": entry[1], "reviewid": entry[2]}), 200
+    return jsonify({"authid": entry[0], "chat_id": entry[1], "reviewid": entry[2] , "trip_id": entry[3] }), 200
 
 @app.route(appendurl + 'auth/google', methods=['GET'])
 def google():
@@ -268,5 +272,31 @@ def google():
 
     return redirect(response.url)
 
+#
+# CHAT
+# 
+@app.route(appendurl + '/conversations', methods=['POST','GET','DELETE'])
+def conversations():
+    
+    if request.method == 'POST':
+       print("post")
+    elif request.method == 'GET':
+        #get conversations of one user
+        
+        author=request.args.get("author");
+        url=f'http://{ip}:5010/conversations?author={author}'
+        response = requests.get(url)
+        print('RESPONSSE DO TWILIO');
+        print(response.json());
+    elif request.method == 'DELETE':
+        print("delete")
+    return response.json(), response.status_code
+
+@app.route(appendurl + '/new_conversation', methods=['POST'])
+def new_conversation():
+    pass
+
+
+    
 if __name__ == "__main__":
     app.run(debug=True, port=8080)
