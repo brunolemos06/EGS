@@ -231,18 +231,19 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
         },
       ),
       bottomNavigationBar: BottomAppBar(
-        color : const Color(0x808080),
+        color : const Color(0x828282),
         child: Row(
           children: [
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
                   decoration:
                       const InputDecoration(
                         hintText: "Type a message...",
-                        fillColor: const Color(0x808080),
-                        filled: true,
                         hintStyle: TextStyle(
                           color: Colors.grey,
                         ),
