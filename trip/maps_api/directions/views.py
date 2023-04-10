@@ -18,12 +18,13 @@ url = 'https://maps.googleapis.com/maps/api/directions/json'
 class TripView(APIView):
     @swagger_auto_schema(query_serializer=TripSerializer, responses={201: '{v: True, msg: Trip created successfully.}'})
     def post(self, request):
-        # id = request.data.get('id')
+        # print(request.data.get('id'))
+        # print(request.data)
+        # print(request)
+        # id = uuid.UUID(request.data.get('id'))
         id = uuid.uuid4()
         origin = request.data.get('origin')
         destination = request.data.get('destination')
-        print(request.data)
-        print(request)
         owner_id = uuid.UUID(request.data.get('owner_id'))
         # starting_date = datetime.fromtimestamp(int(request.data.get('starting_date')))
         starting_date = parse_datetime(request.data.get('starting_date'))

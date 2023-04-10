@@ -1,6 +1,7 @@
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
+import 'package:latlong2/latlong.dart';
 import 'login_page.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -9,7 +10,7 @@ import 'package:ridemate/pages/main_page.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({Key? key}) : super(key:key);
+  const ProfilePage({Key? key}) : super(key: key);
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -25,45 +26,42 @@ class _ProfilePageState extends State<ProfilePage> {
   String _lname = "";
   String _email = "";
   String _avatar = "";
+
+  String trip_id = "";
+
   @override
   void initState() {
     super.initState();
     fetchData();
   }
 
-  // create trip 
-  final List<Trip> _trips = [
-    Trip(destination: 'Tokyo', departure: 'New York', time: '9:00 AM'),
-  ];
+  // create trip
+  final List<Travel> _trips = [];
 
   Future<void> fetchData() async {
-
-
     // token
     final String tokenKey = 'token';
     final String? token = await storage.read(key: tokenKey);
 
-
-
     if (token != null) {
       // Perform API request with token here
-        
+
       final String url = 'http://10.0.2.2:8080/service-review/v1/auth/info';
       final String url2 = 'http://10.0.2.2:8080/service-review/v1/auth/auth';
       final Map<String, String> headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'x-access-token': token 
+        'x-access-token': token
       };
       final response3 = await http.post(Uri.parse(url2), headers: headers);
       if (response3.statusCode != 200) {
-          debugPrint('Token not valid', wrapWidth: 1024);
-          // go to login page
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => LoginPage()),
-          );
-        return ;
+        debugPrint('Token not valid', wrapWidth: 1024);
+        // go to login page
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => LoginPage()),
+        );
+        return;
       }
       final response = await http.post(Uri.parse(url), headers: headers);
 
@@ -75,10 +73,36 @@ class _ProfilePageState extends State<ProfilePage> {
         final String email = responseJson['email'];
         final String id = responseJson['id'];
 
-        
+        final String url_owner = 'http://10.0.2.2:8080/owner/';
+        final response_owner = (await http.get(Uri.parse(url_owner)));
+        final data = json.decode(response_owner.body);
+        debugPrint("OWNER");
+        debugPrint(data.toString());
+        setState(() {
+          data['msg'].forEach((k, v) {
+            var trip_id = k;
+            debugPrint(k);
+            for (var trip in data['msg'][k]) {
+              var trip_id = trip['id'];
+              var origin = trip['origin'];
+              var destination = trip['destination'];
+              var available_sits = trip['available_sits'];
+              var owner_id = id;
+              var starting_date = trip['starting_date'];
+              _trips.add(Travel(
+                  id: id,
+                  origin: origin,
+                  destination: destination,
+                  available_sits: available_sits,
+                  starting_date: starting_date,
+                  owner_id: owner_id));
+            }
+          });
+        });
 
         // get id for reviews
-        final String url = 'http://10.0.2.2:8080/service-review/v1/auth/fetchdata';
+        final String url =
+            'http://10.0.2.2:8080/service-review/v1/auth/fetchdata';
         final responsefetch = await http.post(
           Uri.parse(url),
           headers: {
@@ -91,7 +115,7 @@ class _ProfilePageState extends State<ProfilePage> {
         );
 
         debugPrint('Response: ${responsefetch.body}', wrapWidth: 1024);
-        if(responsefetch.statusCode == 200){
+        if (responsefetch.statusCode == 200) {
           debugPrint('Fetch success', wrapWidth: 1024);
           final responseJson = json.decode(responsefetch.body);
           final int id = responseJson["reviewid"];
@@ -99,22 +123,20 @@ class _ProfilePageState extends State<ProfilePage> {
           setState(() {
             _id = id.toString();
           });
-        }
-        else{
+        } else {
           debugPrint('Fetch fail', wrapWidth: 1024);
         }
         // .
-        
-      debugPrint('MUAHAHHAHHAHAHA', wrapWidth: 1024);
+
+        debugPrint('MUAHAHHAHHAHAHA', wrapWidth: 1024);
         setState(() {
           _fname = name;
           _lname = lname;
           _email = email;
-          try{
+          try {
             final int size = responseJson['avatar'].length;
             _avatar = responseJson['avatar'];
-          }
-          catch(e){
+          } catch (e) {
             _avatar = "http://www.gravatar.com/avatar/?d=mp";
           }
 
@@ -122,8 +144,7 @@ class _ProfilePageState extends State<ProfilePage> {
           debugPrint("LName   -> $_lname", wrapWidth: 1024);
           debugPrint("Email   -> $_email", wrapWidth: 1024);
           debugPrint("Avatar  -> $_avatar", wrapWidth: 1024);
-          
-        });        
+        });
       } else {
         debugPrint('Error: ${response.statusCode}', wrapWidth: 1024);
       }
@@ -138,64 +159,69 @@ class _ProfilePageState extends State<ProfilePage> {
       );
     }
 
-    final response = await http.get(Uri.parse('http://10.0.2.2:8080/service-review/v1/review/rating?personid=$_id'));
-    final response2 = await http.get(Uri.parse('http://10.0.2.2:8080/service-review/v1/review?personid=$_id'));
+    final response = await http.get(Uri.parse(
+        'http://10.0.2.2:8080/service-review/v1/review/rating?personid=$_id'));
+    final response2 = await http.get(Uri.parse(
+        'http://10.0.2.2:8080/service-review/v1/review?personid=$_id'));
 
     final data = json.decode(response.body);
     final data2 = json.decode(response2.body);
     debugPrint('Response: ${response.body}', wrapWidth: 1024);
     setState(() {
-      
       var rat = data['reviews'][0]['rating'].toString();
       // if rat = "3.15432" then _rating = "3.15"
-      try{
+      try {
         _rating = rat.substring(0, 4);
-      }
-      catch(e){
+      } catch (e) {
         _rating = rat;
       }
       for (var review in data2["reviews"]) {
         var rating = review["rating"];
-        var name = review["personid"].toString(); // Replace with the name of the person who wrote the review
+        var name = review["personid"]
+            .toString(); // Replace with the name of the person who wrote the review
         var title = review["title"];
         var description = review["description"];
 
-        _reviews.add(Review(rating: rating, name: name, title: title, description: description));
+        _reviews.add(Review(
+            rating: rating,
+            name: name,
+            title: title,
+            description: description));
       }
     });
     // refresh page
-
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(
-      title: Text('Profile'),
-      actions: [
-        IconButton(
-          icon: Icon(Icons.login),
-        onPressed: () async {
-          final storage = FlutterSecureStorage();
-          await storage.delete(key: 'token');
-          
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => MainPage()),
-            (route) => false,
-          );
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                "Logged OUT successfully!!",
-                style: TextStyle(color: Colors.white),
-              ),
-              backgroundColor: Colors.red,
-            ),
-          );
-        },
-        ),
-      ],
-    ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Profile'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.login),
+            onPressed: () async {
+              final storage = FlutterSecureStorage();
+              await storage.delete(key: 'token');
+
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => MainPage()),
+                (route) => false,
+              );
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    "Logged OUT successfully!!",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -203,7 +229,8 @@ class _ProfilePageState extends State<ProfilePage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(
-                width: 120, height: 120,
+                width: 120,
+                height: 120,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(100),
                   child: Image(
@@ -225,7 +252,6 @@ class _ProfilePageState extends State<ProfilePage> {
               const SizedBox(height: 20),
               Text(
                 'Number of Travels: 2',
-
                 style: Theme.of(context).textTheme.headline6,
               ),
               // rating
@@ -252,126 +278,17 @@ class _ProfilePageState extends State<ProfilePage> {
               // icon
               SizedBox(
                 height: 20,
-              ), 
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey[600],
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  padding: const EdgeInsets.all(10),
-                  margin: const EdgeInsets.symmetric(vertical: 10),
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: _trips.length,
-                    physics: BouncingScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _trips[index].destination,
-                              style: Theme.of(context).textTheme.headline6,
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Text(
-                              'Departure: ${_trips[index].departure}, Time: ${_trips[index].time}',
-                              style: Theme.of(context).textTheme.bodyText1,
-                            ),
-                            // button
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Row(
-                              children: [
-                                ElevatedButton(
-                                  onPressed: () async {
-                                    // Show dialog with form to submit review
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: Text('Submit Review'),
-                                          content: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              TextFormField(
-                                                decoration: InputDecoration(
-                                                  labelText: 'Title',
-                                                ),
-                                              ),
-                                              TextFormField(
-                                                decoration: InputDecoration(
-                                                  labelText: 'Description',
-                                                ),
-                                                maxLines: null,
-                                              ),
-                                              SizedBox(height: 16),
-                                              RatingBar.builder(
-                                                initialRating: 0,
-                                                minRating: 1,
-                                                direction: Axis.horizontal,
-                                                allowHalfRating: false,
-                                                itemCount: 5,
-                                                itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                                                itemBuilder: (context, _) => Icon(
-                                                  Icons.star,
-                                                  color: Colors.amber,
-                                                ),
-                                                onRatingUpdate: (rating) {
-                                                  _publishrating = rating.toInt();
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () {
-                                                // Dismiss dialog
-                                                Navigator.of(context).pop();
-                                              },
-                                              child: Text('Cancel'),
-                                            ),
-                                            ElevatedButton(
-                                              onPressed: () {
-                                                // Submit review
-                                              },
-                                              child: Text('Submit'),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  },
-                                  style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
-                                  ),
-                                  child: Text('Feedback'),
-                                ),
-
-                                // sizebox to separate buttons to secound button go to end of the row
-                                SizedBox(
-                                  width: 150,
-                                ),
-                                ElevatedButton(
-                                  onPressed: () {},
-                                  child: Text('Finish'),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[600],
+                  borderRadius: BorderRadius.circular(10),
                 ),
-              const SizedBox(height: 15),
-              ListView.builder(
+                padding: const EdgeInsets.all(10),
+                margin: const EdgeInsets.symmetric(vertical: 10),
+                child: ListView.builder(
                   shrinkWrap: true,
-                  itemCount: _reviews.length,
+                  itemCount: _trips.length,
                   physics: BouncingScrollPhysics(),
                   itemBuilder: (context, index) {
                     return Padding(
@@ -379,11 +296,153 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Text(
+                            _trips[index].destination,
+                            style: Theme.of(context).textTheme.headline6,
+                          ),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            'Departure: ${_trips[index].origin}, Time: ${_trips[index].starting_date}',
+                            style: Theme.of(context).textTheme.bodyText1,
+                          ),
+                          // button
+                          SizedBox(
+                            height: 5,
+                          ),
                           Row(
+                            children: [
+                              ElevatedButton(
+                                onPressed: () async {
+                                  // Show dialog with form to submit review
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text('Submit Review'),
+                                        content: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            TextFormField(
+                                              decoration: InputDecoration(
+                                                labelText: 'Title',
+                                              ),
+                                            ),
+                                            TextFormField(
+                                              decoration: InputDecoration(
+                                                labelText: 'Description',
+                                              ),
+                                              maxLines: null,
+                                            ),
+                                            SizedBox(height: 16),
+                                            RatingBar.builder(
+                                              initialRating: 0,
+                                              minRating: 1,
+                                              direction: Axis.horizontal,
+                                              allowHalfRating: false,
+                                              itemCount: 5,
+                                              itemPadding: EdgeInsets.symmetric(
+                                                  horizontal: 4.0),
+                                              itemBuilder: (context, _) => Icon(
+                                                Icons.star,
+                                                color: Colors.amber,
+                                              ),
+                                              onRatingUpdate: (rating) {
+                                                _publishrating = rating.toInt();
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              // Dismiss dialog
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Text('Cancel'),
+                                          ),
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              // Submit review
+                                            },
+                                            child: Text('Submit'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                                style: ButtonStyle(
+                                  backgroundColor:
+                                      MaterialStateProperty.all<Color>(
+                                          Colors.blue),
+                                ),
+                                child: Text('Feedback'),
+                              ),
+
+                              // sizebox to separate buttons to secound button go to end of the row
+                              SizedBox(
+                                width: 150,
+                              ),
+                              ElevatedButton(
+                                onPressed: () async {
+                                  final String url =
+                                      'http://10.0.2.2:8080/trip/';
+                                  final response =
+                                      await http.delete(Uri.parse(url),
+                                          headers: {
+                                            'Content-Type': 'application/json',
+                                          },
+                                          body: jsonEncode({'id': trip_id}));
+                                  if (response.statusCode == 201) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          "Trip finished successfully",
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        backgroundColor: Colors.green,
+                                      ),
+                                    );
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          "Trip deletion failed!",
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                  }
+                                },
+                                child: Text('Finish'),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 15),
+              ListView.builder(
+                shrinkWrap: true,
+                itemCount: _reviews.length,
+                physics: BouncingScrollPhysics(),
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
                             // put _reviews[index].rating.toString() number of stars
                             // others are grey
                             children: [
-                              for (var i = 0; i <5; i++)
+                              for (var i = 0; i < 5; i++)
                                 if (i < _reviews[index].rating)
                                   Icon(
                                     Icons.star,
@@ -394,28 +453,26 @@ class _ProfilePageState extends State<ProfilePage> {
                                     Icons.star,
                                     color: Colors.grey,
                                   ),
-                            ]
-                          ),
-
-                          SizedBox(
-                            height: 5,
-                          ),
-                          Text(
-                            _reviews[index].title,
-                            style: Theme.of(context).textTheme.headline6,
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
-                          Text(
-                            _reviews[index].description,
-                            style: Theme.of(context).textTheme.bodyText1,
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
+                            ]),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Text(
+                          _reviews[index].title,
+                          style: Theme.of(context).textTheme.headline6,
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Text(
+                          _reviews[index].description,
+                          style: Theme.of(context).textTheme.bodyText1,
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
             ],
           ),
         ),
@@ -437,10 +494,21 @@ class Review {
     required this.description,
   });
 }
-class Trip {
-  final String destination;
-  final String departure;
-  final String time;
 
-  Trip({required this.destination, required this.departure, required this.time});
+class Travel {
+  final String id;
+  final String origin;
+  final String destination;
+  final int available_sits;
+  final String starting_date;
+  final String owner_id;
+
+  Travel({
+    required this.id,
+    required this.origin,
+    required this.destination,
+    required this.available_sits,
+    required this.starting_date,
+    required this.owner_id,
+  });
 }
