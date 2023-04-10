@@ -26,6 +26,7 @@ class MessagePage extends StatefulWidget {
 
 class _MessagePageState extends State<MessagePage> {
   final List<Message> _messages = [];
+  bool loading = true;
   @override
   void initState() {
     super.initState();
@@ -56,7 +57,7 @@ class _MessagePageState extends State<MessagePage> {
         return;
       }
       final response = await http.post(Uri.parse(url), headers: headers);
-
+      // pop up 
       if (response.statusCode == 200) {
         final responseJson = json.decode(response.body);
         debugPrint('Response: ${response.body}', wrapWidth: 1024);
@@ -78,13 +79,11 @@ class _MessagePageState extends State<MessagePage> {
             "email": email,
           }),
         );
-
         debugPrint('Response: ${responsefetch.body}', wrapWidth: 1024);
         if (responsefetch.statusCode == 200) {
           final responseJson = json.decode(responsefetch.body);
           final String chatid = responseJson['chat_id'];
-          final responsechat = await http.get(Uri.parse(
-              'http://10.0.2.2:8080/service-review/v1/conversations?author=US1a381f88799a4768bd58018d0b64cb66'));
+          final responsechat = await http.get(Uri.parse('http://10.0.2.2:8080/service-review/v1/conversations?author=US1a381f88799a4768bd58018d0b64cb66'));
           if (responsechat.statusCode == 200) {
             final responseJson = json.decode(responsechat.body);
             debugPrint('Response: ${responsechat.body}', wrapWidth: 1024);
@@ -98,6 +97,7 @@ class _MessagePageState extends State<MessagePage> {
                     conversa: 'conversa',
                     message: message['body']));
               }
+              loading = false;
             });
 
             debugPrint(_messages.toString(), wrapWidth: 1024);
@@ -119,9 +119,15 @@ class _MessagePageState extends State<MessagePage> {
         uniqueSenders.add(message.conversa);
       }
     }
-    return Scaffold(
+    return MaterialApp(
+      home: loading ? LoadingScreen() : Scaffold(
+      backgroundColor : const Color(0x808080),
+      
       appBar: AppBar(
         title: const Text("Messages"),
+        backgroundColor: Colors.grey[800],
+        // text color white
+        foregroundColor: Colors.white,
       ),
       body: ListView.builder(
         itemCount: uniqueSenders.length,
@@ -143,7 +149,11 @@ class _MessagePageState extends State<MessagePage> {
                 ),
               ),
             ),
-            subtitle: Text(firstMessage.message),
+            subtitle: Text(
+              firstMessage.message,
+                style: TextStyle(
+                  color: Colors.white, // set the text color of the subtitle
+                )),
             onTap: () {
               Navigator.push(
                 context,
@@ -156,6 +166,7 @@ class _MessagePageState extends State<MessagePage> {
           );
         },
       ),
+    ),
     );
   }
 }
@@ -188,8 +199,10 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor : const Color(0x808080),
       appBar: AppBar(
         title: Text(widget.sender),
+        backgroundColor: Colors.grey[800],
       ),
       body: ListView.builder(
         reverse: true,
@@ -218,6 +231,7 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
         },
       ),
       bottomNavigationBar: BottomAppBar(
+        color : const Color(0x808080),
         child: Row(
           children: [
             Expanded(
@@ -225,7 +239,20 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
                   decoration:
-                      const InputDecoration(hintText: "Type a message..."),
+                      const InputDecoration(
+                        hintText: "Type a message...",
+                        fillColor: const Color(0x808080),
+                        filled: true,
+                        hintStyle: TextStyle(
+                          color: Colors.grey,
+                        ),
+                        // when the textfield is focused
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.green,
+                          ),
+                        ),
+                        ),
                   onFieldSubmitted: (value) {
                     setState(() {
                       _messages.add(Message(
@@ -241,8 +268,21 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
             IconButton(
               onPressed: () {},
               icon: const Icon(Icons.send),
-            ),
+              color: Colors.green,            ),
           ],
+        ),
+      ),
+    );
+  }
+}
+// Define the loading screen widget
+class LoadingScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
         ),
       ),
     );
