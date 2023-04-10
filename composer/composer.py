@@ -121,6 +121,14 @@ def get_all_reviews():
     if (request.method == 'GET'):
         reviewid = request.args.get('reviewid')
         personid = request.args.get('personid')
+        trip_id = request.args.get('trip_id')
+        if (trip_id != None):
+            entry = get_review_id(trip_id)
+            if (entry == None):
+                return jsonify({'error': 'review not found'}), 404
+            else:
+                print(entry)
+                return jsonify(entry), 200
         # get in http:{ip}:5005/api/v1/review?reviewid=1&personid=1
         if (reviewid == None and personid == None):
             response = requests.get(url)
@@ -135,11 +143,13 @@ def get_all_reviews():
             response = requests.get(url, params=params)
     elif (request.method == 'POST'):
         try:
-            personid = request.form['personid']
-            title = request.form['title']
-            description = request.form['description']
-            rating = request.form['rating']
-        except:
+            print(request.json)
+            personid = request.json.get('person_id')
+            title = request.json.get('title')
+            description = request.json.get('description')
+            rating = request.json.get('rating')
+        except Exception as e:
+            print(e)
             return jsonify({'error': 'personid, title, description, rating are required'}), 400
 
         data = {'personid': personid, 'title': title, 'description': description, 'rating': rating}
@@ -160,6 +170,7 @@ def rating_reviews():
             response = requests.get(url, params=params)
 
     return response.json(), response.status_code
+
 
 # ------------------------------
 
@@ -315,6 +326,6 @@ def new_conversation():
     pass
 
 
-    
+
 if __name__ == "__main__":
     app.run(debug=True, port=8080)

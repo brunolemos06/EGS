@@ -26,8 +26,19 @@ class _ProfilePageState extends State<ProfilePage> {
   String _lname = "";
   String _email = "";
   String _avatar = "";
+  int _personid = -1;
+
+  final _formKey = GlobalKey<FormState>();
+  final _descriptionController = TextEditingController();
+  final _titleController = TextEditingController();
 
   String trip_id = "";
+
+  @override
+  void dispose() {
+    _descriptionController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -40,6 +51,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> fetchData() async {
     // token
+    _reviews.clear();
+    debugPrint('fetching data', wrapWidth: 1024);
     final String tokenKey = 'token';
     final String? token = await storage.read(key: tokenKey);
 
@@ -72,6 +85,8 @@ class _ProfilePageState extends State<ProfilePage> {
         final String lname = responseJson['lname'];
         final String email = responseJson['email'];
         final String id = responseJson['id'];
+
+
 
         // get id for reviews
         final String url =
@@ -331,13 +346,32 @@ class _ProfilePageState extends State<ProfilePage> {
                                             TextFormField(
                                               decoration: InputDecoration(
                                                 labelText: 'Title',
+                                                
                                               ),
+                                              controller: _titleController,
+                                              validator: (value) {
+                                                if (value == null ||
+                                                    value.isEmpty) {
+                                                  return 'Please enter a title';
+                                                }
+                                                return null;
+                                              },
                                             ),
                                             TextFormField(
                                               decoration: InputDecoration(
                                                 labelText: 'Description',
+
                                               ),
+                                              controller:
+                                                    _descriptionController,
                                               maxLines: null,
+                                              validator: (value) {
+                                                if (value == null ||
+                                                    value.isEmpty) {
+                                                  return 'Please enter a description';
+                                                }
+                                                return null;
+                                              },
                                             ),
                                             SizedBox(height: 16),
                                             RatingBar.builder(
@@ -367,8 +401,97 @@ class _ProfilePageState extends State<ProfilePage> {
                                             child: Text('Cancel'),
                                           ),
                                           ElevatedButton(
-                                            onPressed: () {
+                                            onPressed: ()  async{
+                                              final description = _descriptionController.text;
+                                              final title = _titleController.text;
+                                              if (description.isEmpty ||
+                                                  title.isEmpty) {
+                                             ScaffoldMessenger.of(context).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      "Fill required!",
+                                                      style: TextStyle(color: Colors.white),
+                                                    ),
+                                                    backgroundColor: Colors.red,
+                                                  ),
+                                                );
+                                                return;
+                                              }
+                                              // Dismiss dialog
+
                                               // Submit review
+                                              // get owner id from trip
+                                              var ownerid = _trips[index].owner_id;
+                                              final url3 = 'http://10.0.2.2:8080/service-review/v1/review?trip_id=$ownerid';
+                                              final response3 = (await http.get(Uri.parse(url3)));
+                                              debugPrint(response3.statusCode.toString());
+                                              if (response3.statusCode == 200) {
+                                                final data = jsonDecode(response3.body);
+                                                _personid = int.parse(data.toString());
+                                                // post review
+                                                final url = 'http://10.0.2.2:8080/service-review/v1/review';
+                                                // get title and description from form
+                                                debugPrint("person id: $_personid",wrapWidth: 1024);
+                                                debugPrint("rating: $_publishrating",wrapWidth: 1024);
+                                                debugPrint("title: ${_titleController.text}",wrapWidth: 1024);
+                                                debugPrint("description: ${_descriptionController.text}",wrapWidth: 1024);
+                                                final response = await http.post(
+                                                  Uri.parse(url),
+                                                  headers: <String, String>{
+                                                    'Content-Type': 'application/json; charset=UTF-8',
+                                                  },
+                                                  body: jsonEncode(<String, dynamic>{
+                                                    'title': title,
+                                                    'description': description,
+                                                    'rating': int.parse(_publishrating.toString()),
+                                                    'person_id': _personid,
+                                                  }),
+                                                );
+                                                if(response.statusCode == 200){
+                                                  // pop
+                                                  Navigator.of(context).pop();
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(
+                                                        "Review submitted!",
+                                                        style: TextStyle(color: Colors.white),
+                                                      ),
+                                                      backgroundColor: Colors.green,
+                                                    ),
+                                                  );
+                                                  fetchData();
+                                                }else{
+                                                  // something went wrong
+                                                  // pop
+                                                  debugPrint("something went wrong",wrapWidth: 1024);
+                                                  Navigator.of(context).pop();
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(
+                                                        "Something went with adding review!",
+                                                        style: TextStyle(color: Colors.white),
+                                                      ),
+                                                      backgroundColor: Colors.red,
+                                                    ),
+                                                  );
+                                                }
+
+                                              }else{
+                                                // something went wrong
+                                                // pop
+                                                debugPrint("something went wrong",wrapWidth: 1024);
+                                                Navigator.of(context).pop();
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      "Something went wrong!",
+                                                      style: TextStyle(color: Colors.white),
+                                                    ),
+                                                    backgroundColor: Colors.red,
+                                                  ),
+                                                );
+                                              }
+
                                             },
                                             child: Text('Submit'),
                                           ),
@@ -382,7 +505,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       MaterialStateProperty.all<Color>(
                                           Colors.blue),
                                 ),
-                                child: Text('Feedback'),
+                                child: Text('Review'),
                               ),
 
                               // sizebox to separate buttons to secound button go to end of the row
@@ -399,7 +522,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                             'Content-Type': 'application/json',
                                           },
                                           body: jsonEncode({'id': trip_id}));
-                                  if (response.statusCode == 201) {
+                                  debugPrint(response.statusCode.toString());
+                                  if (response.statusCode == 200) {
+                                    Navigator.of(context).pop();
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(
@@ -409,6 +534,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         backgroundColor: Colors.green,
                                       ),
                                     );
+                                    
                                   } else {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(

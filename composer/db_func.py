@@ -72,3 +72,22 @@ def check_free_review_id(review_id):
     finally:
         con.close()
         
+def get_review_id(trip_id):
+    # check if review_id is already in db
+
+    try:
+        with sql.connect("compuser.db") as con:
+            cur = con.cursor()
+            cur.execute("SELECT review_id FROM compuser WHERE trip_id = ?", [str(trip_id)])
+            entry = cur.fetchone()
+            # print("ENTRY: "+ entry)
+            if not entry:
+                return None
+            return entry[0]
+    except Exception as e:
+    # handle the error
+        print("An error occurred:", e)
+        con.rollback()
+        return None
+    finally:
+        con.close()
