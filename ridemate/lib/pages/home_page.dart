@@ -31,6 +31,8 @@ class _HomePageState extends State<HomePage> {
       //add all destinations to the list
       _destinations.add("All");
       for (var trip in data['msg']) {
+        // if(trip['destination'] in _destinations) continue;
+        if (_destinations.contains(trip['destination'])) continue;
         String destination = trip['destination'];
         _destinations.add(destination);
       }

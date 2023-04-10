@@ -181,7 +181,7 @@ def login():
                 while(check_free_review_id(reviewid) == False):
                     reviewid += 1
                     print(reviewid)
-                uidTRIP = uuid.uuid4()
+                uidTRIP = uuid.uuid4().toString()
                 print(create_full_entry(str(authid), str(UID),reviewid,str(uidTRIP)))
                 print("authid: " + str(authid) + " UID: " + str(UID) + " reviewid: " + str(reviewid) + " TRIPID: " + uidTRIP)
 
@@ -248,7 +248,8 @@ def fetchdata():
             while(check_free_review_id(reviewid) == False):
                 reviewid += 1
                 print(reviewid)
-            uidTRIP = uuid.uuid4()
+            uidTRIP = uuid.uuid4().toString()
+            
             print(create_full_entry(str(authid), str(UID),reviewid,str(uidTRIP)))
             print("authid: " + str(authid) + " UID: " + str(UID) + " reviewid: " + str(reviewid))
 
@@ -288,12 +289,11 @@ def conversations():
         
         author=request.args.get("author");
         url=f'http://{ip}:5010/conversations?author={author}'
-        response = requests.get(url)
-        print('RESPONSSE DO TWILIO');
+        response = requests.get(url);
         print(response.json());
     elif request.method == 'DELETE':
         print("delete")
-    return response.json(), response.status_code
+    return jsonify(response.json()), response.status_code
 
 @app.route(appendurl + '/new_conversation', methods=['POST'])
 def new_conversation():
