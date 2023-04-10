@@ -469,7 +469,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                   ScaffoldMessenger.of(context).showSnackBar(
                                                     SnackBar(
                                                       content: Text(
-                                                        "Something went with adding review!",
+                                                        "Something went wrong with adding review!",
                                                         style: TextStyle(color: Colors.white),
                                                       ),
                                                       backgroundColor: Colors.red,
