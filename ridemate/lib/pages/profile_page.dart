@@ -73,33 +73,6 @@ class _ProfilePageState extends State<ProfilePage> {
         final String email = responseJson['email'];
         final String id = responseJson['id'];
 
-        final String url_owner = 'http://10.0.2.2:8080/owner/';
-        final response_owner = (await http.get(Uri.parse(url_owner)));
-        final data = json.decode(response_owner.body);
-        debugPrint("OWNER");
-        debugPrint(data.toString());
-        setState(() {
-          data['msg'].forEach((k, v) {
-            var trip_id = k;
-            debugPrint(k);
-            for (var trip in data['msg'][k]) {
-              var trip_id = trip['id'];
-              var origin = trip['origin'];
-              var destination = trip['destination'];
-              var available_sits = trip['available_sits'];
-              var owner_id = id;
-              var starting_date = trip['starting_date'];
-              _trips.add(Travel(
-                  id: id,
-                  origin: origin,
-                  destination: destination,
-                  available_sits: available_sits,
-                  starting_date: starting_date,
-                  owner_id: owner_id));
-            }
-          });
-        });
-
         // get id for reviews
         final String url =
             'http://10.0.2.2:8080/service-review/v1/auth/fetchdata';
@@ -122,6 +95,37 @@ class _ProfilePageState extends State<ProfilePage> {
           debugPrint('ID: $id', wrapWidth: 1024);
           setState(() {
             _id = id.toString();
+          });
+          // get trips for loged user
+          final String url_owner = 'http://10.0.2.2:8080/owner/';
+          final response_owner = (await http.get(Uri.parse(url_owner)));
+          final data = json.decode(response_owner.body);
+          debugPrint("OWNER");
+          debugPrint(data.toString());
+          setState(() {
+            data['msg'].forEach((k, v) {
+              debugPrint("AQUIIII");
+              debugPrint(responseJson['trip_id']);
+              debugPrint(k);
+              if (k == responseJson['trip_id'] && v != null) {
+                var trip_id = k;
+                for (var trip in data['msg'][k]) {
+                  var trip_id = trip['id'];
+                  var origin = trip['origin'];
+                  var destination = trip['destination'];
+                  var available_sits = trip['available_sits'];
+                  var owner_id = id;
+                  var starting_date = trip['starting_date'];
+                  _trips.add(Travel(
+                      id: trip_id,
+                      origin: origin,
+                      destination: destination,
+                      available_sits: available_sits,
+                      starting_date: starting_date,
+                      owner_id: responseJson['trip_id']));
+                }
+              }
+            });
           });
         } else {
           debugPrint('Fetch fail', wrapWidth: 1024);
