@@ -196,7 +196,7 @@ def login():
                 while(check_free_review_id(reviewid) == False):
                     reviewid += 1
                     print(reviewid)
-                uidTRIP = uuid.uuid4().toString()
+                uidTRIP = str(uuid.uuid4())
                 print(create_full_entry(str(authid), str(UID),reviewid,str(uidTRIP)))
                 print("authid: " + str(authid) + " UID: " + str(UID) + " reviewid: " + str(reviewid) + " TRIPID: " + uidTRIP)
 
@@ -263,7 +263,7 @@ def fetchdata():
             while(check_free_review_id(reviewid) == False):
                 reviewid += 1
                 print(reviewid)
-            uidTRIP = uuid.uuid4()
+            uidTRIP = str(uuid.uuid4())
             
             print(create_full_entry(str(authid), str(UID),reviewid,str(uidTRIP)))
             print("authid: " + str(authid) + " UID: " + str(UID) + " reviewid: " + str(reviewid))
