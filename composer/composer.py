@@ -84,16 +84,21 @@ def trip():
 
 @app.route('/participant/', methods=['GET', 'POST', 'DELETE'])
 def participant():
+    print('ON PARTICIPANT METHOD')
     url = f'http://{ip}:5015/directions/participant/'
     if (request.method == 'GET'):
         id = request.args.get('id')
         params = {'id': id}
         response = requests.get(url, data=params)
     elif (request.method == 'POST'):
-        id = request.args.get('id')
-        trip_id = request.args.get('trip_id')
-        pickup_location = request.args.get('pickup_location')
+        request.data = request.json
+        id = request.data.get('id')
+        print(f'ID: {id}')
+        trip_id = request.data.get('trip_id')
+        pickup_location = request.data.get('pickup_location')
         params = {'id': id, 'trip_id': trip_id, 'pickup_location': pickup_location}
+
+        print(params)
         response = requests.post(url, data=params)
     elif (request.method == 'DELETE'):
         id = request.args.get('id')

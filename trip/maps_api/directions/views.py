@@ -115,14 +115,14 @@ class ParticipantView(APIView):
     
     @swagger_auto_schema(manual_parameters=[id_param, trip_id_param, pickup_location_param], responses={200: '{v: True, msg: Participant created successfully}', 404: '{v: False, error: Cannot get Trip.}'})
     def post(self, request):
-        id = request.GET.get('id')
-        trip_id = request.GET.get('trip_id')
-        pickup_location = request.GET.get('pickup_location')
-
+        print("ENTROU")
+        id = request.data.get('id')
+        trip_id = request.data.get('trip_id')
+        pickup_location = request.data.get('pickup_location')
+        print(id, trip_id, pickup_location)
         trip = Trip.objects.get(id=trip_id)
         if trip is None:
             return JsonResponse({'v': False, 'error': f'No Trip with id {trip_id}'}, status = 404)
-        
         if trip.available_sits == 0:
             return JsonResponse({'v': False, 'error': f'No available sits in Trip {trip_id}'}, status = 404)
         
@@ -154,7 +154,7 @@ class ParticipantView(APIView):
         trip.info = info.json()
         trip.save()
     
-        return JsonResponse({'v': True, 'msg': f'Participant {id} added to Trip {trip_id} successfully.'}, status = 201)
+        return JsonResponse({'v': True, 'msg': f'Participant {id} added to Trip {trip_id} successfully.', 'money': participant.price}, status = 201)
     
     # @swagger_auto_schema(query_serializer=ParticipantSerializer)
     id_param = openapi.Parameter('id', openapi.IN_QUERY, description="participant id", type=openapi.TYPE_STRING)

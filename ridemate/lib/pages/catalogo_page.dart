@@ -36,7 +36,6 @@ class Travel {
 class catalogo_page extends StatefulWidget {
   final String? pontodechegada;
   // _pickedLocation
-  
 
   const catalogo_page({Key? key, this.pontodechegada}) : super(key: key);
 
@@ -47,8 +46,8 @@ class catalogo_page extends StatefulWidget {
 class _catalogoPageState extends State<catalogo_page> {
   final _storage = FlutterSecureStorage();
   final List<Travel> travels = [];
-   LatLng _pickedLocation = LatLng(39.5572, -8.0317);
-
+  LatLng _pickedLocation = LatLng(39.5572, -8.0317);
+  String _pickedLocationString = '39.5572, -8.0317';
   final flutterWebviewPlugin = FlutterWebviewPlugin();
 
   String order_id = '';
@@ -88,10 +87,9 @@ class _catalogoPageState extends State<catalogo_page> {
       }
     });
   }
-  
+
   Future<void> _getLocation() async {
     // Get the user's current location and update `_pickedLocation`
-
   }
   @override
   void initState() {
@@ -268,81 +266,110 @@ class _catalogoPageState extends State<catalogo_page> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: <Widget>[
                                       // flutter map to select pick up location
-                                        Container(
-                                          height: 180,
-                                          width: 400,
-                                          child: Stack(
-                                            children: [
-                                              FlutterMap(
-                                                options: MapOptions(
-                                                  center: LatLng(39.5572, -8.0317),
-                                                  zoom: 5.2,
-                                                  onPositionChanged: (position, hasGesture) {
-                                                    debugPrint(position.center.toString());
-                                                    _pickedLocation = position.center!;
-                                                  },
+                                      Container(
+                                        height: 180,
+                                        width: 400,
+                                        child: Stack(
+                                          children: [
+                                            FlutterMap(
+                                              options: MapOptions(
+                                                center:
+                                                    LatLng(39.5572, -8.0317),
+                                                zoom: 5.2,
+                                                onPositionChanged:
+                                                    (position, hasGesture) {
+                                                  debugPrint(position.center
+                                                      .toString());
+                                                  _pickedLocation =
+                                                      position.center!;
+                                                  // turn this LatLng(latitude:39.5572, longitude:-8.0317) into this "39.5572,-8.0317"
+                                                  _pickedLocationString =
+                                                      _pickedLocation
+                                                          .toString()
+                                                          .replaceFirst(
+                                                              'LatLng(latitude:',
+                                                              '');
+                                                  _pickedLocationString =
+                                                      _pickedLocationString
+                                                          .replaceFirst(
+                                                              ' longitude:',
+                                                              '');
+                                                  _pickedLocationString =
+                                                      _pickedLocationString
+                                                          .replaceFirst(
+                                                              ')', '');
+                                                  debugPrint(
+                                                      _pickedLocationString);
+                                                },
+                                              ),
+                                              layers: [
+                                                TileLayerOptions(
+                                                  urlTemplate:
+                                                      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                                                  subdomains: ['a', 'b', 'c'],
                                                 ),
-                                                layers: [
-                                                  TileLayerOptions(
-                                                    urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                                                    subdomains: ['a', 'b', 'c'],
-                                                  ),
-                                                  MarkerLayerOptions(
-                                                    markers: [
-                                                      Marker(
-                                                        width: 80.0,
-                                                        height: 80.0,
-                                                        point: travels[index].origin_coords,
-                                                        builder: (ctx) => Container(
-                                                          child: Icon(
-                                                            Icons.location_on,
-                                                            color: Colors.red,
-                                                          ),
+                                                MarkerLayerOptions(
+                                                  markers: [
+                                                    Marker(
+                                                      width: 80.0,
+                                                      height: 80.0,
+                                                      point: travels[index]
+                                                          .origin_coords,
+                                                      builder: (ctx) =>
+                                                          Container(
+                                                        child: Icon(
+                                                          Icons.location_on,
+                                                          color: Colors.red,
                                                         ),
                                                       ),
-                                                      Marker(
-                                                        width: 80.0,
-                                                        height: 80.0,
-                                                        point: travels[index].destination_coords,
-                                                        builder: (ctx) => Container(
-                                                          child: Icon(
-                                                            Icons.location_on,
-                                                            color: Colors.green,
-                                                          ),
+                                                    ),
+                                                    Marker(
+                                                      width: 80.0,
+                                                      height: 80.0,
+                                                      point: travels[index]
+                                                          .destination_coords,
+                                                      builder: (ctx) =>
+                                                          Container(
+                                                        child: Icon(
+                                                          Icons.location_on,
+                                                          color: Colors.green,
                                                         ),
                                                       ),
-                                                    ],
-                                                  ),
-                                                  PolylineLayerOptions(
-                                                    polylines: [
-                                                      Polyline(
-                                                        points: [
-                                                          travels[index].origin_coords,
-                                                          travels[index].destination_coords
-                                                        ],
-                                                        strokeWidth: 4.0,
-                                                        color: Colors.cyan,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                              Positioned(
-                                                // center of container
-                                                top: 0,
-                                                left: 0,
-                                                right: 0,
-                                                bottom: 0,
-                                                child: Center(
-                                                  child: Icon(
-                                                    Icons.location_on,
-                                                    color: Colors.blue,
-                                                  ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                PolylineLayerOptions(
+                                                  polylines: [
+                                                    Polyline(
+                                                      points: [
+                                                        travels[index]
+                                                            .origin_coords,
+                                                        travels[index]
+                                                            .destination_coords
+                                                      ],
+                                                      strokeWidth: 4.0,
+                                                      color: Colors.cyan,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                            Positioned(
+                                              // center of container
+                                              top: 0,
+                                              left: 0,
+                                              right: 0,
+                                              bottom: 0,
+                                              child: Center(
+                                                child: Icon(
+                                                  Icons.location_on,
+                                                  color: Colors.blue,
                                                 ),
                                               ),
-                                            ],
-                                          ),
+                                            ),
+                                          ],
                                         ),
+                                      ),
                                     ],
                                   ),
                                   actions: <Widget>[
@@ -351,9 +378,7 @@ class _catalogoPageState extends State<catalogo_page> {
                                       style: ElevatedButton.styleFrom(
                                         primary: Colors.orange[400],
                                       ),
-                                      onPressed: () async{
-
-
+                                      onPressed: () async {
                                         // you need to be logged in to make a payment
                                         // if you are not logged in, you will be redirected to the login page
                                         // if you are logged in, you will be redirected to the payment page
@@ -362,20 +387,19 @@ class _catalogoPageState extends State<catalogo_page> {
                                         final String? token =
                                             await _storage.read(key: tokenKey);
                                         if (token == null) {
-                                          debugPrint('Token not found', wrapWidth: 1024);
+                                          debugPrint('Token not found',
+                                              wrapWidth: 1024);
                                           // go to login page
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                                builder: (context) => LoginPage()),
+                                                builder: (context) =>
+                                                    LoginPage()),
                                           );
                                           return;
                                         }
 
-
                                         // verify if the pick up location is in the route
-
-
 
                                         //
                                         final String url2 =
@@ -385,51 +409,105 @@ class _catalogoPageState extends State<catalogo_page> {
                                           'Accept': 'application/json',
                                           'x-access-token': token
                                         };
-                                        final response3 = await http.post(Uri.parse(url2),
+                                        final response3 = await http.post(
+                                            Uri.parse(url2),
                                             headers: headers2);
                                         if (response3.statusCode != 200) {
-                                          debugPrint('Token not valid', wrapWidth: 1024);
+                                          debugPrint('Token not valid',
+                                              wrapWidth: 1024);
                                           // go to login page
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                                builder: (context) => LoginPage()),
+                                                builder: (context) =>
+                                                    LoginPage()),
                                           );
                                           // message to user that to pay you need to be logged in
-                                          ScaffoldMessenger.of(context).showSnackBar(
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
                                             SnackBar(
                                               content: Text(
                                                 "To pay you need to be logged in !!",
-                                                style: TextStyle(color: Colors.white),
+                                                style: TextStyle(
+                                                    color: Colors.white),
                                               ),
                                               backgroundColor: Colors.red,
                                             ),
                                           );
                                           return;
                                         }
+                                        //adiciona participante
+                                        final String url_add_participant =
+                                            'http://10.0.2.2:8080/participant/';
+                                        final response_add_participant =
+                                            await http.post(
+                                          Uri.parse(url_add_participant),
+                                          headers: {
+                                            'Content-Type': 'application/json',
+                                          },
+                                          body: jsonEncode({
+                                            'pickup_location':
+                                                _pickedLocationString,
+                                            'trip_id': travels[index].id,
+                                            'id':
+                                                "0e4aefcb-ab8a-415f-9731-32a1f4bd7705"
+                                          }),
+                                        );
+                                        debugPrint("response_add_participant");
+                                        debugPrint(
+                                            response_add_participant.body,
+                                            wrapWidth: 1024);
 
                                         final url = Uri.parse(
                                             'http://10.0.2.2:8000/paypal/create/order');
                                         final headers = {
                                           'Content-Type': 'application/json'
                                         };
-                                        final payload = {'amount': travels[index].money};
+                                        final payload = {
+                                          'amount': json.decode(
+                                              response_add_participant
+                                                  .body)['money']
+                                        };
                                         final response = await http.post(url,
-                                            headers: headers, body: json.encode(payload));
+                                            headers: headers,
+                                            body: json.encode(payload));
                                         final errorMessage =
                                             'Status: ${response.statusCode.toString()}';
-                                        debugPrint(errorMessage, wrapWidth: 1024);
+                                        debugPrint(errorMessage,
+                                            wrapWidth: 1024);
                                         if (response.statusCode == 201) {
-                                          final jsonResponse = jsonDecode(response.body);
+                                          final jsonResponse =
+                                              jsonDecode(response.body);
                                           final linkForPayment =
                                               jsonResponse['linkForPayment'];
                                           // save the order_id in class variable
                                           order_id = jsonResponse['order_id'];
 
                                           // lauch the linkForPayment in a webview until the url contains the string 'http://10.0.2.2:8000/paypal/finish'
-                                          flutterWebviewPlugin.launch(linkForPayment);
+                                          flutterWebviewPlugin
+                                              .launch(linkForPayment);
                                         } else {
                                           // Handle the failure response
+                                          // remove participante porque nao conseguiu pagar
+                                          // final String url_remove_participant =
+                                          //     'http://10.0.2.2:8080/participant/';
+                                          // final response_remove_participant =
+                                          //     await http.delete(
+                                          //   Uri.parse(url_remove_participant),
+                                          //   headers: {
+                                          //     'Content-Type':
+                                          //         'application/json',
+                                          //   },
+                                          //   body: jsonEncode({
+                                          //     'id':
+                                          //         "0e4aefcb-ab8a-415f-9731-32a1f4bd7705"
+                                          //   }),
+                                          // );
+                                          // debugPrint(
+                                          //     "response_remove_participant");
+                                          // debugPrint(
+                                          //     response_remove_participant.body,
+                                          //     wrapWidth: 1024);
                                         }
                                         Navigator.of(context).pop();
                                       },
