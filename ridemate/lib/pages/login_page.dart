@@ -191,7 +191,7 @@ class _LoginPageState extends State<LoginPage> {
                     final token = out[3].replaceAll('"', '').replaceAll('}', '').replaceAll('\n', '');
                     debugPrint("Token -> " + token, wrapWidth: 1024);
                     // save token to secure storage
-                    await _storage.write(key: 'token', value: token);
+                    
                     final String url2 = 'http://10.0.2.2:8080/service-review/v1/auth/auth';
                     final Map<String, String> headers2 = {
                       'Content-Type': 'application/json',
@@ -213,6 +213,7 @@ class _LoginPageState extends State<LoginPage> {
                       );
                       return ;
                     }
+                    await _storage.write(key: 'token', value: token);
                     WebView.platform.clearCookies();
                     // close webview
                     Navigator.of(context).pop();
