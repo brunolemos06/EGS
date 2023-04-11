@@ -35,6 +35,8 @@ class Travel {
 
 class catalogo_page extends StatefulWidget {
   final String? pontodechegada;
+  // _pickedLocation
+  
 
   const catalogo_page({Key? key, this.pontodechegada}) : super(key: key);
 
@@ -45,6 +47,7 @@ class catalogo_page extends StatefulWidget {
 class _catalogoPageState extends State<catalogo_page> {
   final _storage = FlutterSecureStorage();
   final List<Travel> travels = [];
+   LatLng _pickedLocation = LatLng(39.5572, -8.0317);
 
   final flutterWebviewPlugin = FlutterWebviewPlugin();
 
@@ -85,11 +88,16 @@ class _catalogoPageState extends State<catalogo_page> {
       }
     });
   }
+  
+  Future<void> _getLocation() async {
+    // Get the user's current location and update `_pickedLocation`
 
+  }
   @override
   void initState() {
     super.initState();
     fetchData();
+    _getLocation();
     flutterWebviewPlugin.onUrlChanged.listen((url) {
       if (url.contains('http://10.0.2.2:8000/paypal/finish')) {
         flutterWebviewPlugin.close();
@@ -259,16 +267,90 @@ class _catalogoPageState extends State<catalogo_page> {
                                   content: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: <Widget>[
-                                      TextField(
-                                        decoration: InputDecoration(
-                                          hintText: "Enter location",
+                                      // flutter map to select pick up location
+                                        Container(
+                                          height: 180,
+                                          width: 400,
+                                          child: Stack(
+                                            children: [
+                                              FlutterMap(
+                                                options: MapOptions(
+                                                  center: LatLng(39.5572, -8.0317),
+                                                  zoom: 5.2,
+                                                  onPositionChanged: (position, hasGesture) {
+                                                    debugPrint(position.center.toString());
+                                                    _pickedLocation = position.center!;
+                                                  },
+                                                ),
+                                                layers: [
+                                                  TileLayerOptions(
+                                                    urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                                                    subdomains: ['a', 'b', 'c'],
+                                                  ),
+                                                  MarkerLayerOptions(
+                                                    markers: [
+                                                      Marker(
+                                                        width: 80.0,
+                                                        height: 80.0,
+                                                        point: travels[index].origin_coords,
+                                                        builder: (ctx) => Container(
+                                                          child: Icon(
+                                                            Icons.location_on,
+                                                            color: Colors.red,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Marker(
+                                                        width: 80.0,
+                                                        height: 80.0,
+                                                        point: travels[index].destination_coords,
+                                                        builder: (ctx) => Container(
+                                                          child: Icon(
+                                                            Icons.location_on,
+                                                            color: Colors.green,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  PolylineLayerOptions(
+                                                    polylines: [
+                                                      Polyline(
+                                                        points: [
+                                                          travels[index].origin_coords,
+                                                          travels[index].destination_coords
+                                                        ],
+                                                        strokeWidth: 4.0,
+                                                        color: Colors.cyan,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                              Positioned(
+                                                // center of container
+                                                top: 0,
+                                                left: 0,
+                                                right: 0,
+                                                bottom: 0,
+                                                child: Center(
+                                                  child: Icon(
+                                                    Icons.location_on,
+                                                    color: Colors.blue,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
                                     ],
                                   ),
                                   actions: <Widget>[
                                     ElevatedButton(
-                                      child: Text('PAY NOW'),
+                                      child: Text('Pay'),
+                                      style: ElevatedButton.styleFrom(
+                                        primary: Colors.orange[400],
+                                      ),
                                       onPressed: () async{
 
 
@@ -354,6 +436,9 @@ class _catalogoPageState extends State<catalogo_page> {
                                     ),
                                     ElevatedButton(
                                       child: Text('Cancel'),
+                                      style: ElevatedButton.styleFrom(
+                                        primary: Colors.red[400],
+                                      ),
                                       onPressed: () {
                                         Navigator.of(context).pop();
                                       },
