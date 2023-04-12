@@ -55,6 +55,8 @@ def index():
 @app.route('/trip/', methods=['GET', 'POST', 'DELETE'])
 def trip():
     print('ON TRIP METHOD')
+    # print the received request url
+    print(request.url)
     url = f'http://{ip}:5015/directions/trip/'
     if (request.method == 'GET'):
         trip_id = request.args.get('id')
@@ -80,6 +82,7 @@ def trip():
         params = {'id': id}
         response = requests.delete(url, data=params)
     print(response.status_code)
+    print(response.json())
     return response.json(), response.status_code
 
 @app.route('/participant/', methods=['GET', 'POST', 'DELETE'])

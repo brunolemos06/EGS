@@ -47,6 +47,8 @@ class TripView(APIView):
     trip_response = openapi.Response('response description', TripSerializer)
     @swagger_auto_schema(manual_parameters=[id_param], responses={200: trip_response, 404: '{v: False, error: Cannot get Trip.}'})
     def get(self, request):
+        # print the request url
+        print(request.build_absolute_uri())
         query_set = Trip.objects.all()
         id = request.GET.get('id')
         if id is not None:
