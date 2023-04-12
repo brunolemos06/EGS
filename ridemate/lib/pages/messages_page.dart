@@ -108,6 +108,7 @@ class _MessagePageState extends State<MessagePage> {
               }
               loading = false;
             });
+            
 
             for (var message in _messages) {
               debugPrint('Message: ${message.conversation_name}',
@@ -115,6 +116,7 @@ class _MessagePageState extends State<MessagePage> {
             }
           }
         }
+
 
         //request to get chat to composer
       }

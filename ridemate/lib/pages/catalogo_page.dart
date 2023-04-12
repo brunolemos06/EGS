@@ -39,6 +39,7 @@ class Travel {
 class catalogo_page extends StatefulWidget {
   final String? pontodechegada;
   // _pickedLocation
+  final String trip_id = '';
 
   const catalogo_page({Key? key, this.pontodechegada}) : super(key: key);
 
@@ -54,6 +55,7 @@ class _catalogoPageState extends State<catalogo_page> {
   final flutterWebviewPlugin = FlutterWebviewPlugin();
 
   String order_id = '';
+  // String _tripid = '';
 
   Future<void> fetchData() async {
     final String url = 'http://10.0.2.2:8080/trip/';
@@ -450,46 +452,86 @@ class _catalogoPageState extends State<catalogo_page> {
                                           );
                                           return;
                                         }
-                                        //adiciona participante
-                                        final String url_add_participant =
-                                            'http://10.0.2.2:8080/participant/';
-                                        final response_add_participant =
-                                            await http.post(
-                                          Uri.parse(url_add_participant),
-                                          headers: {
-                                            'Content-Type': 'application/json',
-                                          },
-                                          body: jsonEncode({
-                                            'pickup_location':
-                                                _pickedLocationString,
-                                            'trip_id': travels[index].id,
-                                            'id':
-                                                "0e4aefcb-ab8a-415f-9731-32a1f4bd7705"
-                                          }),
-                                        );
-                                        debugPrint("response_add_participant");
-                                        debugPrint(
-                                            response_add_participant.body,
-                                            wrapWidth: 1024);
 
-                                        final url = Uri.parse(
-                                            'http://10.0.2.2:8000/paypal/create/order');
-                                        final headers = {
-                                          'Content-Type': 'application/json'
+                                        final String url10 = 'http://10.0.2.2:8080/service-review/v1/auth/info';
+                                        final Map<String, String> headers22 = {
+                                          'Content-Type': 'application/json',
+                                          'Accept': 'application/json',
+                                          'x-access-token': token
                                         };
-                                        final payload = {
-                                          'amount': json.decode(
-                                              response_add_participant
-                                                  .body)['money']
-                                        };
-                                        final response = await http.post(url,
-                                            headers: headers,
-                                            body: json.encode(payload));
-                                        final errorMessage =
-                                            'Status: ${response.statusCode.toString()}';
-                                        debugPrint(errorMessage,
-                                            wrapWidth: 1024);
-                                        if (response.statusCode == 201) {
+
+                                        final response50 = await http.post(Uri.parse(url10), headers: headers22);
+                                        if (response50.statusCode == 200) {
+                                          final responseJson = json.decode(response50.body);
+                                          debugPrint('Response: ${response50.body}', wrapWidth: 1024);
+                                          final String name = responseJson['fname'];
+                                          final String lname = responseJson['lname'];
+                                          final String email = responseJson['email'];
+                                          final String id = responseJson['id'];
+
+
+
+                                          // get id for reviews
+                                          final String url =
+                                              'http://10.0.2.2:8080/service-review/v1/auth/fetchdata';
+                                          final responsefetch = await http.post(
+                                            Uri.parse(url),
+                                            headers: {
+                                              'Content-Type': 'application/json',
+                                            },
+                                            body: jsonEncode({
+                                              "auth_id": id,
+                                              "email": email,
+                                            }),
+                                          );
+                                          
+                                          debugPrint('Response: ${responsefetch.body}', wrapWidth: 1024);
+                                          if (responsefetch.statusCode == 200) {
+                                            debugPrint('Fetch success', wrapWidth: 1024);
+                                            final responseJson2 = json.decode(responsefetch.body);
+                                            // ..
+                                            debugPrint('Response: ${responseJson2}', wrapWidth: 1024);
+                                              final String url_add_participant =
+                                                  'http://10.0.2.2:8080/participant/';
+                                              final response_add_participant =
+                                                  await http.post(
+                                                Uri.parse(url_add_participant),
+                                                headers: {
+                                                  'Content-Type': 'application/json',
+                                                },
+                                                body: jsonEncode({
+                                                  'pickup_location':
+                                                      _pickedLocationString,
+                                                  'trip_id': travels[index].id,
+                                                  'id' : responseJson2['trip_id'],
+                                                }),
+                                              );
+                                              debugPrint("response_add_participant");
+                                              debugPrint(
+                                                  response_add_participant.body,
+                                                  wrapWidth: 1024);
+
+                                              final url = Uri.parse(
+                                                  'http://10.0.2.2:8000/paypal/create/order');
+                                              final headers = {
+                                                'Content-Type': 'application/json'
+                                              };
+                                              final double value = (json.decode(response_add_participant.body)['money']);
+                                              // transform the value to int
+                                              final int valuemoney = value.toInt();
+                                              debugPrint(valuemoney.toString(),
+                                                  wrapWidth: 1024);
+                                              final payload = {
+                                                'amount': valuemoney,
+                                              };
+                                              final response = await http.post(url,
+                                                  headers: headers,
+                                                  body: json.encode(payload));
+                                              final errorMessage =
+                                                  'Status: ${response.statusCode.toString()}';
+                                              debugPrint(errorMessage,
+                                                  wrapWidth: 1024);
+                                                                                          if (response.statusCode == 201) {
                                           final jsonResponse =
                                               jsonDecode(response.body);
                                           final linkForPayment =
@@ -523,6 +565,12 @@ class _catalogoPageState extends State<catalogo_page> {
                                               response_remove_participant.body,
                                               wrapWidth: 1024);
                                         }
+                                            //  ..
+                                          }
+                                        }
+
+
+                                        //adiciona participante
                                         Navigator.of(context).pop();
                                       },
                                     ),
