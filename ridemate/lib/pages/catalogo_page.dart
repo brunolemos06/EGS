@@ -9,6 +9,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:flutter_map/flutter_map.dart' show getBoundsZoomLevel;
 import 'login_page.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:geocoding/geocoding.dart';
 
 class Travel {
   final String id;
@@ -20,6 +21,7 @@ class Travel {
   final int money;
   final LatLng origin_coords;
   final LatLng destination_coords;
+  final List<LatLng> waypoints_coords;
 
   Travel(
       {required this.id,
@@ -30,7 +32,8 @@ class Travel {
       required this.owner_id,
       required this.money,
       required this.origin_coords,
-      required this.destination_coords});
+      required this.destination_coords,
+      required this.waypoints_coords});
 }
 
 class catalogo_page extends StatefulWidget {
@@ -57,7 +60,7 @@ class _catalogoPageState extends State<catalogo_page> {
     final response = await http.get(Uri.parse(url));
     final data = json.decode(response.body);
 
-    setState(() {
+    setState(() async {
       for (var trip in data['msg']) {
         var origin = trip['origin'];
         debugPrint(origin);
@@ -74,6 +77,16 @@ class _catalogoPageState extends State<catalogo_page> {
         var destination_coords = LatLng(
             trip['info']['routes'][0]['bounds']['southwest']['lat'],
             trip['info']['routes'][0]['bounds']['southwest']['lng']);
+        List<LatLng> waypoints_coords = [];
+        for (var i = 2; i < trip['info']['geocoded_waypoints'].length; i++) {
+          debugPrint("i, ${i}");
+          List<Location> locations =
+              await locationFromAddress("Gronausestraat 710, Enschede");
+          debugPrint(locations.toString());
+          waypoints_coords
+              .add(LatLng(locations[0].latitude, locations[0].longitude));
+        }
+        debugPrint(waypoints_coords.toString());
         travels.add(Travel(
             id: id,
             origin: origin,
@@ -83,7 +96,8 @@ class _catalogoPageState extends State<catalogo_page> {
             owner_id: owner_id,
             money: money,
             origin_coords: origin_coords,
-            destination_coords: destination_coords));
+            destination_coords: destination_coords,
+            waypoints_coords: waypoints_coords));
       }
     });
   }
@@ -489,25 +503,25 @@ class _catalogoPageState extends State<catalogo_page> {
                                         } else {
                                           // Handle the failure response
                                           // remove participante porque nao conseguiu pagar
-                                          // final String url_remove_participant =
-                                          //     'http://10.0.2.2:8080/participant/';
-                                          // final response_remove_participant =
-                                          //     await http.delete(
-                                          //   Uri.parse(url_remove_participant),
-                                          //   headers: {
-                                          //     'Content-Type':
-                                          //         'application/json',
-                                          //   },
-                                          //   body: jsonEncode({
-                                          //     'id':
-                                          //         "0e4aefcb-ab8a-415f-9731-32a1f4bd7705"
-                                          //   }),
-                                          // );
-                                          // debugPrint(
-                                          //     "response_remove_participant");
-                                          // debugPrint(
-                                          //     response_remove_participant.body,
-                                          //     wrapWidth: 1024);
+                                          final String url_remove_participant =
+                                              'http://10.0.2.2:8080/participant/';
+                                          final response_remove_participant =
+                                              await http.delete(
+                                            Uri.parse(url_remove_participant),
+                                            headers: {
+                                              'Content-Type':
+                                                  'application/json',
+                                            },
+                                            body: jsonEncode({
+                                              'id':
+                                                  "0e4aefcb-ab8a-415f-9731-32a1f4bd7705"
+                                            }),
+                                          );
+                                          debugPrint(
+                                              "response_remove_participant");
+                                          debugPrint(
+                                              response_remove_participant.body,
+                                              wrapWidth: 1024);
                                         }
                                         Navigator.of(context).pop();
                                       },
