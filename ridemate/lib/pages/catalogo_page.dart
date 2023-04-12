@@ -65,11 +65,10 @@ class _catalogoPageState extends State<catalogo_page> {
     final String url = 'http://10.0.2.2:8080/trip/';
     final response = await http.get(Uri.parse(url));
     final data = json.decode(response.body);
-
+    debugPrint(data.toString(), wrapWidth: 1024);
     setState(() {
       for (var trip in data['msg']) {
         var origin = trip['origin'];
-        debugPrint(origin);
         var destination = trip['destination'];
         var id = trip['id'];
         var available_sits = trip['available_sits'];
@@ -77,12 +76,11 @@ class _catalogoPageState extends State<catalogo_page> {
         var starting_date = trip['starting_date'];
         var info = trip['info'];
         var money = 10;
-        var origin_coords = LatLng(
-            trip['info']['routes'][0]['bounds']['northeast']['lat'],
-            trip['info']['routes'][0]['bounds']['northeast']['lng']);
+        var origin_coords = LatLng(trip['info']['origin_coords']['lat'],
+            trip['info']['origin_coords']['lng']);
         var destination_coords = LatLng(
-            trip['info']['routes'][0]['bounds']['southwest']['lat'],
-            trip['info']['routes'][0]['bounds']['southwest']['lng']);
+            trip['info']['destination_coords']['lat'],
+            trip['info']['destination_coords']['lng']);
         List<LatLng> waypoints_coords = [];
         // for (var i = 2; i < trip['info']['geocoded_waypoints'].length; i++) {
         //   debugPrint("i, ${i}");
