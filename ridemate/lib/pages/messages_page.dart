@@ -7,15 +7,20 @@ import 'package:ridemate/pages/main_page.dart';
 
 class Message {
   String sender;
-  String conversa;
+  String conversation;
+  String conversation_name;
   String message;
 
   Message({
     required this.sender,
-    required this.conversa,
+    required this.conversation,
+    required this.conversation_name,
     required this.message,
   });
 }
+
+final List<Message> _messages = [];
+String chatid = '';
 
 class MessagePage extends StatefulWidget {
   const MessagePage({Key? key}) : super(key: key);
@@ -25,7 +30,6 @@ class MessagePage extends StatefulWidget {
 }
 
 class _MessagePageState extends State<MessagePage> {
-  final List<Message> _messages = [];
   bool loading = true;
   @override
   void initState() {
@@ -57,7 +61,7 @@ class _MessagePageState extends State<MessagePage> {
         return;
       }
       final response = await http.post(Uri.parse(url), headers: headers);
-      // pop up 
+      // pop up
       if (response.statusCode == 200) {
         final responseJson = json.decode(response.body);
         debugPrint('Response: ${response.body}', wrapWidth: 1024);
@@ -82,25 +86,33 @@ class _MessagePageState extends State<MessagePage> {
         debugPrint('Response: ${responsefetch.body}', wrapWidth: 1024);
         if (responsefetch.statusCode == 200) {
           final responseJson = json.decode(responsefetch.body);
-          final String chatid = responseJson['chat_id'];
-          final responsechat = await http.get(Uri.parse('http://10.0.2.2:8080/service-review/v1/conversations?author=US1a381f88799a4768bd58018d0b64cb66'));
+          chatid = responseJson['chat_id'];
+          final responsechat = await http.get(Uri.parse(
+              'http://10.0.2.2:8080/service-review/v1/conversations?author=$chatid'));
           if (responsechat.statusCode == 200) {
             final responseJson = json.decode(responsechat.body);
             debugPrint('Response: ${responsechat.body}', wrapWidth: 1024);
             //get the messages array in the jsonresponse;
             final messages = responseJson[0]['messages'];
+            final c_id = responseJson[0]['id'];
+            final c_name = responseJson[0]['friendly_name'];
             //add the messages to the list
+            _messages.clear();
             setState(() {
               for (var message in messages) {
                 _messages.add(Message(
                     sender: message['author'],
-                    conversa: 'conversa',
+                    conversation: c_id,
+                    conversation_name: c_name,
                     message: message['body']));
               }
               loading = false;
             });
 
-            debugPrint(_messages.toString(), wrapWidth: 1024);
+            for (var message in _messages) {
+              debugPrint('Message: ${message.conversation_name}',
+                  wrapWidth: 1024);
+            }
           }
         }
 
@@ -111,62 +123,65 @@ class _MessagePageState extends State<MessagePage> {
 
   @override
   Widget build(BuildContext context) {
+    //set of tuples
     Set<String> uniqueSenders = Set<String>();
 
 // Loop through messages and add unique senders to the set
     for (var message in _messages) {
-      if (!uniqueSenders.contains(message.conversa)) {
-        uniqueSenders.add(message.conversa);
+      if (!uniqueSenders.contains(message.conversation)) {
+        uniqueSenders.add(message.conversation);
       }
     }
     return MaterialApp(
-      home: loading ? LoadingScreen() : Scaffold(
-      backgroundColor : const Color(0x808080),
-      
-      appBar: AppBar(
-        title: const Text("Messages"),
-        backgroundColor: Colors.grey[800],
-        // text color white
-        foregroundColor: Colors.white,
-      ),
-      body: ListView.builder(
-        itemCount: uniqueSenders.length,
-        itemBuilder: (context, index) {
-          // Get the sender at the current index
-          String sender = uniqueSenders.elementAt(index);
+      home: loading
+          ? LoadingScreen()
+          : Scaffold(
+              backgroundColor: const Color(0x808080),
+              appBar: AppBar(
+                title: const Text("Messages"),
+                backgroundColor: Colors.grey[800],
+                // text color white
+                foregroundColor: Colors.white,
+              ),
+              body: ListView.builder(
+                itemCount: uniqueSenders.length,
+                itemBuilder: (context, index) {
+                  // Get the sender at the current index
+                  String sender = uniqueSenders.elementAt(index);
 
-          // Find the first message with the current sender
-          Message firstMessage =
-              _messages.firstWhere((message) => message.conversa == sender);
+                  // Find the first message with the current sender
+                  Message firstMessage = _messages
+                      .firstWhere((message) => message.conversation == sender);
 
-          return ListTile(
-            title: Container(
-              child: Text(
-                sender,
-                style: TextStyle(
-                  color: Colors.green, // set the text color of the title
-                  fontWeight: FontWeight.bold,
-                ),
+                  return ListTile(
+                    title: Container(
+                      child: Text(
+                        sender,
+                        style: TextStyle(
+                          color:
+                              Colors.green, // set the text color of the title
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    subtitle: Text(firstMessage.message,
+                        style: TextStyle(
+                          color: Colors
+                              .white, // set the text color of the subtitle
+                        )),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MessageConversationPage(
+                              sender: firstMessage.sender, messages: _messages),
+                        ),
+                      );
+                    },
+                  );
+                },
               ),
             ),
-            subtitle: Text(
-              firstMessage.message,
-                style: TextStyle(
-                  color: Colors.white, // set the text color of the subtitle
-                )),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      MessageConversationPage(sender: firstMessage.sender),
-                ),
-              );
-            },
-          );
-        },
-      ),
-    ),
     );
   }
 }
@@ -174,7 +189,8 @@ class _MessagePageState extends State<MessagePage> {
 class MessageConversationPage extends StatefulWidget {
   final String sender;
 
-  const MessageConversationPage({Key? key, required this.sender})
+  const MessageConversationPage(
+      {Key? key, required this.sender, required List<Message> messages})
       : super(key: key);
 
   @override
@@ -183,25 +199,14 @@ class MessageConversationPage extends StatefulWidget {
 }
 
 class _MessageConversationPageState extends State<MessageConversationPage> {
-  final List<Message> _messages = [
-    // Message(
-    //   sender: "Bruno",
-    //   recipient: "Tiago",
-    //   message: "Oi frontend é uma seca",
-    // ),
-    // Message(
-    //   sender: "Tiago",
-    //   recipient: "Bruno",
-    //   message: "eu gosto!",
-    // ),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    debugPrint('OLA: ${_messages.length}', wrapWidth: 1024);
+    final conversation_id = _messages[0].conversation;
     return Scaffold(
-      backgroundColor : const Color(0x808080),
+      backgroundColor: const Color(0x808080),
       appBar: AppBar(
-        title: Text(widget.sender),
+        title: Text('olaole'),
         backgroundColor: Colors.grey[800],
       ),
       body: ListView.builder(
@@ -214,12 +219,12 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
           return ListTile(
             title: Align(
               alignment:
-                  isSender ? Alignment.centerLeft : Alignment.centerRight,
+                  isSender ? Alignment.centerRight : Alignment.centerLeft,
               child: Text(message.message, textAlign: textAlign),
             ),
             subtitle: Align(
               alignment:
-                  isSender ? Alignment.centerLeft : Alignment.centerRight,
+                  isSender ? Alignment.centerRight : Alignment.centerLeft,
               child: Text(
                 message.sender,
                 style: TextStyle(
@@ -231,7 +236,7 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
         },
       ),
       bottomNavigationBar: BottomAppBar(
-        color : const Color(0x828282),
+        color: const Color(0x828282),
         child: Row(
           children: [
             Expanded(
@@ -241,41 +246,54 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
                   style: TextStyle(
                     color: Colors.white,
                   ),
-                  decoration:
-                      const InputDecoration(
-                        hintText: "Type a message...",
-                        hintStyle: TextStyle(
-                          color: Colors.grey,
-                        ),
-                        // when the textfield is focused
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.green,
-                          ),
-                        ),
-                        ),
-                  onFieldSubmitted: (value) {
+                  decoration: const InputDecoration(
+                    hintText: "Type a message...",
+                    hintStyle: TextStyle(
+                      color: Colors.grey,
+                    ),
+                    // when the textfield is focused
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.green,
+                      ),
+                    ),
+                  ),
+                  onFieldSubmitted: (value) async {
+                    debugPrint('mensagem enviada2', wrapWidth: 1024);
                     setState(() {
                       _messages.add(Message(
                         sender: widget.sender,
-                        conversa: "",
+                        conversation: conversation_id,
+                        conversation_name: "",
                         message: value,
                       ));
                     });
+
+                    final response = await http.post(Uri.parse(
+                        'http://10.0.2.2:8080/service-review/v1/conversations?author=$chatid&c_id=$conversation_id&message=$value'));
+                    if (response.statusCode == 200) {
+                      debugPrint('Response send: ${response.body}',
+                          wrapWidth: 1024);
+                    }
                   },
                 ),
               ),
             ),
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                //field submitted
+                debugPrint('mensagem enviada', wrapWidth: 1024);
+              },
               icon: const Icon(Icons.send),
-              color: Colors.green,            ),
+              color: Colors.green,
+            ),
           ],
         ),
       ),
     );
   }
 }
+
 // Define the loading screen widget
 class LoadingScreen extends StatelessWidget {
   @override

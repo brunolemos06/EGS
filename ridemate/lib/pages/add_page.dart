@@ -36,6 +36,8 @@ class _AddPageState extends State<AddPage> {
   bool _eat = false;
 
   String _owner_id = "";
+  String _chat_id = "";
+  String _travelchat_id = "";
 
   final _formKey = GlobalKey<FormState>();
 
@@ -222,9 +224,11 @@ class _AddPageState extends State<AddPage> {
                                 json.decode(responsefetch.body);
                             // debugPrint(responseJson.toString());
                             final String id = responseJson["trip_id"];
+                            final String chat_id = responseJson["chat_id"];
                             debugPrint('ID: $id', wrapWidth: 1024);
                             setState(() {
                               _owner_id = id.toString();
+                              _chat_id = chat_id.toString();
                             });
                           } else {
                             debugPrint('Fetch fail', wrapWidth: 1024);
@@ -263,6 +267,47 @@ class _AddPageState extends State<AddPage> {
                             backgroundColor: Colors.green,
                           ),
                         );
+
+                        // create chat
+                        final String url =
+                            'http://10.0.2.2:8080/service-review/v1/new_conversation?friendly_name=$_owner_id';
+                        final response = await http.post(
+                          Uri.parse(url),
+                        );
+                        if (response.statusCode == 200) {
+                          final responseJson = json.decode(response.body);
+                          setState(() {
+                            _travelchat_id = responseJson["c_id"];
+                          });
+                          debugPrint('CID:: ${_travelchat_id}',
+                              wrapWidth: 1024);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                "Chat created successfully",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                          // update conversation
+                          final String url =
+                              'http://10.0.2.2:8080/service-review/v1/conversations?c_id=$_travelchat_id&member=$_chat_id';
+
+                          final response2 = await http.post(
+                            Uri.parse(url),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                "Chat creation failed!",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(

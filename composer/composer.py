@@ -84,16 +84,21 @@ def trip():
 
 @app.route('/participant/', methods=['GET', 'POST', 'DELETE'])
 def participant():
+    print('ON PARTICIPANT METHOD')
     url = f'http://{ip}:5015/directions/participant/'
     if (request.method == 'GET'):
         id = request.args.get('id')
         params = {'id': id}
         response = requests.get(url, data=params)
     elif (request.method == 'POST'):
-        id = request.args.get('id')
-        trip_id = request.args.get('trip_id')
-        pickup_location = request.args.get('pickup_location')
+        request.data = request.json
+        id = request.data.get('id')
+        print(f'ID: {id}')
+        trip_id = request.data.get('trip_id')
+        pickup_location = request.data.get('pickup_location')
         params = {'id': id, 'trip_id': trip_id, 'pickup_location': pickup_location}
+
+        print(params)
         response = requests.post(url, data=params)
     elif (request.method == 'DELETE'):
         id = request.args.get('id')
@@ -311,7 +316,16 @@ def google():
 def conversations():
     
     if request.method == 'POST':
-       print("post")
+        c_id=request.args.get("c_id");
+        author=request.args.get("author");
+        message=request.args.get("message");
+        member=request.args.get("member");
+        if author == None and message == None:
+            url=f'http://{ip}:5010/conversations?c_id={c_id}&member={member}'
+        elif member == None:
+            url=f'http://{ip}:5010/conversations?c_id={c_id}&author={author}&message={message}'
+        response = requests.post(url);
+        print(response.json());
     elif request.method == 'GET':
         #get conversations of one user
         
@@ -320,12 +334,23 @@ def conversations():
         response = requests.get(url);
         print(response.json());
     elif request.method == 'DELETE':
+        #delete conversation
+        # c_id=request.args.get("c_id");
+        # member=request.args.get("member");
+        # url=f'http://{ip}:5010/conversations?c_id={c_id}&member={member}'
+        # response = requests.delete(url);
         print("delete")
     return jsonify(response.json()), response.status_code
 
 @app.route(appendurl + '/new_conversation', methods=['POST'])
 def new_conversation():
-    pass
+    if request.method == 'POST':
+        friendly_name=request.args.get("friendly_name");
+        url=f'http://{ip}:5010/new_conversation?friendly_name={friendly_name}'
+        response=requests.post(url);
+
+    return jsonify(response.json()), response.status_code
+# pass
 
 
 

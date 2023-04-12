@@ -445,7 +445,7 @@ def update_conversation():
     # c = Conversation(c_id=conversation.sid, friendly_name=conversation.friendly_name)
     # db.session.add(c)
     # db.session.commit()
-    if member is not None and message is None:
+    if member is not None and message is None and author is None:
         #get the user 
         # participant = client.conversations \
         #                     .v1 \
@@ -468,7 +468,7 @@ def update_conversation():
                             .conversations(c_id) \
                             .participants \
                             .create(identity=user.identity)
-      
+        
         return {'message': 'The member was added'}
     
     
@@ -486,7 +486,8 @@ def new_conversation():
                         .conversations \
                         .create(friendly_name=friendly_name)
     
-    return {'message': 'The conversation was created'}
+    return {'message': 'The conversation was created',
+            'c_id': conversation.sid}
 @app.route('/new_user', methods=['POST'])
 def new_user():
     identity = flask.request.args.get('identity')
