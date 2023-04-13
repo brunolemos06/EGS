@@ -47,6 +47,8 @@ class TripView(APIView):
     trip_response = openapi.Response('response description', TripSerializer)
     @swagger_auto_schema(manual_parameters=[id_param], responses={200: trip_response, 404: '{v: False, error: Cannot get Trip.}'})
     def get(self, request):
+        # print the request url
+        print(request.build_absolute_uri())
         query_set = Trip.objects.all()
         id = request.GET.get('id')
         if id is not None:
@@ -176,7 +178,8 @@ class ParticipantView(APIView):
     id_param = openapi.Parameter('id', openapi.IN_QUERY, description="participant id", type=openapi.TYPE_STRING)
     @swagger_auto_schema(manual_parameters=[id_param], responses={200: '{v: True, msg: Participant deleted successfully}', 404: '{v: False, error: Cannot get Participant.}'})
     def delete(self, request):
-        id = request.GET.get('id')
+        print("PARTICIAPNT DELETE")
+        id = request.data.get('id')
         if id is None:
             return JsonResponse({'v': False, 'error': 'Id not provided.'}, status = 404)
         participant = Participant.objects.get(id=id)

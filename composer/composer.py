@@ -55,6 +55,8 @@ def index():
 @app.route('/trip/', methods=['GET', 'POST', 'DELETE'])
 def trip():
     print('ON TRIP METHOD')
+    # print the received request url
+    print(request.url)
     url = f'http://{ip}:5015/directions/trip/'
     if (request.method == 'GET'):
         trip_id = request.args.get('id')
@@ -63,6 +65,21 @@ def trip():
         else:
             params = {'id': trip_id}
             response = requests.get(url, data=params)
+
+        response_short = {'v': response.json()['v'], 'msg': [{'id': None, 'origin': None, 'destination': None, 'available_sits': None, 'starting_date': None, 'owner_id': None, 'info': {'origin_coords': None, 'destination_coords': None}} for i in range(len(response.json()['msg']))]}
+        for i in range(len(response.json()['msg'])):
+            print(i)
+            response_short['msg'][i]['id'] = response.json()['msg'][i]['id']
+            response_short['msg'][i]['origin'] = response.json()['msg'][i]['origin']
+            response_short['msg'][i]['destination'] = response.json()['msg'][i]['destination']
+            response_short['msg'][i]['available_sits'] = response.json()['msg'][i]['available_sits']
+            response_short['msg'][i]['starting_date'] = response.json()['msg'][i]['starting_date']
+            response_short['msg'][i]['owner_id'] = response.json()['msg'][i]['owner_id']
+            origin_coords = response.json()['msg'][i]['info']['routes'][0]['legs'][0]['start_location']
+            destination_coords = response.json()['msg'][i]['info']['routes'][0]['legs'][0]['end_location']
+            response_short['msg'][i]['info'] = {'origin_coords': origin_coords, 'destination_coords': destination_coords}
+        print(response_short)
+        return response_short, response.status_code
     elif (request.method == 'POST'):
         request.data = request.json
         id = request.data.get('id')
@@ -79,19 +96,19 @@ def trip():
         print(id)
         params = {'id': id}
         response = requests.delete(url, data=params)
-    print(response.status_code)
+
     return response.json(), response.status_code
 
 @app.route('/participant/', methods=['GET', 'POST', 'DELETE'])
 def participant():
     print('ON PARTICIPANT METHOD')
     url = f'http://{ip}:5015/directions/participant/'
+    request.data = request.json
     if (request.method == 'GET'):
-        id = request.args.get('id')
+        id = request.data.get('id')
         params = {'id': id}
         response = requests.get(url, data=params)
     elif (request.method == 'POST'):
-        request.data = request.json
         id = request.data.get('id')
         print(f'ID: {id}')
         trip_id = request.data.get('trip_id')
@@ -101,8 +118,9 @@ def participant():
         print(params)
         response = requests.post(url, data=params)
     elif (request.method == 'DELETE'):
-        id = request.args.get('id')
+        id = request.data.get('id')
         params = {'id': id}
+        print(params)
         response = requests.delete(url, data=params)
     return response.json(), response.status_code
 
