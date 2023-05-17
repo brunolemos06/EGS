@@ -17,7 +17,7 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 COPY maps_api/ .
 
 # Expose port (still to decide)
-EXPOSE 5000
+EXPOSE 5015
 
 # Run django makemigrations
 CMD ["python3", "manage.py", "makemigrations"]
@@ -26,5 +26,9 @@ CMD ["python3", "manage.py", "makemigrations"]
 CMD ["python3", "manage.py", "migrate"]
 
 # Run django runserver
-CMD ["python3", "manage.py", "runserver", "10.139.0.2:5000"] 
-# can add 0.0.0.0:8000 to specify host and port
+CMD ["python3", "manage.py", "runserver", "0.0.0.0:5015"] 
+
+#BUILD IMAGE
+# docker build -t my-django-app .
+#RUN CONTAINER
+# docker run -d -p 127.0.0.1:5015:5015 my-django-app

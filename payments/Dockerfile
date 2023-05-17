@@ -26,5 +26,12 @@ CMD ["python3", "manage.py", "makemigrations"]
 CMD ["python3", "manage.py", "migrate"]
 
 # Run django runserver
-CMD ["python3", "manage.py", "runserver"] 
-# can add 0.0.0.0:8000 to specify host and port
+CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
+
+
+
+#BUILD IMAGE
+# docker build -t my-django-app .
+#RUN CONTAINER
+# docker run -d -p 127.0.0.1:8000:8000 my-django-app
+
