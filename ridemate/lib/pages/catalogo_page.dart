@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
@@ -9,6 +10,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:flutter_map/flutter_map.dart' show getBoundsZoomLevel;
 import 'login_page.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:geocoding/geocoding.dart';
 
 class Travel {
   final String id;
@@ -20,6 +22,7 @@ class Travel {
   final int money;
   final LatLng origin_coords;
   final LatLng destination_coords;
+  final List<LatLng> waypoints_coords;
 
   Travel(
       {required this.id,
@@ -30,11 +33,14 @@ class Travel {
       required this.owner_id,
       required this.money,
       required this.origin_coords,
-      required this.destination_coords});
+      required this.destination_coords,
+      required this.waypoints_coords});
 }
 
 class catalogo_page extends StatefulWidget {
   final String? pontodechegada;
+  // _pickedLocation
+  final String trip_id = '';
 
   const catalogo_page({Key? key, this.pontodechegada}) : super(key: key);
 
@@ -45,20 +51,24 @@ class catalogo_page extends StatefulWidget {
 class _catalogoPageState extends State<catalogo_page> {
   final _storage = FlutterSecureStorage();
   final List<Travel> travels = [];
-
+  LatLng _pickedLocation = LatLng(39.5572, -8.0317);
+  String _pickedLocationString = '39.5572, -8.0317';
   final flutterWebviewPlugin = FlutterWebviewPlugin();
 
   String order_id = '';
+  // String _tripid = '';
 
   Future<void> fetchData() async {
-    final String url = 'http://10.0.2.2:5015/directions/trip/';
-    final response = (await http.get(Uri.parse(url)));
-    final data = json.decode(response.body);
+    debugPrint(
+        "--------------------------------------------------------------------------");
 
+    final String url = 'http://10.0.2.2:8080/trip/';
+    final response = await http.get(Uri.parse(url));
+    final data = json.decode(response.body);
+    debugPrint(data.toString(), wrapWidth: 1024);
     setState(() {
       for (var trip in data['msg']) {
         var origin = trip['origin'];
-        debugPrint(origin);
         var destination = trip['destination'];
         var id = trip['id'];
         var available_sits = trip['available_sits'];
@@ -66,12 +76,21 @@ class _catalogoPageState extends State<catalogo_page> {
         var starting_date = trip['starting_date'];
         var info = trip['info'];
         var money = 10;
-        var origin_coords = LatLng(
-            trip['info']['routes'][0]['bounds']['northeast']['lat'],
-            trip['info']['routes'][0]['bounds']['northeast']['lng']);
+        var origin_coords = LatLng(trip['info']['origin_coords']['lat'],
+            trip['info']['origin_coords']['lng']);
         var destination_coords = LatLng(
-            trip['info']['routes'][0]['bounds']['southwest']['lat'],
-            trip['info']['routes'][0]['bounds']['southwest']['lng']);
+            trip['info']['destination_coords']['lat'],
+            trip['info']['destination_coords']['lng']);
+        List<LatLng> waypoints_coords = [];
+        // for (var i = 2; i < trip['info']['geocoded_waypoints'].length; i++) {
+        //   debugPrint("i, ${i}");
+        //   List<Location> locations =
+        //       await locationFromAddress("Gronausestraat 710, Enschede");
+        //   debugPrint(locations.toString());
+        //   waypoints_coords
+        //       .add(LatLng(locations[0].latitude, locations[0].longitude));
+        // }
+        debugPrint(waypoints_coords.toString());
         travels.add(Travel(
             id: id,
             origin: origin,
@@ -81,15 +100,20 @@ class _catalogoPageState extends State<catalogo_page> {
             owner_id: owner_id,
             money: money,
             origin_coords: origin_coords,
-            destination_coords: destination_coords));
+            destination_coords: destination_coords,
+            waypoints_coords: waypoints_coords));
       }
     });
   }
 
+  Future<void> _getLocation() async {
+    // Get the user's current location and update `_pickedLocation`
+  }
   @override
   void initState() {
     super.initState();
     fetchData();
+    _getLocation();
     flutterWebviewPlugin.onUrlChanged.listen((url) {
       if (url.contains('http://10.0.2.2:8000/paypal/finish')) {
         flutterWebviewPlugin.close();
@@ -251,77 +275,345 @@ class _catalogoPageState extends State<catalogo_page> {
                         Text(travels[index].money.toString() + "€"),
                         ElevatedButton(
                           onPressed: () async {
-                            // you need to be logged in to make a payment
-                            // if you are not logged in, you will be redirected to the login page
-                            // if you are logged in, you will be redirected to the payment page
-                            // get token from local storage
-                            final String tokenKey = 'token';
-                            final String? token =
-                                await _storage.read(key: tokenKey);
-                            if (token == null) {
-                              debugPrint('Token not found', wrapWidth: 1024);
-                              // go to login page
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => LoginPage()),
-                              );
-                              return;
-                            }
-                            final String url2 = 'http://10.0.2.2:8080/service-review/v1/auth/auth';
-                            final Map<String, String> headers2 = {
-                              'Content-Type': 'application/json',
-                              'Accept': 'application/json',
-                              'x-access-token': token
-                            };
-                            final response3 = await http.post(Uri.parse(url2),
-                                headers: headers2);
-                            if (response3.statusCode != 200) {
-                              debugPrint('Token not valid', wrapWidth: 1024);
-                              // go to login page
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => LoginPage()),
-                              );
-                              // message to user that to pay you need to be logged in
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    "To pay you need to be logged in !!",
-                                    style: TextStyle(color: Colors.white),
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("Pick a Location"),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      // flutter map to select pick up location
+                                      Container(
+                                        height: 180,
+                                        width: 400,
+                                        child: Stack(
+                                          children: [
+                                            FlutterMap(
+                                              options: MapOptions(
+                                                center:
+                                                    LatLng(39.5572, -8.0317),
+                                                zoom: 5.2,
+                                                onPositionChanged:
+                                                    (position, hasGesture) {
+                                                  debugPrint(position.center
+                                                      .toString());
+                                                  _pickedLocation =
+                                                      position.center!;
+                                                  // turn this LatLng(latitude:39.5572, longitude:-8.0317) into this "39.5572,-8.0317"
+                                                  _pickedLocationString =
+                                                      _pickedLocation
+                                                          .toString()
+                                                          .replaceFirst(
+                                                              'LatLng(latitude:',
+                                                              '');
+                                                  _pickedLocationString =
+                                                      _pickedLocationString
+                                                          .replaceFirst(
+                                                              ' longitude:',
+                                                              '');
+                                                  _pickedLocationString =
+                                                      _pickedLocationString
+                                                          .replaceFirst(
+                                                              ')', '');
+                                                  debugPrint(
+                                                      _pickedLocationString);
+                                                },
+                                              ),
+                                              layers: [
+                                                TileLayerOptions(
+                                                  urlTemplate:
+                                                      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                                                  subdomains: ['a', 'b', 'c'],
+                                                ),
+                                                MarkerLayerOptions(
+                                                  markers: [
+                                                    Marker(
+                                                      width: 80.0,
+                                                      height: 80.0,
+                                                      point: travels[index]
+                                                          .origin_coords,
+                                                      builder: (ctx) =>
+                                                          Container(
+                                                        child: Icon(
+                                                          Icons.location_on,
+                                                          color: Colors.red,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Marker(
+                                                      width: 80.0,
+                                                      height: 80.0,
+                                                      point: travels[index]
+                                                          .destination_coords,
+                                                      builder: (ctx) =>
+                                                          Container(
+                                                        child: Icon(
+                                                          Icons.location_on,
+                                                          color: Colors.green,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                PolylineLayerOptions(
+                                                  polylines: [
+                                                    Polyline(
+                                                      points: [
+                                                        travels[index]
+                                                            .origin_coords,
+                                                        travels[index]
+                                                            .destination_coords
+                                                      ],
+                                                      strokeWidth: 4.0,
+                                                      color: Colors.cyan,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                            Positioned(
+                                              // center of container
+                                              top: 0,
+                                              left: 0,
+                                              right: 0,
+                                              bottom: 0,
+                                              child: Center(
+                                                child: Icon(
+                                                  Icons.location_on,
+                                                  color: Colors.blue,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                              return;
-                            }
+                                  actions: <Widget>[
+                                    ElevatedButton(
+                                      child: Text('Pay'),
+                                      style: ElevatedButton.styleFrom(
+                                        primary: Colors.orange[400],
+                                      ),
+                                      onPressed: () async {
+                                        // you need to be logged in to make a payment
+                                        // if you are not logged in, you will be redirected to the login page
+                                        // if you are logged in, you will be redirected to the payment page
+                                        // get token from local storage
+                                        final String tokenKey = 'token';
+                                        final String? token =
+                                            await _storage.read(key: tokenKey);
+                                        if (token == null) {
+                                          debugPrint('Token not found',
+                                              wrapWidth: 1024);
+                                          // go to login page
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    LoginPage()),
+                                          );
+                                          return;
+                                        }
 
-                            final url = Uri.parse(
-                                'http://10.0.2.2:8000/paypal/create/order');
-                            final headers = {
-                              'Content-Type': 'application/json'
-                            };
-                            final payload = {'amount': travels[index].money};
-                            final response = await http.post(url,
-                                headers: headers, body: json.encode(payload));
-                            final errorMessage =
-                                'Status: ${response.statusCode.toString()}';
-                            debugPrint(errorMessage, wrapWidth: 1024);
-                            if (response.statusCode == 201) {
-                              final jsonResponse = jsonDecode(response.body);
-                              final linkForPayment =
-                                  jsonResponse['linkForPayment'];
-                              // save the order_id in class variable
-                              order_id = jsonResponse['order_id'];
+                                        // verify if the pick up location is in the route
 
-                              // lauch the linkForPayment in a webview until the url contains the string 'http://10.0.2.2:8000/paypal/finish'
-                              flutterWebviewPlugin.launch(linkForPayment);
-                            } else {
-                              // Handle the failure response
-                            }
+                                        //
+                                        final String url2 =
+                                            'http://10.0.2.2:8080/service-review/v1/auth/auth';
+                                        final Map<String, String> headers2 = {
+                                          'Content-Type': 'application/json',
+                                          'Accept': 'application/json',
+                                          'x-access-token': token
+                                        };
+                                        final response3 = await http.post(
+                                            Uri.parse(url2),
+                                            headers: headers2);
+                                        if (response3.statusCode != 200) {
+                                          debugPrint('Token not valid',
+                                              wrapWidth: 1024);
+                                          // go to login page
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    LoginPage()),
+                                          );
+                                          // message to user that to pay you need to be logged in
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                "To pay you need to be logged in !!",
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                              backgroundColor: Colors.red,
+                                            ),
+                                          );
+                                          return;
+                                        }
+
+                                        final String url10 =
+                                            'http://10.0.2.2:8080/service-review/v1/auth/info';
+                                        final Map<String, String> headers22 = {
+                                          'Content-Type': 'application/json',
+                                          'Accept': 'application/json',
+                                          'x-access-token': token
+                                        };
+
+                                        final response50 = await http.post(
+                                            Uri.parse(url10),
+                                            headers: headers22);
+                                        if (response50.statusCode == 200) {
+                                          final responseJson =
+                                              json.decode(response50.body);
+                                          debugPrint(
+                                              'Response: ${response50.body}',
+                                              wrapWidth: 1024);
+                                          final String name =
+                                              responseJson['fname'];
+                                          final String lname =
+                                              responseJson['lname'];
+                                          final String email =
+                                              responseJson['email'];
+                                          final String id = responseJson['id'];
+
+                                          // get id for reviews
+                                          final String url =
+                                              'http://10.0.2.2:8080/service-review/v1/auth/fetchdata';
+                                          final responsefetch = await http.post(
+                                            Uri.parse(url),
+                                            headers: {
+                                              'Content-Type':
+                                                  'application/json',
+                                            },
+                                            body: jsonEncode({
+                                              "auth_id": id,
+                                              "email": email,
+                                            }),
+                                          );
+
+                                          debugPrint(
+                                              'Response: ${responsefetch.body}',
+                                              wrapWidth: 1024);
+                                          if (responsefetch.statusCode == 200) {
+                                            debugPrint('Fetch success',
+                                                wrapWidth: 1024);
+                                            final responseJson2 =
+                                                json.decode(responsefetch.body);
+                                            // ..
+                                            debugPrint(
+                                                'Response: ${responseJson2}',
+                                                wrapWidth: 1024);
+                                            final String url_add_participant =
+                                                'http://10.0.2.2:8080/participant/';
+                                            final response_add_participant =
+                                                await http.post(
+                                              Uri.parse(url_add_participant),
+                                              headers: {
+                                                'Content-Type':
+                                                    'application/json',
+                                              },
+                                              body: jsonEncode({
+                                                'pickup_location':
+                                                    _pickedLocationString,
+                                                'trip_id': travels[index].id,
+                                                'id': responseJson2['trip_id'],
+                                              }),
+                                            );
+                                            debugPrint(
+                                                "response_add_participant");
+                                            debugPrint(
+                                                response_add_participant.body,
+                                                wrapWidth: 1024);
+
+                                            final url = Uri.parse(
+                                                'http://10.0.2.2:8000/paypal/create/order');
+                                            final headers = {
+                                              'Content-Type': 'application/json'
+                                            };
+                                            final double value = (json.decode(
+                                                response_add_participant
+                                                    .body)['money']);
+                                            // transform the value to int
+                                            final int valuemoney =
+                                                value.toInt();
+                                            debugPrint(valuemoney.toString(),
+                                                wrapWidth: 1024);
+                                            final payload = {
+                                              'amount': valuemoney,
+                                            };
+                                            final response = await http.post(
+                                                url,
+                                                headers: headers,
+                                                body: json.encode(payload));
+                                            final errorMessage =
+                                                'Status: ${response.statusCode.toString()}';
+                                            debugPrint(errorMessage,
+                                                wrapWidth: 1024);
+                                            if (response.statusCode == 201) {
+                                              final jsonResponse =
+                                                  jsonDecode(response.body);
+                                              final linkForPayment =
+                                                  jsonResponse[
+                                                      'linkForPayment'];
+                                              // save the order_id in class variable
+                                              order_id =
+                                                  jsonResponse['order_id'];
+
+                                              // lauch the linkForPayment in a webview until the url contains the string 'http://10.0.2.2:8000/paypal/finish'
+                                              flutterWebviewPlugin
+                                                  .launch(linkForPayment);
+                                            } else {
+                                              // Handle the failure response
+                                              // remove participante porque nao conseguiu pagar
+                                              final String
+                                                  url_remove_participant =
+                                                  'http://10.0.2.2:8080/participant/';
+                                              final response_remove_participant =
+                                                  await http.delete(
+                                                Uri.parse(
+                                                    url_remove_participant),
+                                                headers: {
+                                                  'Content-Type':
+                                                      'application/json',
+                                                },
+                                                body: jsonEncode({
+                                                  'id': responseJson2['trip_id']
+                                                }),
+                                              );
+                                              debugPrint(
+                                                  "response_remove_participant");
+                                              debugPrint(
+                                                  response_remove_participant
+                                                      .body,
+                                                  wrapWidth: 1024);
+                                            }
+                                            //  ..
+                                          }
+                                        }
+
+                                        //adiciona participante
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                    ElevatedButton(
+                                      child: Text('Cancel'),
+                                      style: ElevatedButton.styleFrom(
+                                        primary: Colors.red[400],
+                                      ),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
                           },
-                          child: Text("Pay Now"),
+                          child: Text("Participate"),
                         ),
                       ],
                     ),

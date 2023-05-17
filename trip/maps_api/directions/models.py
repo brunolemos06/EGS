@@ -15,13 +15,13 @@ class Trip(models.Model):
     available_sits = models.IntegerField()
     starting_date = models.DateTimeField()
     # owner_id = models.ForeignKey(Owner, on_delete=models.CASCADE)
-    owner_id = models.UUIDField()
+    owner_id = models.TextField()
 
     def __str__(self):
         return {'id': self.id, 'origin': self.origin, 'destination': self.destination, 'owner_id': self.owner_id, 'info': self.info}
 
 class Participant(models.Model):
-    id = models.UUIDField(primary_key=True)
+    id = models.TextField(primary_key=True)
     pickup_location = models.TextField()
     trip_id = models.ForeignKey(Trip, on_delete=models.CASCADE)
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True)

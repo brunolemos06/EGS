@@ -15,6 +15,8 @@ from flask_swagger_ui import get_swaggerui_blueprint
 import requests
 from flask import redirect
 import json
+import uuid
+
 
 # import file located in the same directory
 from db_func import *
@@ -50,45 +52,88 @@ def index():
 # TRIP
 # -
 
-@app.route('/trip', methods=['GET', 'POST', 'DELETE'])
+@app.route('/trip/', methods=['GET', 'POST', 'DELETE'])
 def trip():
-    url = f'http://{ip}:5015/directions/trip'
+    print('ON TRIP METHOD')
+    # print the received request url
+    print(request.url)
+    url = f'http://{ip}:5015/directions/trip/'
     if (request.method == 'GET'):
         trip_id = request.args.get('id')
-        params = {'id': trip_id}
-        response = requests.get(url, params=params)
+        if (trip_id == None):
+            response = requests.get(url)
+        else:
+            params = {'id': trip_id}
+            response = requests.get(url, data=params)
+
+        response_short = {'v': response.json()['v'], 'msg': [{'id': None, 'origin': None, 'destination': None, 'available_sits': None, 'starting_date': None, 'owner_id': None, 'info': {'origin_coords': None, 'destination_coords': None}} for i in range(len(response.json()['msg']))]}
+        for i in range(len(response.json()['msg'])):
+            print(i)
+            response_short['msg'][i]['id'] = response.json()['msg'][i]['id']
+            response_short['msg'][i]['origin'] = response.json()['msg'][i]['origin']
+            response_short['msg'][i]['destination'] = response.json()['msg'][i]['destination']
+            response_short['msg'][i]['available_sits'] = response.json()['msg'][i]['available_sits']
+            response_short['msg'][i]['starting_date'] = response.json()['msg'][i]['starting_date']
+            response_short['msg'][i]['owner_id'] = response.json()['msg'][i]['owner_id']
+            origin_coords = response.json()['msg'][i]['info']['routes'][0]['legs'][0]['start_location']
+            destination_coords = response.json()['msg'][i]['info']['routes'][0]['legs'][0]['end_location']
+            response_short['msg'][i]['info'] = {'origin_coords': origin_coords, 'destination_coords': destination_coords}
+        print(response_short)
+        return response_short, response.status_code
     elif (request.method == 'POST'):
-        id = request.args.get('id')
-        origin = request.args.get('origin')
-        destination = request.args.get('destination')
-        available_sits = request.args.get('available_sits')
-        starting_date = request.args.get('starting_date')
-        owner_id = request.args.get('owner_id')
+        request.data = request.json
+        id = request.data.get('id')
+        origin = request.data.get('origin')
+        destination = request.data.get('destination')
+        available_sits = request.data.get('available_sits')
+        starting_date = request.data.get('starting_date')
+        owner_id = request.data.get('owner_id')
         params = {'id': id, 'origin': origin, 'destination': destination, 'available_sits': available_sits, 'starting_date': starting_date, 'owner_id': owner_id}
-        response = requests.post(url, params=params)
+        print(params)
+        response = requests.post(url, data=params)
     elif (request.method == 'DELETE'):
-        id = request.args.get('id')
+        id = json.loads(request.data.decode('utf-8'))['id']
+        print(id)
         params = {'id': id}
-        response = requests.delete(url, params=params)
+        response = requests.delete(url, data=params)
+
     return response.json(), response.status_code
 
-@app.route('/participant', methods=['GET', 'POST', 'DELETE'])
+@app.route('/participant/', methods=['GET', 'POST', 'DELETE'])
 def participant():
-    url = f'http://{ip}:5015/directions/participant'
+    print('ON PARTICIPANT METHOD')
+    url = f'http://{ip}:5015/directions/participant/'
+    request.data = request.json
     if (request.method == 'GET'):
-        id = request.args.get('id')
+        id = request.data.get('id')
         params = {'id': id}
-        response = requests.get(url, params=params)
+        response = requests.get(url, data=params)
     elif (request.method == 'POST'):
-        id = request.args.get('id')
-        trip_id = request.args.get('trip_id')
-        pickup_location = request.args.get('pickup_location')
+        id = request.data.get('id')
+        print(f'ID: {id}')
+        trip_id = request.data.get('trip_id')
+        pickup_location = request.data.get('pickup_location')
         params = {'id': id, 'trip_id': trip_id, 'pickup_location': pickup_location}
-        response = requests.post(url, params=params)
+
+        print(params)
+        response = requests.post(url, data=params)
     elif (request.method == 'DELETE'):
-        id = request.args.get('id')
+        id = request.data.get('id')
         params = {'id': id}
-        response = requests.delete(url, params=params)
+        print(params)
+        response = requests.delete(url, data=params)
+    return response.json(), response.status_code
+
+@app.route('/owner/', methods=['GET'])
+def owner():
+    url = f'http://{ip}:5015/directions/owner/'
+    owner_id = request.args.get('id')
+    if (request.method == 'GET'):
+        if (owner_id == None):
+            response = requests.get(url)
+        else:
+            params = {'id': owner_id}
+            response = requests.get(url, data=params)
     return response.json(), response.status_code
 
 # -
@@ -101,6 +146,14 @@ def get_all_reviews():
     if (request.method == 'GET'):
         reviewid = request.args.get('reviewid')
         personid = request.args.get('personid')
+        trip_id = request.args.get('trip_id')
+        if (trip_id != None):
+            entry = get_review_id(trip_id)
+            if (entry == None):
+                return jsonify({'error': 'review not found'}), 404
+            else:
+                print(entry)
+                return jsonify(entry), 200
         # get in http:{ip}:5005/api/v1/review?reviewid=1&personid=1
         if (reviewid == None and personid == None):
             response = requests.get(url)
@@ -115,11 +168,13 @@ def get_all_reviews():
             response = requests.get(url, params=params)
     elif (request.method == 'POST'):
         try:
-            personid = request.form['personid']
-            title = request.form['title']
-            description = request.form['description']
-            rating = request.form['rating']
-        except:
+            print(request.json)
+            personid = request.json.get('person_id')
+            title = request.json.get('title')
+            description = request.json.get('description')
+            rating = request.json.get('rating')
+        except Exception as e:
+            print(e)
             return jsonify({'error': 'personid, title, description, rating are required'}), 400
 
         data = {'personid': personid, 'title': title, 'description': description, 'rating': rating}
@@ -140,6 +195,7 @@ def rating_reviews():
             response = requests.get(url, params=params)
 
     return response.json(), response.status_code
+
 
 # ------------------------------
 
@@ -176,8 +232,9 @@ def login():
                 while(check_free_review_id(reviewid) == False):
                     reviewid += 1
                     print(reviewid)
-                print(create_full_entry(str(authid), str(UID),reviewid,str(UID)))
-                print("authid: " + str(authid) + " UID: " + str(UID) + " reviewid: " + str(reviewid))
+                uidTRIP = str(uuid.uuid4())
+                print(create_full_entry(str(authid), str(UID),reviewid,str(uidTRIP)))
+                print("authid: " + str(authid) + " UID: " + str(UID) + " reviewid: " + str(reviewid) + " TRIPID: " + uidTRIP)
 
             # print entry
             print(get_entry(str(authid)))
@@ -242,7 +299,9 @@ def fetchdata():
             while(check_free_review_id(reviewid) == False):
                 reviewid += 1
                 print(reviewid)
-            print(create_full_entry(str(authid), str(UID),reviewid,str(UID)))
+            uidTRIP = str(uuid.uuid4())
+            
+            print(create_full_entry(str(authid), str(UID),reviewid,str(uidTRIP)))
             print("authid: " + str(authid) + " UID: " + str(UID) + " reviewid: " + str(reviewid))
 
         # print entry
@@ -254,7 +313,7 @@ def fetchdata():
     # entry to json
     entry = get_entry(str(authid))
     print(entry)
-    return jsonify({"authid": entry[0], "chat": entry[1], "reviewid": entry[2]}), 200
+    return jsonify({"authid": entry[0], "chat_id": entry[1], "reviewid": entry[2] , "trip_id": entry[3] }), 200
 
 @app.route(appendurl + 'auth/google', methods=['GET'])
 def google():
@@ -267,6 +326,51 @@ def google():
     # so we need to redirect to that url
 
     return redirect(response.url)
+
+#
+# CHAT
+# 
+@app.route(appendurl + '/conversations', methods=['POST','GET','DELETE'])
+def conversations():
+    
+    if request.method == 'POST':
+        c_id=request.args.get("c_id");
+        author=request.args.get("author");
+        message=request.args.get("message");
+        member=request.args.get("member");
+        if author == None and message == None:
+            url=f'http://{ip}:5010/conversations?c_id={c_id}&member={member}'
+        elif member == None:
+            url=f'http://{ip}:5010/conversations?c_id={c_id}&author={author}&message={message}'
+        response = requests.post(url);
+        print(response.json());
+    elif request.method == 'GET':
+        #get conversations of one user
+        
+        author=request.args.get("author");
+        url=f'http://{ip}:5010/conversations?author={author}'
+        response = requests.get(url);
+        print(response.json());
+    elif request.method == 'DELETE':
+        #delete conversation
+        # c_id=request.args.get("c_id");
+        # member=request.args.get("member");
+        # url=f'http://{ip}:5010/conversations?c_id={c_id}&member={member}'
+        # response = requests.delete(url);
+        print("delete")
+    return jsonify(response.json()), response.status_code
+
+@app.route(appendurl + '/new_conversation', methods=['POST'])
+def new_conversation():
+    if request.method == 'POST':
+        friendly_name=request.args.get("friendly_name");
+        url=f'http://{ip}:5010/new_conversation?friendly_name={friendly_name}'
+        response=requests.post(url);
+
+    return jsonify(response.json()), response.status_code
+# pass
+
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=8080)
