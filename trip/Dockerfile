@@ -5,7 +5,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # Set the working directory inside the container
-WORKDIR /payments
+WORKDIR /maps_api
 
 # Copy requirements file
 COPY requirements.txt .
@@ -14,10 +14,10 @@ COPY requirements.txt .
 RUN pip3 install --no-cache-dir -r requirements.txt
 
 #Copy rest of payments app
-COPY payments/ .
+COPY maps_api/ .
 
 # Expose port (still to decide)
-EXPOSE 8000
+EXPOSE 5015
 
 # Run django makemigrations
 CMD ["python3", "manage.py", "makemigrations"]
@@ -26,12 +26,9 @@ CMD ["python3", "manage.py", "makemigrations"]
 CMD ["python3", "manage.py", "migrate"]
 
 # Run django runserver
-CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
-
-
+CMD ["python3", "manage.py", "runserver", "0.0.0.0:5015"] 
 
 #BUILD IMAGE
 # docker build -t my-django-app .
 #RUN CONTAINER
-# docker run -d -p 127.0.0.1:8000:8000 my-django-app
-
+# docker run -d -p 127.0.0.1:5015:5015 my-django-app
