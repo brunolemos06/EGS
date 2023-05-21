@@ -1,11 +1,11 @@
-# auth          -> port     =   5000
-# review        -> port     =   5005
-# mensagem      -> port     =   5010
-# trip          -> port     =   5015
-# payment       -> port     =   8000
-# frontendauth  -> port     =   3000
+# auth                      -> port     =   5000
+# review                    -> port     =   5005
+# mensagem                  -> port     =   5010
+# trip                      -> port     =   5015
+# payment                   -> port     =   8000
+# frontendauth              -> port     =   3000
 
-# RIDE-MATE API -> port     =   8080
+# RIDE-MATE API [composer]  -> port     =   8080
 
 from flask import Flask, jsonify, request
 from flask_restful import Api, Resource, reqparse
@@ -373,4 +373,4 @@ def new_conversation():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=8080)
+    app.run(host='0.0.0.0',debug=True, port=8080)

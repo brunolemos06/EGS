@@ -19,7 +19,9 @@ EXPOSE 5005
 
 
 # Clean DB
-CMD ["python3", "createdb.py"]
+RUN rm -rf db.sqlite3
+# Create the database
+RUN python3 create_db.py
 
 # Run the Flask application
 CMD ["python3", "main.py"]
