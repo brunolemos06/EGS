@@ -449,4 +449,4 @@ def info(user_firstname, user_lastname, user_email, user_avatar, user_id):
     return make_response(jsonify({'fname' : user_firstname, 'lname' : user_lastname, 'email' : user_email, 'avatar' : user_avatar, 'id' : user_id}), 200)
 
 if __name__ == '__main__':
-  app.run(debug=True)
+  app.run(host='0.0.0.0',port=5000,debug=True)
