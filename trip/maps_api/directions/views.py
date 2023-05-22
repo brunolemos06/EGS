@@ -118,6 +118,7 @@ class ParticipantView(APIView):
     @swagger_auto_schema(manual_parameters=[id_param, trip_id_param, pickup_location_param], responses={200: '{v: True, msg: Participant created successfully}', 404: '{v: False, error: Cannot get Trip.}'})
     def post(self, request):
         print("ENTROU")
+        print(request.data)
         id = request.data.get('id')
         trip_id = request.data.get('trip_id')
         pickup_location = request.data.get('pickup_location')
@@ -156,15 +157,17 @@ class ParticipantView(APIView):
         trip.info = info.json()
         trip.save()
     
-        return JsonResponse({'v': True, 'msg': f'Participant {id} added to Trip {trip_id} successfully.', 'money': participant.price}, status = 201)
+        return JsonResponse({'v': True, 'msg': f'Participant {id} added to Trip {trip_id} successfully.', 'money': participant.price, 'participant_id':id}, status = 201)
     
     # @swagger_auto_schema(query_serializer=ParticipantSerializer)
     id_param = openapi.Parameter('id', openapi.IN_QUERY, description="participant id", type=openapi.TYPE_STRING)
     participant_response = openapi.Response('response description', ParticipantSerializer)
     @swagger_auto_schema(manual_parameters=[id_param], responses={200: participant_response, 404: '{v: False, error: Cannot get Participant.}'})
     def get(self, request):
+        print("PARTICIAPNT GET")
+        print(request.data)
         query_set = Participant.objects.all()
-        id = request.GET.get('id')
+        id = request.data.get('id')
         if id is not None:
             query_set = query_set.filter(id=id)
 
@@ -179,6 +182,7 @@ class ParticipantView(APIView):
     @swagger_auto_schema(manual_parameters=[id_param], responses={200: '{v: True, msg: Participant deleted successfully}', 404: '{v: False, error: Cannot get Participant.}'})
     def delete(self, request):
         print("PARTICIAPNT DELETE")
+        print(request.data)
         id = request.data.get('id')
         if id is None:
             return JsonResponse({'v': False, 'error': 'Id not provided.'}, status = 404)
