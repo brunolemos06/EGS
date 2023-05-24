@@ -16,12 +16,7 @@ COPY . .
 # Expose port 5005 to the outside world
 EXPOSE 5005
 
-
-
-# Clean DB
-RUN rm -rf db.sqlite3
-# Create the database
-RUN python3 create_db.py
-
+# Create tables on database
+CMD ["python3", "create_db.py"]
 # Run the Flask application
 CMD ["python3", "main.py"]
