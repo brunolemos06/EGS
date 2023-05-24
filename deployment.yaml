@@ -4,7 +4,7 @@ apiVersion: ridemate/v1
 kind: Deployment
 metadata:
   name: ridemate
-  namespace: our-namespace
+  namespace: egs-ridemate
 spec: 
   replicas: 1
   selector:
@@ -17,35 +17,31 @@ spec:
     sepcs:
       containers:
         - name: auth_backend
-          image: auth_backend:tag #change tag
+          image: auth_backend:v1 
           ports: 
             - containerPort: 5000
         - name: auth_frontend
-          image: auth_frontend:tag #change tag
+          image: auth_frontend:v1 
           ports: 
             - containerPort: 3000
         - name: chat_api
-          image: chat_api:tag #change tag
-          ports: 
-            - containerPort: 5010
-        - name: chat_api
-          image: chat_api:tag #change tag
+          image: chat_api:v1 
           ports: 
             - containerPort: 5010
         - name: composer
-          image: composer:tag #change tag
+          image: composer:v1 
           ports: 
-            - containerPort: #composer port
+            - containerPort: 8080
         - name: payments
-          image: payments:tag #change tag
+          image: payments:v1 
           ports: 
             - containerPort: 8000
         - name: reviews
-          image: reviews:tag #change tag
+          image: reviews:v1 
           ports: 
             - containerPort: 5005
         - name: trip
-          image: trip:tag #change tag
+          image: trip:v1 
           ports: 
             - containerPort: 5015
 ---
@@ -95,8 +91,8 @@ spec:
     app: ridemate
     container: composer
   ports:
-    - port: #composer port
-      targetPort: #composer port
+    - port: 8080
+      targetPort: 8080
 ---
 apiVersion: v1
 kind: Service
@@ -139,7 +135,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: app-k3s
-  namespace: our-namespace
+  namespace: egs-ridemate
   annotations:
     kubernetes.io/ingress.class: traefik
     traefik.ingress.kubernetes.io/frontend-entry-points: http,https
@@ -147,7 +143,7 @@ metadata:
     traefik.ingress.kubernetes.io/redirect-permanent: "true"
 spec:
   rules:
-  - host: ridemate-our-namespace.k3s
+  - host: egs-ridemate.k3s
     http:
       paths:
       - path: /
@@ -155,4 +151,4 @@ spec:
         backend:
           service:
             name: ridemate
-            port: #composer port
+            port: 8080
