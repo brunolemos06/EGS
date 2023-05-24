@@ -109,6 +109,8 @@ def participant():
     url = f'http://{ip}:5015/directions/participant/'
     request.data = request.json
     if (request.method == 'GET'):
+        print('ON GET')
+        print(request.data)
         id = request.data.get('id')
         params = {'id': id}
         response = requests.get(url, data=params)

@@ -87,8 +87,6 @@ class _ProfilePageState extends State<ProfilePage> {
         final String email = responseJson['email'];
         final String id = responseJson['id'];
 
-
-
         // get id for reviews
         final String url =
             'http://10.0.2.2:8080/service-review/v1/auth/fetchdata';
@@ -120,9 +118,6 @@ class _ProfilePageState extends State<ProfilePage> {
           debugPrint(data.toString());
           setState(() {
             data['msg'].forEach((k, v) {
-              debugPrint("AQUIIII");
-              debugPrint(responseJson['trip_id']);
-              debugPrint(k);
               if (k == responseJson['trip_id'] && v != null) {
                 var trip_id = k;
                 for (var trip in data['msg'][k]) {
@@ -143,12 +138,25 @@ class _ProfilePageState extends State<ProfilePage> {
               }
             });
           });
+          debugPrint("HELLO WORLD!!!!");
+          final String url_get_participating =
+              'http://10.0.2.2:8080/participant/';
+          final response_get_participating =
+              (await http.get(Uri.parse(url_get_participating)));
+          debugPrint("HELLO WORLD!!!!");
+          debugPrint(response_get_participating.body);
+          final data_get_participating =
+              json.decode(response_get_participating.body);
+          debugPrint("PARTICIPATING");
+          debugPrint(data_get_participating.toString());
+          setState(() {
+            print(data_get_participating);
+          });
         } else {
           debugPrint('Fetch fail', wrapWidth: 1024);
         }
         // .
 
-        debugPrint('MUAHAHHAHHAHAHA', wrapWidth: 1024);
         setState(() {
           _fname = name;
           _lname = lname;
@@ -347,7 +355,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                             TextFormField(
                                               decoration: InputDecoration(
                                                 labelText: 'Title',
-                                                
                                               ),
                                               controller: _titleController,
                                               validator: (value) {
@@ -361,10 +368,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                             TextFormField(
                                               decoration: InputDecoration(
                                                 labelText: 'Description',
-
                                               ),
                                               controller:
-                                                    _descriptionController,
+                                                  _descriptionController,
                                               maxLines: null,
                                               validator: (value) {
                                                 if (value == null ||
@@ -402,16 +408,20 @@ class _ProfilePageState extends State<ProfilePage> {
                                             child: Text('Cancel'),
                                           ),
                                           ElevatedButton(
-                                            onPressed: ()  async{
-                                              final description = _descriptionController.text;
-                                              final title = _titleController.text;
+                                            onPressed: () async {
+                                              final description =
+                                                  _descriptionController.text;
+                                              final title =
+                                                  _titleController.text;
                                               if (description.isEmpty ||
                                                   title.isEmpty) {
-                                             ScaffoldMessenger.of(context).showSnackBar(
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
                                                   SnackBar(
                                                     content: Text(
                                                       "Fill required!",
-                                                      style: TextStyle(color: Colors.white),
+                                                      style: TextStyle(
+                                                          color: Colors.white),
                                                     ),
                                                     backgroundColor: Colors.red,
                                                   ),
@@ -422,77 +432,110 @@ class _ProfilePageState extends State<ProfilePage> {
 
                                               // Submit review
                                               // get owner id from trip
-                                              var ownerid = _trips[index].owner_id;
-                                              final url3 = 'http://10.0.2.2:8080/service-review/v1/review?trip_id=$ownerid';
-                                              final response3 = (await http.get(Uri.parse(url3)));
-                                              debugPrint(response3.statusCode.toString());
+                                              var ownerid =
+                                                  _trips[index].owner_id;
+                                              final url3 =
+                                                  'http://10.0.2.2:8080/service-review/v1/review?trip_id=$ownerid';
+                                              final response3 = (await http
+                                                  .get(Uri.parse(url3)));
+                                              debugPrint(response3.statusCode
+                                                  .toString());
                                               if (response3.statusCode == 200) {
-                                                final data = jsonDecode(response3.body);
-                                                _personid = int.parse(data.toString());
+                                                final data =
+                                                    jsonDecode(response3.body);
+                                                _personid =
+                                                    int.parse(data.toString());
                                                 // post review
-                                                final url = 'http://10.0.2.2:8080/service-review/v1/review';
+                                                final url =
+                                                    'http://10.0.2.2:8080/service-review/v1/review';
                                                 // get title and description from form
-                                                debugPrint("person id: $_personid",wrapWidth: 1024);
-                                                debugPrint("rating: $_publishrating",wrapWidth: 1024);
-                                                debugPrint("title: ${_titleController.text}",wrapWidth: 1024);
-                                                debugPrint("description: ${_descriptionController.text}",wrapWidth: 1024);
-                                                final response = await http.post(
+                                                debugPrint(
+                                                    "person id: $_personid",
+                                                    wrapWidth: 1024);
+                                                debugPrint(
+                                                    "rating: $_publishrating",
+                                                    wrapWidth: 1024);
+                                                debugPrint(
+                                                    "title: ${_titleController.text}",
+                                                    wrapWidth: 1024);
+                                                debugPrint(
+                                                    "description: ${_descriptionController.text}",
+                                                    wrapWidth: 1024);
+                                                final response =
+                                                    await http.post(
                                                   Uri.parse(url),
                                                   headers: <String, String>{
-                                                    'Content-Type': 'application/json; charset=UTF-8',
+                                                    'Content-Type':
+                                                        'application/json; charset=UTF-8',
                                                   },
-                                                  body: jsonEncode(<String, dynamic>{
+                                                  body: jsonEncode(<String,
+                                                      dynamic>{
                                                     'title': title,
                                                     'description': description,
-                                                    'rating': int.parse(_publishrating.toString()),
+                                                    'rating': int.parse(
+                                                        _publishrating
+                                                            .toString()),
                                                     'person_id': _personid,
                                                   }),
                                                 );
-                                                if(response.statusCode == 200){
+                                                if (response.statusCode ==
+                                                    200) {
                                                   // pop
                                                   Navigator.of(context).pop();
-                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
                                                     SnackBar(
                                                       content: Text(
                                                         "Review submitted!",
-                                                        style: TextStyle(color: Colors.white),
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white),
                                                       ),
-                                                      backgroundColor: Colors.green,
+                                                      backgroundColor:
+                                                          Colors.green,
                                                     ),
                                                   );
                                                   fetchData();
-                                                }else{
+                                                } else {
                                                   // something went wrong
                                                   // pop
-                                                  debugPrint("something went wrong",wrapWidth: 1024);
+                                                  debugPrint(
+                                                      "something went wrong",
+                                                      wrapWidth: 1024);
                                                   Navigator.of(context).pop();
-                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
                                                     SnackBar(
                                                       content: Text(
                                                         "Something went wrong with adding review!",
-                                                        style: TextStyle(color: Colors.white),
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white),
                                                       ),
-                                                      backgroundColor: Colors.red,
+                                                      backgroundColor:
+                                                          Colors.red,
                                                     ),
                                                   );
                                                 }
-
-                                              }else{
+                                              } else {
                                                 // something went wrong
                                                 // pop
-                                                debugPrint("something went wrong",wrapWidth: 1024);
+                                                debugPrint(
+                                                    "something went wrong",
+                                                    wrapWidth: 1024);
                                                 Navigator.of(context).pop();
-                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
                                                   SnackBar(
                                                     content: Text(
                                                       "Something went wrong!",
-                                                      style: TextStyle(color: Colors.white),
+                                                      style: TextStyle(
+                                                          color: Colors.white),
                                                     ),
                                                     backgroundColor: Colors.red,
                                                   ),
                                                 );
                                               }
-
                                             },
                                             child: Text('Submit'),
                                           ),
@@ -536,7 +579,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                         backgroundColor: Colors.green,
                                       ),
                                     );
-                                    
                                   } else {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
