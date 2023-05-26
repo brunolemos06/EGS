@@ -1,12 +1,6 @@
 import sqlite3
 import os
 
-print('-> creating database..')
-# remove the database if it exists
-if os.path.exists('database.db'):
-    os.remove('database.db')
-    print('-> database removed..')
-
 # Connect to the database
 conn = sqlite3.connect('database.db')
 

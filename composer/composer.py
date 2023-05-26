@@ -1,4 +1,4 @@
-# auth                      -> port     =   5000
+# auth                      -> port     =   5100
 # review                    -> port     =   5005
 # mensagem                  -> port     =   5010
 # trip                      -> port     =   5015
@@ -21,10 +21,11 @@ import uuid
 # import file located in the same directory
 from db_func import *
 
-
 app = Flask(__name__)
 
 ip = '127.0.0.1'
+auth_port = 5100
+
 SWAGGER_URL = '/api/docs'   # URL for exposing Swagger UI (without trailing '/')
 API_URL = '/static/swagger.yml'  # Our API url (can of course be a local resource)
 
@@ -75,9 +76,13 @@ def trip():
             response_short['msg'][i]['available_sits'] = response.json()['msg'][i]['available_sits']
             response_short['msg'][i]['starting_date'] = response.json()['msg'][i]['starting_date']
             response_short['msg'][i]['owner_id'] = response.json()['msg'][i]['owner_id']
-            origin_coords = response.json()['msg'][i]['info']['routes'][0]['legs'][0]['start_location']
-            destination_coords = response.json()['msg'][i]['info']['routes'][0]['legs'][0]['end_location']
-            response_short['msg'][i]['info'] = {'origin_coords': origin_coords, 'destination_coords': destination_coords}
+            origin_coords = response.json()['msg'][i]['info']['routes'][0]['bounds']['northeast']
+            destination_coords = response.json()['msg'][i]['info']['routes'][0]['bounds']['southwest']
+            response_short['msg'][i]['info'] = {'origin_coords': origin_coords, 'destination_coords': destination_coords, 'geocoded_waypoints': []}
+            if len(response.json()['msg'][i]['info']['geocoded_waypoints']) > 2:
+                print(len(response.json()['msg'][0]['info']['geocoded_waypoints']))
+                for w in range(2, len(response.json()['msg'][0]['info']['geocoded_waypoints'])):
+                    response_short['msg'][i]['info']['geocoded_waypoints'].append(response.json()['msg'][i]['info']['geocoded_waypoints'][w]['place_id'])
         print(response_short)
         return response_short, response.status_code
     elif (request.method == 'POST'):
@@ -105,6 +110,8 @@ def participant():
     url = f'http://{ip}:5015/directions/participant/'
     request.data = request.json
     if (request.method == 'GET'):
+        print('ON GET')
+        print(request.data)
         id = request.data.get('id')
         params = {'id': id}
         response = requests.get(url, data=params)
@@ -203,7 +210,7 @@ def rating_reviews():
 @app.route(appendurl + 'auth/login', methods=['POST'])
 def login():
     if request.method == 'POST':
-        url = f'http://{ip}:5000/login'
+        url = f'http://{ip}:{auth_port}/login'
         data = request.get_json()
         response = requests.post(url, json=data)
         if response.status_code == 202:
@@ -215,7 +222,7 @@ def login():
                 "Content-Type": "application/json"
             }
             # send the new header to the info endpoint
-            url = f'http://{ip}:5000/info'
+            url = f'http://{ip}:{auth_port}/info'
             response1 = requests.post(url, headers=headers)
             authid = response1.json()['id']
             email = response1.json()['email']
@@ -245,7 +252,7 @@ def login():
 @app.route(appendurl + 'auth/register', methods=['POST'])
 def register():
     if request.method == 'POST':
-        url = f'http://{ip}:5000/register'
+        url = f'http://{ip}:{auth_port}/register'
         data = request.get_json()
         response = requests.post(url, json=data)
         print(data)
@@ -255,7 +262,7 @@ def register():
 def auth():
     # get token from header
     if request.method == 'POST':
-        url = f'http://{ip}:5000/auth'
+        url = f'http://{ip}:{auth_port}/auth'
         headers = request.headers
         response = requests.post(url, headers=headers)
         print(response.json())
@@ -266,7 +273,7 @@ def auth():
 def info():
     # get token from header
     if request.method == 'POST':
-        url = f'http://{ip}:5000/info'
+        url = f'http://{ip}:{auth_port}/info'
         headers = request.headers
         response = requests.post(url, headers=headers)
         print(response.json())
@@ -274,7 +281,7 @@ def info():
 
 @app.route(appendurl + 'auth/github')
 def github():
-    url = f'http://10.0.2.2:5000/github'
+    url = f'http://10.0.2.2:{auth_port}/github'
     if request.method == 'GET':
         return redirect(url)
 
@@ -317,7 +324,7 @@ def fetchdata():
 
 @app.route(appendurl + 'auth/google', methods=['GET'])
 def google():
-    url = f'http://{ip}:5000/google'
+    url = f'http://{ip}:{auth_port}/google'
     if request.method == 'GET':
         response = requests.get(url)
 

@@ -12,6 +12,8 @@ import 'login_page.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:geocoding/geocoding.dart';
 
+var pendingParticipantId = null;
+
 class Travel {
   final String id;
   final String origin;
@@ -82,13 +84,8 @@ class _catalogoPageState extends State<catalogo_page> {
             trip['info']['destination_coords']['lat'],
             trip['info']['destination_coords']['lng']);
         List<LatLng> waypoints_coords = [];
-        // for (var i = 2; i < trip['info']['geocoded_waypoints'].length; i++) {
-        //   debugPrint("i, ${i}");
-        //   List<Location> locations =
-        //       await locationFromAddress("Gronausestraat 710, Enschede");
-        //   debugPrint(locations.toString());
-        //   waypoints_coords
-        //       .add(LatLng(locations[0].latitude, locations[0].longitude));
+        // for (var waypoint in trip['info']['waypoints_coords']) {
+        //   waypoints_coords.add(LatLng(waypoint['lat'], waypoint['lng']));
         // }
         debugPrint(waypoints_coords.toString());
         travels.add(Travel(
@@ -124,7 +121,7 @@ class _catalogoPageState extends State<catalogo_page> {
         http
             .post(token_url,
                 headers: token_headers, body: json.encode(token_payload))
-            .then((token_response) {
+            .then((token_response) async {
           final token_jsonResponse = jsonDecode(token_response.body);
           final token = token_jsonResponse['status'];
           if (token == "success") {
@@ -174,6 +171,27 @@ class _catalogoPageState extends State<catalogo_page> {
                 );
               },
             );
+            // Delete trip because the payment failed
+            final String url_delete_participant =
+                'http://10.0.2.2:8080/participant/';
+            final response_delete_participant =
+                await http.delete(
+              Uri.parse(url_delete_participant),
+              headers: {
+                'Content-Type':
+                'application/json',
+              },
+              body: jsonEncode({
+                'pickup_location':
+                _pickedLocationString,
+                'id': pendingParticipantId
+              }),
+            );
+            debugPrint(
+                "response_delete_participant");
+            debugPrint(
+                response_delete_participant.body,
+                wrapWidth: 1024);
           }
         });
       }
@@ -523,6 +541,8 @@ class _catalogoPageState extends State<catalogo_page> {
                                                 'id': responseJson2['trip_id'],
                                               }),
                                             );
+                                            pendingParticipantId = json.decode(response_add_participant.body)['participant_id'];
+                                            debugPrint(pendingParticipantId);
                                             debugPrint(
                                                 "response_add_participant");
                                             debugPrint(

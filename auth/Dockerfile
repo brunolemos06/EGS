@@ -18,7 +18,7 @@ COPY user.py .
 COPY users.db .
 
 # Expose port (still to decide)
-EXPOSE 5000
+EXPOSE 5100
 
 #CLEAN DB 
 CMD ["python3", "clean_db.py"]

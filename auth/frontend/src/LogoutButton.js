@@ -3,7 +3,7 @@ import './LogoutButton.css';
 
 function LogoutButton() {
   function handleClick() {
-    window.location.href = 'http://10.0.2.2:5000/logout';
+    window.location.href = 'http://10.0.2.2:5100/logout';
   }
 
   return ( 
