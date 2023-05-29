@@ -174,24 +174,18 @@ class _catalogoPageState extends State<catalogo_page> {
             // Delete trip because the payment failed
             final String url_delete_participant =
                 'http://10.0.2.2:8080/participant/';
-            final response_delete_participant =
-                await http.delete(
+            final response_delete_participant = await http.delete(
               Uri.parse(url_delete_participant),
               headers: {
-                'Content-Type':
-                'application/json',
+                'Content-Type': 'application/json',
               },
               body: jsonEncode({
-                'pickup_location':
-                _pickedLocationString,
+                'pickup_location': _pickedLocationString,
                 'id': pendingParticipantId
               }),
             );
-            debugPrint(
-                "response_delete_participant");
-            debugPrint(
-                response_delete_participant.body,
-                wrapWidth: 1024);
+            debugPrint("response_delete_participant");
+            debugPrint(response_delete_participant.body, wrapWidth: 1024);
           }
         });
       }
@@ -283,7 +277,9 @@ class _catalogoPageState extends State<catalogo_page> {
                     title: Text(travels[index].origin +
                         " - " +
                         travels[index].destination),
-                    subtitle: Text(travels[index].starting_date),
+                    subtitle: Text(travels[index].starting_date +
+                        "\nAvailable seats: " +
+                        travels[index].available_sits.toString()),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(16.0),
@@ -541,7 +537,9 @@ class _catalogoPageState extends State<catalogo_page> {
                                                 'id': responseJson2['trip_id'],
                                               }),
                                             );
-                                            pendingParticipantId = json.decode(response_add_participant.body)['participant_id'];
+                                            pendingParticipantId = json.decode(
+                                                response_add_participant
+                                                    .body)['participant_id'];
                                             debugPrint(pendingParticipantId);
                                             debugPrint(
                                                 "response_add_participant");

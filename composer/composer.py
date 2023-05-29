@@ -108,14 +108,16 @@ def trip():
 def participant():
     print('ON PARTICIPANT METHOD')
     url = f'http://{ip}:5015/directions/participant/'
-    request.data = request.json
     if (request.method == 'GET'):
         print('ON GET')
-        print(request.data)
-        id = request.data.get('id')
+        print(request.args)
+        id = request.args.get('trip_id')
         params = {'id': id}
         response = requests.get(url, data=params)
+        print(response.json())
     elif (request.method == 'POST'):
+        request.data = request.json
+        print('ON POST')
         id = request.data.get('id')
         print(f'ID: {id}')
         trip_id = request.data.get('trip_id')
@@ -125,6 +127,8 @@ def participant():
         print(params)
         response = requests.post(url, data=params)
     elif (request.method == 'DELETE'):
+        request.data = request.json
+        print('ON DELETE')
         id = request.data.get('id')
         params = {'id': id}
         print(params)
