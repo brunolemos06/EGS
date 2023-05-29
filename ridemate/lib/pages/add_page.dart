@@ -277,9 +277,9 @@ class _AddPageState extends State<AddPage> {
                         if (response.statusCode == 200) {
                           final responseJson = json.decode(response.body);
                           setState(() {
-                            _travelchat_id = responseJson["c_id"];
+                            _travelchat_id = responseJson["friendly_name"];
                           });
-                          debugPrint('CID:: ${_travelchat_id}',
+                          debugPrint('FNAME:: ${_travelchat_id}',
                               wrapWidth: 1024);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -292,7 +292,7 @@ class _AddPageState extends State<AddPage> {
                           );
                           // update conversation
                           final String url =
-                              'http://10.0.2.2:8080/service-review/v1/conversations?c_id=$_travelchat_id&member=$_chat_id';
+                              'http://10.0.2.2:8080/service-review/v1/conversations?f_name=$_travelchat_id&member=$_chat_id';
 
                           final response2 = await http.post(
                             Uri.parse(url),
