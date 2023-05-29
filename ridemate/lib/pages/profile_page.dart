@@ -33,6 +33,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final _titleController = TextEditingController();
 
   String trip_id = "";
+  String chat_id = "";
 
   @override
   void dispose() {
@@ -48,9 +49,15 @@ class _ProfilePageState extends State<ProfilePage> {
 
   // create trip
   final List<Travel> _trips = [];
+  final List<String> _participating = [];
+  final List<Trip> _travels = [];
+
+  String user_id = "";
 
   Future<void> fetchData() async {
     _trips.clear();
+    _participating.clear();
+    _travels.clear();
     // token
     _reviews.clear();
     debugPrint('fetching data', wrapWidth: 1024);
@@ -78,7 +85,6 @@ class _ProfilePageState extends State<ProfilePage> {
         return;
       }
       final response = await http.post(Uri.parse(url), headers: headers);
-
       if (response.statusCode == 200) {
         final responseJson = json.decode(response.body);
         debugPrint('Response: ${response.body}', wrapWidth: 1024);
@@ -109,6 +115,7 @@ class _ProfilePageState extends State<ProfilePage> {
           debugPrint('ID: $id', wrapWidth: 1024);
           setState(() {
             _id = id.toString();
+            chat_id = responseJson['chat_id'];
           });
           // get trips for loged user
           final String url_owner = 'http://10.0.2.2:8080/owner/';
@@ -138,24 +145,69 @@ class _ProfilePageState extends State<ProfilePage> {
               }
             });
           });
-          debugPrint("HELLO WORLD!!!!");
+          debugPrint(responseJson['trip_id'].toString());
+          user_id = responseJson['trip_id'];
           final String url_get_participating =
-              'http://10.0.2.2:8080/participant/';
+              'http://10.0.2.2:8080/participant?trip_id=$user_id';
           final response_get_participating =
-              (await http.get(Uri.parse(url_get_participating)));
-          debugPrint("HELLO WORLD!!!!");
+              await http.get(Uri.parse(url_get_participating));
           debugPrint(response_get_participating.body);
           final data_get_participating =
               json.decode(response_get_participating.body);
           debugPrint("PARTICIPATING");
           debugPrint(data_get_participating.toString());
           setState(() {
-            print(data_get_participating);
+            // add dict to _participating list => data_get_participating = {msg: [{id: 0e4aefcb-ab8a-415f-9731-32a1f4bd7705, pickup_location: 39.5572,-8.0317, price: 36.68, trip_id_id: 7ac6d883-aeec-42cd-a516-09bb7afd0d91}], v: true}, {id: 0e4aefcb-ab8a-415f-9731-32a1f4bd7705, pickup_location: 39.5572,-8.0317, price: 36.68, trip_id_id: 7ac6d883-aeec-42cd-a516-09bb7afd0d91}], v: true}]
+            for (var i = 0; i < data_get_participating['msg'].length; i++) {
+              _participating
+                  .add(data_get_participating['msg'][i]['trip_id_id']);
+            }
           });
         } else {
           debugPrint('Fetch fail', wrapWidth: 1024);
         }
-        // .
+        // print _participating
+        debugPrint(_participating.toString());
+
+        final String urlTrips = 'http://10.0.2.2:8080/trip/';
+        final responseTrips = await http.get(Uri.parse(urlTrips));
+        final dataTrips = json.decode(responseTrips.body);
+        debugPrint(dataTrips.toString(), wrapWidth: 1024);
+        setState(() {
+          for (var trip in dataTrips['msg']) {
+            var origin = trip['origin'];
+            var destination = trip['destination'];
+            var id = trip['id'];
+            var available_sits = trip['available_sits'];
+            var owner_id = trip['owner_id'];
+            var starting_date = trip['starting_date'];
+            var info = trip['info'];
+            var money = 10;
+            var origin_coords = LatLng(trip['info']['origin_coords']['lat'],
+                trip['info']['origin_coords']['lng']);
+            var destination_coords = LatLng(
+                trip['info']['destination_coords']['lat'],
+                trip['info']['destination_coords']['lng']);
+            List<LatLng> waypoints_coords = [];
+            // for (var waypoint in trip['info']['waypoints_coords']) {
+            //   waypoints_coords.add(LatLng(waypoint['lat'], waypoint['lng']));
+            // }
+            debugPrint(waypoints_coords.toString());
+            _travels.add(Trip(
+                id: id,
+                origin: origin,
+                destination: destination,
+                available_sits: available_sits,
+                starting_date: starting_date,
+                owner_id: owner_id,
+                money: money,
+                origin_coords: origin_coords,
+                destination_coords: destination_coords,
+                waypoints_coords: waypoints_coords));
+          }
+        });
+
+        debugPrint(_travels.toString(), wrapWidth: 1024);
 
         setState(() {
           _fname = name;
@@ -558,7 +610,11 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                               ElevatedButton(
                                 onPressed: () async {
+                                  var owner_id = _trips[index].owner_id;
                                   debugPrint(_trips[index].id.toString());
+                                  final url_delete_conversation =
+                                      await http.delete(Uri.parse(
+                                          'http://10.0.2.2:8080/service-review/v1/conversations?f_name=$owner_id'));
                                   final String url =
                                       'http://10.0.2.2:8080/trip/';
                                   final response = await http.delete(
@@ -598,6 +654,99 @@ class _ProfilePageState extends State<ProfilePage> {
                         ],
                       ),
                     );
+                  },
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[600],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: const EdgeInsets.all(10),
+                margin: const EdgeInsets.symmetric(vertical: 10),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _participating.length,
+                  physics: BouncingScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    debugPrint("participating: $_participating");
+                    var trip_id = "";
+                    var origin = "";
+                    var destination = "";
+                    var date = "";
+                    _travels.forEach((element) {
+                      if (element.id == _participating[index]) {
+                        trip_id = element.id.toString();
+                        origin = element.origin;
+                        destination = element.destination;
+                        date = element.starting_date;
+                      }
+                    });
+                    return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              destination,
+                              style: Theme.of(context).textTheme.bodyText1,
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Text(
+                              "Departure: $origin, Time: $date",
+                              style: Theme.of(context).textTheme.bodyText2,
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            ElevatedButton(
+                              onPressed: () async {
+                                debugPrint(_trips[index].id.toString());
+                                final String url_delete_participant =
+                                    'http://10.0.2.2:8080/participant/';
+                                final response_delete_participant =
+                                    await http.delete(
+                                  Uri.parse(url_delete_participant),
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                  },
+                                  body: jsonEncode({
+                                    'id': user_id,
+                                  }),
+                                );
+                                debugPrint("response_delete_participant");
+                                debugPrint(response_delete_participant.body,
+                                    wrapWidth: 1024);
+                                if (response_delete_participant.statusCode ==
+                                    200) {
+                                  fetchData();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        "Removed from trip successfully",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      backgroundColor: Colors.green,
+                                    ),
+                                  );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        "Participant deletion failed!",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                }
+                              },
+                              child: Text('Exit Trip'),
+                            ),
+                          ],
+                        ));
                   },
                 ),
               ),
@@ -685,4 +834,29 @@ class Travel {
     required this.starting_date,
     required this.owner_id,
   });
+}
+
+class Trip {
+  final String id;
+  final String origin;
+  final String destination;
+  final int available_sits;
+  final String starting_date;
+  final String owner_id;
+  final int money;
+  final LatLng origin_coords;
+  final LatLng destination_coords;
+  final List<LatLng> waypoints_coords;
+
+  Trip(
+      {required this.id,
+      required this.origin,
+      required this.destination,
+      required this.available_sits,
+      required this.starting_date,
+      required this.owner_id,
+      required this.money,
+      required this.origin_coords,
+      required this.destination_coords,
+      required this.waypoints_coords});
 }

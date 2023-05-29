@@ -392,10 +392,23 @@ def update_conversation():
     
     #use params to update the conversation
     # data = flask.request.args()
-    c_id = flask.request.args.get('c_id') ##must not be none
+    f_name = flask.request.args.get('f_name') ##must not be none
     message=flask.request.args.get('message') #message to send
     member=flask.request.args.get('member') #member to add  (user id)
     author=flask.request.args.get('author') #author of the message (user id)
+    c_id=''
+    ##get the c_id of the conversation from the friendly name
+    if f_name is not None:
+        conversations = client.conversations \
+                            .v1 \
+                            .conversations \
+                            .list()
+        for c in conversations:
+            if c.friendly_name == f_name:
+                print(c.sid)
+                c_id = c.sid
+
+
     if c_id is None:
         return {'message': 'No conversation id provided'}
     
@@ -487,7 +500,7 @@ def new_conversation():
                         .create(friendly_name=friendly_name)
     
     return {'message': 'The conversation was created',
-            'c_id': conversation.sid}
+            'friendly_name': conversation.friendly_name}
 @app.route('/new_user', methods=['POST'])
 def new_user():
     identity = flask.request.args.get('identity')
@@ -509,10 +522,27 @@ def new_user():
                         .create(identity=identity)
     
     return {'UID': user.sid}
-@app.route('/conversations/', methods=['DELETE'])
+@app.route('/conversations', methods=['DELETE'])
 def delete():
     member = flask.request.args.get('member')
-    c_id = flask.request.args.get('c_id')
+    # c_id = flask.request.args.get('c_id')
+    c_id=''
+    f_name = flask.request.args.get('f_name')
+    print(f_name)
+    print(member)
+
+    ##get the c_id of the conversation from the friendly name
+    if f_name is not None:
+        conversations = client.conversations \
+                            .v1 \
+                            .conversations \
+                            .list()
+        for c in conversations:
+            if c.friendly_name == f_name:
+                print(c.sid)
+                c_id = c.sid
+        
+
     if c_id is None:
         return {'message': 'No conversation id provided'}
     # conversation = Conversation.query.filter_by(c_id=c_id).first()
@@ -524,6 +554,8 @@ def delete():
     if not conversation:
         return {'message': 'No conversation found'}
     if member is None:
+        print('here')
+        print(c_id)
         #get conversation from db and delete it
         # c = Conversation.query.filter_by(c_id=c_id).first()
         conversation = client.conversations \
