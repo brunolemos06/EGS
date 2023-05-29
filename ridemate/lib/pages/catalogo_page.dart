@@ -13,6 +13,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:geocoding/geocoding.dart';
 
 var pendingParticipantId = null;
+var _chat_id = null;
+var _conversation_id = null;
 
 class Travel {
   final String id;
@@ -75,6 +77,7 @@ class _catalogoPageState extends State<catalogo_page> {
         var id = trip['id'];
         var available_sits = trip['available_sits'];
         var owner_id = trip['owner_id'];
+        _conversation_id = trip['owner_id'];
         var starting_date = trip['starting_date'];
         var info = trip['info'];
         var money = 10;
@@ -125,6 +128,69 @@ class _catalogoPageState extends State<catalogo_page> {
           final token_jsonResponse = jsonDecode(token_response.body);
           final token = token_jsonResponse['status'];
           if (token == "success") {
+            //get the chat id logged in
+            final storage = FlutterSecureStorage();
+            // token
+            final String tokenKey = 'token';
+            final String? token = await storage.read(key: tokenKey);
+            if (token != null) {
+              final String url =
+                  'http://10.0.2.2:8080/service-review/v1/auth/info';
+              final String url2 =
+                  'http://10.0.2.2:8080/service-review/v1/auth/auth';
+              final Map<String, String> headers = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'x-access-token': token
+              };
+              final response3 =
+                  await http.post(Uri.parse(url2), headers: headers);
+              if (response3.statusCode != 200) {
+                debugPrint('Token not valid', wrapWidth: 1024);
+                // go to login page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                );
+                return;
+              }
+              final response =
+                  await http.post(Uri.parse(url), headers: headers);
+              // pop up
+              if (response.statusCode == 200) {
+                final responseJson = json.decode(response.body);
+                debugPrint('Response: ${response.body}', wrapWidth: 1024);
+                final String name = responseJson['fname'];
+                final String lname = responseJson['lname'];
+                final String email = responseJson['email'];
+                final String id = responseJson['id'];
+
+                // get id for chat
+                final String url =
+                    'http://10.0.2.2:8080/service-review/v1/auth/fetchdata';
+                final responsefetch = await http.post(
+                  Uri.parse(url),
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: jsonEncode({
+                    "auth_id": id,
+                    "email": email,
+                  }),
+                );
+                debugPrint('Response: ${responsefetch.body}', wrapWidth: 1024);
+                if (responsefetch.statusCode == 200) {
+                  final responseJson = json.decode(responsefetch.body);
+                  _chat_id = responseJson['chat_id'];
+                  final responsechat = await http.post(Uri.parse(
+                      'http://10.0.2.2:8080/service-review/v1/conversations?f_name=$_conversation_id&member=$_chat_id'));
+                  if (responsechat.statusCode == 200) {}
+                }
+
+                //request to get chat to composer
+              }
+            }
+
             // Handle the success response
             showDialog(
               context: context,
@@ -174,24 +240,18 @@ class _catalogoPageState extends State<catalogo_page> {
             // Delete trip because the payment failed
             final String url_delete_participant =
                 'http://10.0.2.2:8080/participant/';
-            final response_delete_participant =
-                await http.delete(
+            final response_delete_participant = await http.delete(
               Uri.parse(url_delete_participant),
               headers: {
-                'Content-Type':
-                'application/json',
+                'Content-Type': 'application/json',
               },
               body: jsonEncode({
-                'pickup_location':
-                _pickedLocationString,
+                'pickup_location': _pickedLocationString,
                 'id': pendingParticipantId
               }),
             );
-            debugPrint(
-                "response_delete_participant");
-            debugPrint(
-                response_delete_participant.body,
-                wrapWidth: 1024);
+            debugPrint("response_delete_participant");
+            debugPrint(response_delete_participant.body, wrapWidth: 1024);
           }
         });
       }
@@ -541,7 +601,9 @@ class _catalogoPageState extends State<catalogo_page> {
                                                 'id': responseJson2['trip_id'],
                                               }),
                                             );
-                                            pendingParticipantId = json.decode(response_add_participant.body)['participant_id'];
+                                            pendingParticipantId = json.decode(
+                                                response_add_participant
+                                                    .body)['participant_id'];
                                             debugPrint(pendingParticipantId);
                                             debugPrint(
                                                 "response_add_participant");

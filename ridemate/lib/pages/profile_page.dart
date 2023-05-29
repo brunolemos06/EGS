@@ -33,6 +33,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final _titleController = TextEditingController();
 
   String trip_id = "";
+  String chat_id = "";
 
   @override
   void dispose() {
@@ -109,6 +110,7 @@ class _ProfilePageState extends State<ProfilePage> {
           debugPrint('ID: $id', wrapWidth: 1024);
           setState(() {
             _id = id.toString();
+            chat_id = responseJson['chat_id'];
           });
           // get trips for loged user
           final String url_owner = 'http://10.0.2.2:8080/owner/';
@@ -558,7 +560,11 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                               ElevatedButton(
                                 onPressed: () async {
+                                  var owner_id = _trips[index].owner_id;
                                   debugPrint(_trips[index].id.toString());
+                                  final url_delete_conversation =
+                                      await http.delete(Uri.parse(
+                                          'http://10.0.2.2:8080/service-review/v1/conversations?f_name=$owner_id'));
                                   final String url =
                                       'http://10.0.2.2:8080/trip/';
                                   final response = await http.delete(

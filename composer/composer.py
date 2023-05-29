@@ -341,14 +341,14 @@ def google():
 def conversations():
     
     if request.method == 'POST':
-        c_id=request.args.get("c_id");
+        f_name=request.args.get("f_name");
         author=request.args.get("author");
         message=request.args.get("message");
         member=request.args.get("member");
         if author == None and message == None:
-            url=f'http://{ip}:5010/conversations?c_id={c_id}&member={member}'
+            url=f'http://{ip}:5010/conversations?f_name={f_name}&member={member}'
         elif member == None:
-            url=f'http://{ip}:5010/conversations?c_id={c_id}&author={author}&message={message}'
+            url=f'http://{ip}:5010/conversations?f_name={f_name}&author={author}&message={message}'
         response = requests.post(url);
         print(response.json());
     elif request.method == 'GET':
@@ -360,10 +360,13 @@ def conversations():
         print(response.json());
     elif request.method == 'DELETE':
         #delete conversation
-        # c_id=request.args.get("c_id");
-        # member=request.args.get("member");
-        # url=f'http://{ip}:5010/conversations?c_id={c_id}&member={member}'
-        # response = requests.delete(url);
+        f_name=request.args.get("f_name");
+        member=request.args.get("member");
+        if member == None:
+            url=f'http://{ip}:5010/conversations?f_name={f_name}'
+        else:
+            url=f'http://{ip}:5010/conversations?f_name={f_name}&member={member}'
+        response = requests.delete(url);
         print("delete")
     return jsonify(response.json()), response.status_code
 
