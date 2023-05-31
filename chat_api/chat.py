@@ -8,13 +8,14 @@ from twilio.rest import Client
 from flask_swagger_ui import get_swaggerui_blueprint
 from flask import jsonify
 from flask_swagger import swagger
-from dotenv import load_dotenv
 
-load_dotenv()
+account_sid="ACf8b3ce0eb04f21fe7ab30a6e0c58c7d9"
+auth_token= "4cb96b0112a701609a3b621bc403af76"
+service_sid="ISec5512aaa2db4d6abaf1bd31a60fa474"
 
-account_sid = os.getenv("TWILIO_ACCOUNT_SID")
-auth_token = os.getenv("TWILIO_AUTH_TOKEN")
-service_sid = os.getenv("TWILIO_SERVICE_SID")
+# account_sid = os.getenv("TWILIO_ACCOUNT_SID")
+# auth_token = os.getenv("TWILIO_AUTH_TOKEN")
+# service_sid = os.getenv("TWILIO_SERVICE_SID")
 client = Client(account_sid, auth_token)
 
 configuration = client.conversations \
@@ -446,18 +447,17 @@ def update_conversation():
 
         # print(notification.added_to_conversation)
         #send the notification
+
+        #check if any new notifications are added
+        # notifications = client.conversations \
+        #                     .v1 \
+        #                     .services(service_sid) \
+        #                     .configuration \
+        #                     .notifications() \
+        #                     .list()
+        
         
         return {'message': 'The message was sent'}
-        # return {'message': 'The message was sent'}
-    # if friendly_name is not None and member is None and message is None:
-    #     #new conversation
-    #     conversation = client.conversations \
-    #                         .v1 \
-    #                         .conversations \
-    #                         .create(friendly_name=friendly_name)
-    # c = Conversation(c_id=conversation.sid, friendly_name=conversation.friendly_name)
-    # db.session.add(c)
-    # db.session.commit()
     if member is not None and message is None and author is None:
         #get the user 
         # participant = client.conversations \
@@ -583,6 +583,7 @@ def delete():
         return {'message': 'The member was removed from the conversation'}
     else:
         return {'message': 'Bad request'}
+
 
 
 @app.route("/spec")
