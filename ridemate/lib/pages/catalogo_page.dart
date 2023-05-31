@@ -343,7 +343,9 @@ class _catalogoPageState extends State<catalogo_page> {
                     title: Text(travels[index].origin +
                         " - " +
                         travels[index].destination),
-                    subtitle: Text(travels[index].starting_date),
+                    subtitle: Text(travels[index].starting_date +
+                        "\nAvailable seats: " +
+                        travels[index].available_sits.toString()),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(16.0),

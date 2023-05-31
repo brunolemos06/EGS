@@ -168,6 +168,7 @@ class ParticipantView(APIView):
         print(request.data)
         query_set = Participant.objects.all()
         id = request.data.get('id')
+        print(id)
         if id is not None:
             query_set = query_set.filter(id=id)
 
