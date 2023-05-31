@@ -49,7 +49,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   // create trip
   final List<Travel> _trips = [];
-  final List<String> _participating = [];
+  final List<Participant> _participating = [];
   final List<Trip> _travels = [];
 
   String user_id = "";
@@ -155,19 +155,19 @@ class _ProfilePageState extends State<ProfilePage> {
           final data_get_participating =
               json.decode(response_get_participating.body);
           debugPrint("PARTICIPATING");
-          debugPrint(data_get_participating.toString());
+          // debugPrint(data_get_participating.toString());
           setState(() {
             // add dict to _participating list => data_get_participating = {msg: [{id: 0e4aefcb-ab8a-415f-9731-32a1f4bd7705, pickup_location: 39.5572,-8.0317, price: 36.68, trip_id_id: 7ac6d883-aeec-42cd-a516-09bb7afd0d91}], v: true}, {id: 0e4aefcb-ab8a-415f-9731-32a1f4bd7705, pickup_location: 39.5572,-8.0317, price: 36.68, trip_id_id: 7ac6d883-aeec-42cd-a516-09bb7afd0d91}], v: true}]
             for (var i = 0; i < data_get_participating['msg'].length; i++) {
-              _participating
-                  .add(data_get_participating['msg'][i]['trip_id_id']);
+              _participating.add(Participant(trip_id : data_get_participating['msg'][i]['trip_id_id'], owner_id : data_get_participating['msg'][i]['id']));
+              // _participating.add(data_get_participating['msg'][i]['trip_id_id']);
             }
           });
         } else {
           debugPrint('Fetch fail', wrapWidth: 1024);
         }
         // print _participating
-        debugPrint(_participating.toString());
+        // debugPrint(_participating.toString());
 
         final String urlTrips = 'http://10.0.2.2:8080/trip/';
         final responseTrips = await http.get(Uri.parse(urlTrips));
@@ -464,7 +464,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     var destination = "";
                     var date = "";
                     _travels.forEach((element) {
-                      if (element.id == _participating[index]) {
+                      if (element.id == _participating[index].trip_id) {
                         trip_id = element.id.toString();
                         origin = element.origin;
                         destination = element.destination;
@@ -564,6 +564,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                           ),
                                           ElevatedButton(
                                             onPressed: () async {
+                                              debugPrint(
+                                                      "PAPI JOHNNNNNNNNNNNNNN",
+                                                      wrapWidth: 1024);
                                               final description =
                                                   _descriptionController.text;
                                               final title =
@@ -586,9 +589,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                               // Dismiss dialog
 
                                               // Submit review
-                                              // get owner id from trip
-                                              var ownerid =
-                                                  _trips[index].owner_id;
+                                              // get owner id from trip HEREHERE
+                                              var ownerid = _participating[index].owner_id;
+                                              // find id in travel and return the owner id
                                               final url3 =
                                                   'http://10.0.2.2:8080/service-review/v1/review?trip_id=$ownerid';
                                               final response3 = (await http
@@ -708,7 +711,6 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                             ElevatedButton(
                               onPressed: () async {
-                                debugPrint(_trips[index].id.toString());
                                 final String url_delete_participant =
                                     'http://10.0.2.2:8080/participant/';
                                 final response_delete_participant =
@@ -866,4 +868,14 @@ class Trip {
       required this.origin_coords,
       required this.destination_coords,
       required this.waypoints_coords});
+}
+
+class Participant {
+  final String trip_id;
+  final String owner_id;
+
+  Participant({
+    required this.trip_id,
+    required this.owner_id});
+
 }

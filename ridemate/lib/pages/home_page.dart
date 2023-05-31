@@ -85,7 +85,7 @@ class _HomePageState extends State<HomePage> {
             child: DropdownButtonFormField<String>(
               value: _destination,
               decoration: InputDecoration(
-                labelText: 'Ponto de Chegada',
+                labelText: 'Destination',
                 labelStyle: TextStyle(color: Colors.white),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10.0),
