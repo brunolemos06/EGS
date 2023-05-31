@@ -170,9 +170,9 @@ class _AddPageState extends State<AddPage> {
                         // Perform API request with token here
 
                         final String url =
-                            'http://10.0.2.2:8080/service-review/v1/auth/info';
+                            'http://ridemate.deti:8080/service-review/v1/auth/info';
                         final String url2 =
-                            'http://10.0.2.2:8080/service-review/v1/auth/auth';
+                            'http://ridemate.deti:8080/service-review/v1/auth/auth';
                         final Map<String, String> headers = {
                           'Content-Type': 'application/json',
                           'Accept': 'application/json',
@@ -204,7 +204,7 @@ class _AddPageState extends State<AddPage> {
 
                           // get id for reviews
                           final String url =
-                              'http://10.0.2.2:8080/service-review/v1/auth/fetchdata';
+                              'http://ridemate.deti:8080/service-review/v1/auth/fetchdata';
                           final responsefetch = await http.post(
                             Uri.parse(url),
                             headers: {
@@ -239,7 +239,7 @@ class _AddPageState extends State<AddPage> {
                       debugPrint('Validated!');
                       debugPrint(_owner_id);
                       debugPrint("owner_id");
-                      final String url = 'http://10.0.2.2:8080/trip/';
+                      final String url = 'http://ridemate.deti:8080/trip/';
                       final response = await http.post(
                         Uri.parse(url),
                         headers: {
@@ -270,7 +270,7 @@ class _AddPageState extends State<AddPage> {
 
                         // create chat
                         final String url =
-                            'http://10.0.2.2:8080/service-review/v1/new_conversation?friendly_name=$_owner_id';
+                            'http://ridemate.deti:8080/service-review/v1/new_conversation?friendly_name=$_owner_id';
                         final response = await http.post(
                           Uri.parse(url),
                         );
@@ -292,7 +292,7 @@ class _AddPageState extends State<AddPage> {
                           );
                           // update conversation
                           final String url =
-                              'http://10.0.2.2:8080/service-review/v1/conversations?f_name=$_travelchat_id&member=$_chat_id';
+                              'http://ridemate.deti:8080/service-review/v1/conversations?f_name=$_travelchat_id&member=$_chat_id';
 
                           final response2 = await http.post(
                             Uri.parse(url),

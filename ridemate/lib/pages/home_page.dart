@@ -23,7 +23,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> fetchData() async {
-    final String url = 'http://10.0.2.2:5015/directions/trip/';
+    final String url = 'http://ridemate.deti:5015/directions/trip/';
     final response = (await http.get(Uri.parse(url)));
     final data = json.decode(response.body);
 

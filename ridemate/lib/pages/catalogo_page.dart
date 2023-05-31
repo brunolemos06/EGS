@@ -23,7 +23,7 @@ class Travel {
   final int available_sits;
   final String starting_date;
   final String owner_id;
-  final int money;
+  final String money;
   final LatLng origin_coords;
   final LatLng destination_coords;
   final List<LatLng> waypoints_coords;
@@ -66,7 +66,7 @@ class _catalogoPageState extends State<catalogo_page> {
     debugPrint(
         "--------------------------------------------------------------------------");
 
-    final String url = 'http://10.0.2.2:8080/trip/';
+    final String url = 'http://ridemate.deti/trip/';
     final response = await http.get(Uri.parse(url));
     final data = json.decode(response.body);
     debugPrint(data.toString(), wrapWidth: 1024);
@@ -80,7 +80,7 @@ class _catalogoPageState extends State<catalogo_page> {
         _conversation_id = trip['owner_id'];
         var starting_date = trip['starting_date'];
         var info = trip['info'];
-        var money = 10;
+        var money = "";
         var origin_coords = LatLng(trip['info']['origin_coords']['lat'],
             trip['info']['origin_coords']['lng']);
         var destination_coords = LatLng(
@@ -115,10 +115,10 @@ class _catalogoPageState extends State<catalogo_page> {
     fetchData();
     _getLocation();
     flutterWebviewPlugin.onUrlChanged.listen((url) {
-      if (url.contains('http://10.0.2.2:8000/paypal/finish')) {
+      if (url.contains('http://ridemate.deti:8000/paypal/finish')) {
         flutterWebviewPlugin.close();
         final token_url =
-            Uri.parse('http://10.0.2.2:8000/paypal/capture/order');
+            Uri.parse('http://ridemate.deti:8000/paypal/capture/order');
         final token_headers = {'Content-Type': 'application/json'};
         final token_payload = {'id': order_id};
         http
@@ -135,9 +135,9 @@ class _catalogoPageState extends State<catalogo_page> {
             final String? token = await storage.read(key: tokenKey);
             if (token != null) {
               final String url =
-                  'http://10.0.2.2:8080/service-review/v1/auth/info';
+                  'http://ridemate.deti/service-review/v1/auth/info';
               final String url2 =
-                  'http://10.0.2.2:8080/service-review/v1/auth/auth';
+                  'http://ridemate.deti/service-review/v1/auth/auth';
               final Map<String, String> headers = {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
@@ -167,7 +167,7 @@ class _catalogoPageState extends State<catalogo_page> {
 
                 // get id for chat
                 final String url =
-                    'http://10.0.2.2:8080/service-review/v1/auth/fetchdata';
+                    'http://ridemate.deti/service-review/v1/auth/fetchdata';
                 final responsefetch = await http.post(
                   Uri.parse(url),
                   headers: {
@@ -183,7 +183,7 @@ class _catalogoPageState extends State<catalogo_page> {
                   final responseJson = json.decode(responsefetch.body);
                   _chat_id = responseJson['chat_id'];
                   final responsechat = await http.post(Uri.parse(
-                      'http://10.0.2.2:8080/service-review/v1/conversations?f_name=$_conversation_id&member=$_chat_id'));
+                      'http://ridemate.deti/service-review/v1/conversations?f_name=$_conversation_id&member=$_chat_id'));
                   if (responsechat.statusCode == 200) {}
                 }
 
@@ -239,7 +239,7 @@ class _catalogoPageState extends State<catalogo_page> {
             );
             // Delete trip because the payment failed
             final String url_delete_participant =
-                'http://10.0.2.2:8080/participant/';
+                'http://ridemate.deti/participant/';
             final response_delete_participant = await http.delete(
               Uri.parse(url_delete_participant),
               headers: {
@@ -352,7 +352,6 @@ class _catalogoPageState extends State<catalogo_page> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(travels[index].money.toString() + "€"),
                         ElevatedButton(
                           onPressed: () async {
                             showDialog(
@@ -501,7 +500,7 @@ class _catalogoPageState extends State<catalogo_page> {
 
                                         //
                                         final String url2 =
-                                            'http://10.0.2.2:8080/service-review/v1/auth/auth';
+                                            'http://ridemate.deti/service-review/v1/auth/auth';
                                         final Map<String, String> headers2 = {
                                           'Content-Type': 'application/json',
                                           'Accept': 'application/json',
@@ -536,7 +535,7 @@ class _catalogoPageState extends State<catalogo_page> {
                                         }
 
                                         final String url10 =
-                                            'http://10.0.2.2:8080/service-review/v1/auth/info';
+                                            'http://ridemate.deti/service-review/v1/auth/info';
                                         final Map<String, String> headers22 = {
                                           'Content-Type': 'application/json',
                                           'Accept': 'application/json',
@@ -562,7 +561,7 @@ class _catalogoPageState extends State<catalogo_page> {
 
                                           // get id for reviews
                                           final String url =
-                                              'http://10.0.2.2:8080/service-review/v1/auth/fetchdata';
+                                              'http://ridemate.deti/service-review/v1/auth/fetchdata';
                                           final responsefetch = await http.post(
                                             Uri.parse(url),
                                             headers: {
@@ -588,7 +587,7 @@ class _catalogoPageState extends State<catalogo_page> {
                                                 'Response: ${responseJson2}',
                                                 wrapWidth: 1024);
                                             final String url_add_participant =
-                                                'http://10.0.2.2:8080/participant/';
+                                                'http://ridemate.deti/participant/';
                                             final response_add_participant =
                                                 await http.post(
                                               Uri.parse(url_add_participant),
@@ -614,7 +613,7 @@ class _catalogoPageState extends State<catalogo_page> {
                                                 wrapWidth: 1024);
 
                                             final url = Uri.parse(
-                                                'http://10.0.2.2:8000/paypal/create/order');
+                                                'http://ridemate.deti:8000/paypal/create/order');
                                             final headers = {
                                               'Content-Type': 'application/json'
                                             };
@@ -647,7 +646,7 @@ class _catalogoPageState extends State<catalogo_page> {
                                               order_id =
                                                   jsonResponse['order_id'];
 
-                                              // lauch the linkForPayment in a webview until the url contains the string 'http://10.0.2.2:8000/paypal/finish'
+                                              // lauch the linkForPayment in a webview until the url contains the string 'http://ridemate.deti:8000/paypal/finish'
                                               flutterWebviewPlugin
                                                   .launch(linkForPayment);
                                             } else {
@@ -655,7 +654,7 @@ class _catalogoPageState extends State<catalogo_page> {
                                               // remove participante porque nao conseguiu pagar
                                               final String
                                                   url_remove_participant =
-                                                  'http://10.0.2.2:8080/participant/';
+                                                  'http://ridemate.deti/participant/';
                                               final response_remove_participant =
                                                   await http.delete(
                                                 Uri.parse(

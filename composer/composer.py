@@ -24,6 +24,14 @@ from db_func import *
 app = Flask(__name__)
 
 ip = '127.0.0.1'
+
+authip_backend = ''
+authip_frontend = '10.43.120.95'
+reviewip = ''
+chatip = ''
+tripip = ''
+paymentip = ''
+
 auth_port = 5100
 
 SWAGGER_URL = '/api/docs'   # URL for exposing Swagger UI (without trailing '/')
@@ -56,6 +64,7 @@ def index():
 @app.route('/trip/', methods=['GET', 'POST', 'DELETE'])
 def trip():
     print('ON TRIP METHOD')
+    ip = tripip
     # print the received request url
     print(request.url)
     url = f'http://{ip}:5015/directions/trip/'
@@ -106,6 +115,7 @@ def trip():
 
 @app.route('/participant/', methods=['GET', 'POST', 'DELETE'])
 def participant():
+    ip = tripip
     print('ON PARTICIPANT METHOD')
     url = f'http://{ip}:5015/directions/participant/'
     if (request.method == 'GET'):
@@ -137,6 +147,7 @@ def participant():
 
 @app.route('/owner/', methods=['GET'])
 def owner():
+    ip = tripip
     url = f'http://{ip}:5015/directions/owner/'
     owner_id = request.args.get('id')
     if (request.method == 'GET'):
@@ -153,6 +164,7 @@ def owner():
 
 @app.route(appendurl + 'review', methods=['GET', 'POST', 'DELETE', 'PUT'])
 def get_all_reviews():
+    ip = reviewip
     url = f'http://{ip}:5005/api/v1/reviews'
     if (request.method == 'GET'):
         reviewid = request.args.get('reviewid')
@@ -196,6 +208,7 @@ def get_all_reviews():
 
 @app.route(appendurl+'/review/rating/', methods=['GET'])
 def rating_reviews():
+    ip = reviewip
     if request.method == 'GET':
         url = f'http://{ip}:5005/api/v1/reviews/rating'
         personid = request.args.get('personid')
@@ -213,6 +226,7 @@ def rating_reviews():
 
 @app.route(appendurl + 'auth/login', methods=['POST'])
 def login():
+    ip = authip_backend
     if request.method == 'POST':
         url = f'http://{ip}:{auth_port}/login'
         data = request.get_json()
@@ -255,6 +269,7 @@ def login():
 
 @app.route(appendurl + 'auth/register', methods=['POST'])
 def register():
+    ip = authip_backend
     if request.method == 'POST':
         url = f'http://{ip}:{auth_port}/register'
         data = request.get_json()
@@ -264,6 +279,7 @@ def register():
 
 @app.route(appendurl + 'auth/auth', methods=['POST'])
 def auth():
+    ip = authip_backend
     # get token from header
     if request.method == 'POST':
         url = f'http://{ip}:{auth_port}/auth'
@@ -275,6 +291,7 @@ def auth():
 
 @app.route(appendurl + 'auth/info', methods=['POST'])
 def info():
+    ip = authip_backend
     # get token from header
     if request.method == 'POST':
         url = f'http://{ip}:{auth_port}/info'
@@ -285,6 +302,7 @@ def info():
 
 @app.route(appendurl + 'auth/github')
 def github():
+    ip = authip_backend
     url = f'http://10.0.2.2:{auth_port}/github'
     if request.method == 'GET':
         return redirect(url)
@@ -292,7 +310,6 @@ def github():
 @app.route(appendurl + 'auth/fetchdata', methods=['POST'])
 def fetchdata():
     # get authid from request from body
-    
     authid = request.get_json()['auth_id']
     email = request.get_json()['email']
     print(authid)
@@ -300,6 +317,7 @@ def fetchdata():
     entry = get_entry(str(authid))
     try:
         if entry == None:
+            ip = chatip
             url = f'http://{ip}:5010/new_user?identity={email}'
             response2 = requests.post(url)
             jsonresponse = response2.json()
@@ -328,6 +346,7 @@ def fetchdata():
 
 @app.route(appendurl + 'auth/google', methods=['GET'])
 def google():
+    ip = authip_backend
     url = f'http://{ip}:{auth_port}/google'
     if request.method == 'GET':
         response = requests.get(url)
@@ -338,12 +357,19 @@ def google():
 
     return redirect(response.url)
 
+@app.route("webdiv", methods=['GET'])
+def webdiv():
+    ip = authip_frontend
+    url = f'http://{ip}:3000'
+    if request.method == 'GET':
+        response = requests.get(url)
+    return redirect(response.url)
 #
 # CHAT
 # 
 @app.route(appendurl + '/conversations', methods=['POST','GET','DELETE'])
 def conversations():
-    
+    ip = chatip
     if request.method == 'POST':
         f_name=request.args.get("f_name");
         author=request.args.get("author");
@@ -376,6 +402,7 @@ def conversations():
 
 @app.route(appendurl + '/new_conversation', methods=['POST'])
 def new_conversation():
+    ip = chatip
     if request.method == 'POST':
         friendly_name=request.args.get("friendly_name");
         url=f'http://{ip}:5010/new_conversation?friendly_name={friendly_name}'
