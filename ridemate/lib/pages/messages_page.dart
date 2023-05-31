@@ -10,11 +10,13 @@ class Message {
   String conversation;
   String conversation_name;
   String message;
+  String name;
 
   Message({
     required this.sender,
     required this.conversation,
     required this.conversation_name,
+    required this.name,
     required this.message,
   });
 }
@@ -22,6 +24,8 @@ class Message {
 final List<Message> _messages = [];
 String chatid = '';
 String c_name = '';
+String name = '';
+String trip_name = '';
 
 class MessagePage extends StatefulWidget {
   const MessagePage({Key? key}) : super(key: key);
@@ -66,7 +70,7 @@ class _MessagePageState extends State<MessagePage> {
       if (response.statusCode == 200) {
         final responseJson = json.decode(response.body);
         debugPrint('Response: ${response.body}', wrapWidth: 1024);
-        final String name = responseJson['fname'];
+        name = responseJson['fname'];
         final String lname = responseJson['lname'];
         final String email = responseJson['email'];
         final String id = responseJson['id'];
@@ -94,34 +98,46 @@ class _MessagePageState extends State<MessagePage> {
             final responseJson = json.decode(responsechat.body);
             debugPrint('Response: ${responsechat.body}', wrapWidth: 1024);
             //get the messages array in the jsonresponse;
-            final messages = responseJson[0]['messages'];
-            debugPrint('Messages: ${messages.length}', wrapWidth: 1024);
-            final c_id = responseJson[0]['id'];
-            c_name = responseJson[0]['friendly_name'];
-            //add the messages to the list
-            _messages.clear();
-            _messages.add(Message(
-                sender: 'RideMate',
-                conversation: c_id,
-                conversation_name: c_name,
-                message: 'Welcome to RideMate!'));
-            setState(() {
-              for (var message in messages) {
-                _messages.insert(0,Message(
-                    sender: message['author'],
-                    conversation: c_id,
-                    conversation_name: c_name,
-                    message: message['body']));
-              }
-              loading = false;
-            });
-            debugPrint('Messages: ${_messages.length}', wrapWidth: 1024);
-
-            for (var message in _messages) {
-              debugPrint('Message: ${message.conversation_name}',
-                  wrapWidth: 1024);
+            if (responseJson.length > 0) {
+              final messages = responseJson[0]['messages'];
+              debugPrint('Messages: ${messages.length}', wrapWidth: 1024);
+              final c_id = responseJson[0]['id'];
+              c_name = responseJson[0]['friendly_name'];
+              //add the messages to the list
+              _messages.clear();
+              _messages.add(Message(
+                  sender: 'RideMate',
+                  conversation: c_id,
+                  conversation_name: c_name,
+                  name: 'RideMate',
+                  message: 'Welcome to RideMate!'));
+              setState(() {
+                for (var message in messages) {
+                  _messages.insert(
+                      0,
+                      Message(
+                          sender: message['author'],
+                          conversation: c_id,
+                          conversation_name: c_name,
+                          name: name,
+                          message: message['body']));
+                }
+                loading = false;
+              });
             }
           }
+          //request trip details
+          final String url = 'http://10.0.2.2:8080/trip?id=$c_name';
+          final response = await http.get(Uri.parse(url));
+          final data = json.decode(response.body);
+          trip_name =
+              data['msg'][0]['origin'] + ' to ' + data['msg'][0]['destination'];
+
+          debugPrint('tripname: ${trip_name}', wrapWidth: 1024);
+        } else {
+          setState(() {
+            loading = false;
+          });
         }
 
         //request to get chat to composer
@@ -164,7 +180,7 @@ class _MessagePageState extends State<MessagePage> {
                   return ListTile(
                     title: Container(
                       child: Text(
-                        sender,
+                        trip_name,
                         style: TextStyle(
                           color:
                               Colors.green, // set the text color of the title
@@ -209,12 +225,12 @@ class MessageConversationPage extends StatefulWidget {
 class _MessageConversationPageState extends State<MessageConversationPage> {
   @override
   Widget build(BuildContext context) {
-    debugPrint('OLA: ${_messages.length}', wrapWidth: 1024);
     final conversation_id = _messages[0].conversation;
+
     return Scaffold(
       backgroundColor: const Color(0x808080),
       appBar: AppBar(
-        title: Text('olaole'),
+        title: Text(trip_name),
         backgroundColor: Colors.grey[800],
       ),
       body: ListView.builder(
@@ -228,13 +244,17 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
             title: Align(
               alignment:
                   isSender ? Alignment.centerRight : Alignment.centerLeft,
-              child: Text(message.message, textAlign: textAlign),
+              child: Text(message.message,
+                  style: TextStyle(
+                    color: Colors.white, // Replace with desired color
+                  ),
+                  textAlign: textAlign),
             ),
             subtitle: Align(
               alignment:
                   isSender ? Alignment.centerRight : Alignment.centerLeft,
               child: Text(
-                message.sender,
+                message.name,
                 style: TextStyle(
                   color: Colors.green, // Replace with desired color
                 ),
@@ -257,7 +277,7 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
                   decoration: const InputDecoration(
                     hintText: "Type a message...",
                     hintStyle: TextStyle(
-                      color: Colors.grey,
+                      color: Colors.white70,
                     ),
                     // when the textfield is focused
                     focusedBorder: OutlineInputBorder(
@@ -268,12 +288,15 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
                   ),
                   onFieldSubmitted: (value) async {
                     setState(() {
-                      _messages.insert(0,Message(
-                        sender: chatid,
-                        conversation: conversation_id,
-                        conversation_name: c_name,
-                        message: value,
-                      ));
+                      _messages.insert(
+                          0,
+                          Message(
+                            sender: chatid,
+                            conversation: conversation_id,
+                            conversation_name: c_name,
+                            name: name,
+                            message: value,
+                          ));
                     });
 
                     final response = await http.post(Uri.parse(
