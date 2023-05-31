@@ -393,7 +393,110 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           Row(
                             children: [
+                              // sizebox to separate buttons to secound button go to end of the row
+                              SizedBox(
+                                width: 150,
+                              ),
                               ElevatedButton(
+                                onPressed: () async {
+                                  var owner_id = _trips[index].owner_id;
+                                  debugPrint(_trips[index].id.toString());
+                                  final url_delete_conversation =
+                                      await http.delete(Uri.parse(
+                                          'http://10.0.2.2:8080/service-review/v1/conversations?f_name=$owner_id'));
+                                  final String url =
+                                      'http://10.0.2.2:8080/trip/';
+                                  final response = await http.delete(
+                                      Uri.parse(url),
+                                      headers: {
+                                        'Content-Type': 'application/json',
+                                      },
+                                      body:
+                                          jsonEncode({'id': _trips[index].id}));
+                                  if (response.statusCode == 200) {
+                                    fetchData();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          "Trip finished successfully",
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        backgroundColor: Colors.green,
+                                      ),
+                                    );
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          "Trip deletion failed!",
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                  }
+                                },
+                                child: Text('Finish'),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[600],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: const EdgeInsets.all(10),
+                margin: const EdgeInsets.symmetric(vertical: 10),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _participating.length,
+                  physics: BouncingScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    debugPrint("participating: $_participating");
+                    var trip_id = "";
+                    var origin = "";
+                    var destination = "";
+                    var date = "";
+                    _travels.forEach((element) {
+                      if (element.id == _participating[index]) {
+                        trip_id = element.id.toString();
+                        origin = element.origin;
+                        destination = element.destination;
+                        date = element.starting_date;
+                      }
+                    });
+                    return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              destination,
+                              style: Theme.of(context).textTheme.bodyText1,
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Text(
+                              "Departure: $origin, Time: $date",
+                              style: Theme.of(context).textTheme.bodyText2,
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Row(
+                              children: [
+                                // sizebox to separate buttons to secound button go to end of the row
+                                SizedBox(
+                                  width: 150,
+                                ),
+                                ElevatedButton(
                                 onPressed: () async {
                                   // Show dialog with form to submit review
                                   showDialog(
@@ -603,104 +706,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ),
                                 child: Text('Review'),
                               ),
-
-                              // sizebox to separate buttons to secound button go to end of the row
-                              SizedBox(
-                                width: 150,
-                              ),
-                              ElevatedButton(
-                                onPressed: () async {
-                                  var owner_id = _trips[index].owner_id;
-                                  debugPrint(_trips[index].id.toString());
-                                  final url_delete_conversation =
-                                      await http.delete(Uri.parse(
-                                          'http://10.0.2.2:8080/service-review/v1/conversations?f_name=$owner_id'));
-                                  final String url =
-                                      'http://10.0.2.2:8080/trip/';
-                                  final response = await http.delete(
-                                      Uri.parse(url),
-                                      headers: {
-                                        'Content-Type': 'application/json',
-                                      },
-                                      body:
-                                          jsonEncode({'id': _trips[index].id}));
-                                  if (response.statusCode == 200) {
-                                    fetchData();
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          "Trip finished successfully",
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                        backgroundColor: Colors.green,
-                                      ),
-                                    );
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          "Trip deletion failed!",
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                        backgroundColor: Colors.red,
-                                      ),
-                                    );
-                                  }
-                                },
-                                child: Text('Finish'),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey[600],
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                padding: const EdgeInsets.all(10),
-                margin: const EdgeInsets.symmetric(vertical: 10),
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: _participating.length,
-                  physics: BouncingScrollPhysics(),
-                  itemBuilder: (context, index) {
-                    debugPrint("participating: $_participating");
-                    var trip_id = "";
-                    var origin = "";
-                    var destination = "";
-                    var date = "";
-                    _travels.forEach((element) {
-                      if (element.id == _participating[index]) {
-                        trip_id = element.id.toString();
-                        origin = element.origin;
-                        destination = element.destination;
-                        date = element.starting_date;
-                      }
-                    });
-                    return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              destination,
-                              style: Theme.of(context).textTheme.bodyText1,
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Text(
-                              "Departure: $origin, Time: $date",
-                              style: Theme.of(context).textTheme.bodyText2,
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
                             ElevatedButton(
                               onPressed: () async {
                                 debugPrint(_trips[index].id.toString());
@@ -744,6 +749,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                 }
                               },
                               child: Text('Exit Trip'),
+                            ),
+                              ],
                             ),
                           ],
                         ));
