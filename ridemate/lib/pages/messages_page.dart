@@ -21,6 +21,7 @@ class Message {
 
 final List<Message> _messages = [];
 String chatid = '';
+String c_name = '';
 
 class MessagePage extends StatefulWidget {
   const MessagePage({Key? key}) : super(key: key);
@@ -94,13 +95,19 @@ class _MessagePageState extends State<MessagePage> {
             debugPrint('Response: ${responsechat.body}', wrapWidth: 1024);
             //get the messages array in the jsonresponse;
             final messages = responseJson[0]['messages'];
+            debugPrint('Messages: ${messages.length}', wrapWidth: 1024);
             final c_id = responseJson[0]['id'];
-            final c_name = responseJson[0]['friendly_name'];
+            c_name = responseJson[0]['friendly_name'];
             //add the messages to the list
             _messages.clear();
+            _messages.add(Message(
+                sender: 'RideMate',
+                conversation: c_id,
+                conversation_name: c_name,
+                message: 'Welcome to RideMate!'));
             setState(() {
               for (var message in messages) {
-                _messages.add(Message(
+                _messages.insert(0,Message(
                     sender: message['author'],
                     conversation: c_id,
                     conversation_name: c_name,
@@ -108,7 +115,7 @@ class _MessagePageState extends State<MessagePage> {
               }
               loading = false;
             });
-            
+            debugPrint('Messages: ${_messages.length}', wrapWidth: 1024);
 
             for (var message in _messages) {
               debugPrint('Message: ${message.conversation_name}',
@@ -116,7 +123,6 @@ class _MessagePageState extends State<MessagePage> {
             }
           }
         }
-
 
         //request to get chat to composer
       }
@@ -216,7 +222,7 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
         itemCount: _messages.length,
         itemBuilder: (context, index) {
           final message = _messages[index];
-          final isSender = message.sender == widget.sender;
+          final isSender = message.sender == chatid;
           final textAlign = isSender ? TextAlign.start : TextAlign.end;
           return ListTile(
             title: Align(
@@ -261,18 +267,17 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
                     ),
                   ),
                   onFieldSubmitted: (value) async {
-                    debugPrint('mensagem enviada2', wrapWidth: 1024);
                     setState(() {
-                      _messages.add(Message(
-                        sender: widget.sender,
+                      _messages.insert(0,Message(
+                        sender: chatid,
                         conversation: conversation_id,
-                        conversation_name: "",
+                        conversation_name: c_name,
                         message: value,
                       ));
                     });
 
                     final response = await http.post(Uri.parse(
-                        'http://10.0.2.2:8080/service-review/v1/conversations?author=$chatid&c_id=$conversation_id&message=$value'));
+                        'http://10.0.2.2:8080/service-review/v1/conversations?author=$chatid&f_name=$c_name&message=$value'));
                     if (response.statusCode == 200) {
                       debugPrint('Response send: ${response.body}',
                           wrapWidth: 1024);
