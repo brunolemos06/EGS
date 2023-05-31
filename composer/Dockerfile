@@ -2,18 +2,22 @@
 
 FROM python:3.8.10
 
-WORKDIR /ridemate_composer
+RUN mkdir /composer
+RUN mkdir /composer/volumes
 
-COPY requirements.txt .
-COPY static static
+WORKDIR /composer
+
+COPY requirements.txt requirements.txt
+
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+COPY composer.py composer.py
+COPY setup_db.py setup_db.py
+COPY db_func.py db_func.py
+COPY compuser.db compuser.db
 
 EXPOSE 8080
 
-RUN pip3 install -r requirements.txt
+VOLUME /composer/volumes
 
-COPY composer.py .
-COPY setup_db.py .
-COPY db_func.py .
-# create database and run the app
-RUN python3 setup_db.py
 CMD ["python3", "composer.py"]

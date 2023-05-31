@@ -1,22 +1,23 @@
 # Use an official Python runtime as the base image
 FROM python:3.7.3-slim
 
-# Set the working directory in the container
+RUN mkdir /review
+RUN mkdir /review/volumes
 WORKDIR /review
 
 # Copy the requirements file to the container
-COPY requirements.txt .
-
+COPY requirements.txt requirements.txt
 # Install the Python dependencies
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-# Copy the Flask app code to the container
-COPY . .
+COPY createdb.py createdb.py
+COPY database.db database.db
+COPY main.py main.py
 
 # Expose port 5005 to the outside world
 EXPOSE 5005
 
-# Create tables on database
-CMD ["python3", "create_db.py"]
+VOLUME /review/volumes
+
 # Run the Flask application
 CMD ["python3", "main.py"]
