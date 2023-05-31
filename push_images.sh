@@ -1,4 +1,4 @@
-reg_port=5432
+reg_port=5000
 docker push registry.deti:$reg_port/egs-ridemate/auth_backend:v1
 docker push registry.deti:$reg_port/egs-ridemate/auth_frontend:v1
 docker push registry.deti:$reg_port/egs-ridemate/chat_api:v1
