@@ -5,19 +5,24 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # Set the working directory inside the container
+RUN mkdir /payments
+RUN mkdir /payments/volumes
+
 WORKDIR /payments
 
 # Copy requirements file
-COPY requirements.txt .
+COPY requirements.txt requirements.txt
 
 # Install dependencies
 RUN pip3 install --no-cache-dir -r requirements.txt
 
 #Copy rest of payments app
-COPY payments/ .
+COPY payments/. .
 
 # Expose port (still to decide)
 EXPOSE 8000
+
+VOLUME /payments/volumes
 
 # Run django makemigrations
 CMD ["python3", "manage.py", "makemigrations"]
@@ -26,7 +31,7 @@ CMD ["python3", "manage.py", "makemigrations"]
 CMD ["python3", "manage.py", "migrate"]
 
 # Run django runserver
-CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"] 
 
 
 

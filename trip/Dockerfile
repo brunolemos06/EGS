@@ -5,19 +5,24 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # Set the working directory inside the container
+RUN mkdir /maps_api
+RUN mkdir /maps_api/volumes
+
 WORKDIR /maps_api
 
 # Copy requirements file
-COPY requirements.txt .
+COPY requirements.txt requirements.txt
 
 # Install dependencies
 RUN pip3 install --no-cache-dir -r requirements.txt
 
 #Copy rest of payments app
-COPY maps_api/ .
+COPY maps_api/. .
 
 # Expose port (still to decide)
 EXPOSE 5015
+
+VOLUME /maps_api/volumes
 
 # Run django makemigrations
 CMD ["python3", "manage.py", "makemigrations"]
