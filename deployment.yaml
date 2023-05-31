@@ -47,6 +47,10 @@ spec:
       labels:
         app: chat-api
     spec:
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"
       containers:
         - name: chat-api
           image: registry.deti:5000/egs-ridemate/chat_api:v1 
@@ -274,13 +278,13 @@ metadata:
     traefik.ingress.kubernetes.io/redirect-permanent: "true"
 spec:
   rules:
-  - host: ridemate.com
+  - host: ridemate.deti
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: composer-service
+            name: composer
             port: 
               number: 8080

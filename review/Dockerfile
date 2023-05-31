@@ -13,6 +13,7 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 COPY createdb.py createdb.py
 COPY database.db database.db
 COPY main.py main.py
+COPY static static
 
 # Expose port 5005 to the outside world
 EXPOSE 5005
