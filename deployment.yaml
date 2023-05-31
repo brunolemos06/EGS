@@ -1,6 +1,6 @@
 ---
 #DEPLOYMENT
-apiVersion: ridemate/v1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ridemate
@@ -14,34 +14,34 @@ spec:
     metadata:
       labels:
         app: ridemate
-    sepcs:
+    spec:
       containers:
-        - name: auth_backend
-          image: auth_backend:v1 
+        - name: auth-backend
+          image: registry.deti:5000/egs-ridemate/auth_backend:v1 
           ports: 
             - containerPort: 5000
-        - name: auth_frontend
-          image: auth_frontend:v1 
+        - name: auth-frontend
+          image: registry.deti:5000/egs-ridemate/auth_frontend:v1 
           ports: 
             - containerPort: 3000
-        - name: chat_api
-          image: chat_api:v1 
+        - name: chat-api
+          image: registry.deti:5000/egs-ridemate/chat_api:v1 
           ports: 
             - containerPort: 5010
         - name: composer
-          image: composer:v1 
+          image: registry.deti:5000/egs-ridemate/composer:v1 
           ports: 
             - containerPort: 8080
         - name: payments
-          image: payments:v1 
+          image: registry.deti:5000/egs-ridemate/payments:v1 
           ports: 
             - containerPort: 8000
         - name: reviews
-          image: reviews:v1 
+          image: registry.deti:5000/egs-ridemate/reviews:v1 
           ports: 
             - containerPort: 5005
         - name: trip
-          image: trip:v1 
+          image: registry.deti:5000/egs-ridemate/trip:v1 
           ports: 
             - containerPort: 5015
 ---
@@ -49,11 +49,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: auth_backend-service
+  name: auth-backend-service
+  namespace: egs-ridemate
 spec:
   selector:
     app: ridemate
-    container: auth_backend
+    name: auth-backend
   ports:
     - port: 5000
       targetPort: 5000
@@ -61,11 +62,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: auth_frontend-service
+  name: auth-frontend-service
+  namespace: egs-ridemate
 spec:
   selector:
     app: ridemate
-    container: auth_frontend
+    name: auth-frontend
   ports:
     - port: 3000
       targetPort: 3000
@@ -73,11 +75,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: chat_api-service
+  name: chat-api-service
+  namespace: egs-ridemate
 spec:
   selector:
     app: ridemate
-    container: chat_api
+    name: chat-api
   ports:
     - port: 5010
       targetPort: 5010
@@ -86,10 +89,11 @@ apiVersion: v1
 kind: Service
 metadata:
   name: composer-service
+  namespace: egs-ridemate
 spec:
   selector:
     app: ridemate
-    container: composer
+    name: composer
   ports:
     - port: 8080
       targetPort: 8080
@@ -98,10 +102,11 @@ apiVersion: v1
 kind: Service
 metadata:
   name: payments-service
+  namespace: egs-ridemate
 spec:
   selector:
     app: ridemate
-    container: payments
+    name: payments
   ports:
     - port: 8000
       targetPort: 8000
@@ -110,10 +115,11 @@ apiVersion: v1
 kind: Service
 metadata:
   name: reviews-service
+  namespace: egs-ridemate
 spec:
   selector:
     app: ridemate
-    container: reviews
+    name: reviews
   ports:
     - port: 5005
       targetPort: 5005
@@ -122,10 +128,11 @@ apiVersion: v1
 kind: Service
 metadata:
   name: trip-service
+  namespace: egs-ridemate
 spec:
   selector:
     app: ridemate
-    container: trip
+    name: trip
   ports:
     - port: 5015
       targetPort: 5015
@@ -143,12 +150,13 @@ metadata:
     traefik.ingress.kubernetes.io/redirect-permanent: "true"
 spec:
   rules:
-  - host: egs-ridemate.k3s
+  - host: ridemate.com
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: ridemate
-            port: 8080
+            name: composer-service
+            port: 
+              number: 8080

@@ -1,4 +1,4 @@
-reg_port=5432
+reg_port=5000
 
 #auth_backend
 cd auth/
