@@ -24,11 +24,14 @@ EXPOSE 5015
 
 VOLUME /maps_api/volumes
 
-# Run django makemigrations
-CMD ["python3", "manage.py", "makemigrations"]
 
-# Run django migrate
-CMD ["python3", "manage.py", "migrate"]
+RUN python3 manage.py makemigrations && python3 manage.py migrate
+
+# # Run django makemigrations
+# CMD ["python3", "manage.py", "makemigrations"]
+
+# # Run django migrate
+# CMD ["python3", "manage.py", "migrate"]
 
 # Run django runserver
 CMD ["python3", "manage.py", "runserver", "0.0.0.0:5015"] 

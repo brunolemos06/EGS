@@ -1,26 +1,26 @@
 ---
-#Deployment auth
+#Deployment auth backend
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: auth
+  name: auth-backend
   namespace: egs-ridemate
 spec: 
   selector:
     matchLabels:
-      app: auth
+      app: auth-backend
   template:
     metadata:
       labels:
-        app: auth
+        app: auth-backend
     spec:
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"
       containers:
-        - name: auth-frontend
-          image: registry.deti:5000/egs-ridemate/auth_frontend:v1
-          ports:
-            - containerPort: 3000
         - name: auth-backend
-          image: registry.deti:5000/egs-ridemate/auth_backend:v1 
+          image: registry.deti:5000/egs-ridemate/auth_backend:v2 
           ports: 
             - containerPort: 5100
           volumeMounts:
@@ -31,6 +31,32 @@ spec:
         - name: users-db-volume
           persistentVolumeClaim:
             claimName: users-db-pvc
+---
+#Deployment auth frontend
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-frontend
+  namespace: egs-ridemate
+spec: 
+  selector:
+    matchLabels:
+      app: auth-frontend
+  template:
+    metadata:
+      labels:
+        app: auth-frontend
+    spec:
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"
+      containers:
+        - name: auth-frontend
+          image: registry.deti:5000/egs-ridemate/auth_frontend:v1
+          ports:
+            - containerPort: 3000
+      restartPolicy: Always
 ---
 #Deployment chat-api
 apiVersion: apps/v1
@@ -73,9 +99,13 @@ spec:
       labels:
         app: composer
     spec:
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"
       containers:
         - name: composer
-          image: registry.deti:5000/egs-ridemate/composer:v1 
+          image: registry.deti:5000/egs-ridemate/composer:v5 
           ports: 
             - containerPort: 8080
           volumeMounts:
@@ -102,9 +132,13 @@ spec:
       labels:
         app: payments
     spec:
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"
       containers:
         - name: payments
-          image: registry.deti:5000/egs-ridemate/payments:v1 
+          image: registry.deti:5000/egs-ridemate/payments:v2 
           ports: 
             - containerPort: 8000
           volumeMounts:
@@ -131,6 +165,10 @@ spec:
       labels:
         app: reviews
     spec:
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"
       containers:
         - name: reviews
           image: registry.deti:5000/egs-ridemate/reviews:v1 
@@ -160,9 +198,13 @@ spec:
       labels:
         app: trip
     spec:
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"
       containers:
         - name: trip
-          image: registry.deti:5000/egs-ridemate/trip:v1 
+          image: registry.deti:5000/egs-ridemate/trip:v2 
           ports: 
             - containerPort: 5015
           volumeMounts:
@@ -178,11 +220,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: auth
+  name: auth-backend
   namespace: egs-ridemate
 spec:
   selector:
-    app: auth
+    app: auth-backend
   ports:
     - port: 5100
       targetPort: 5100
@@ -191,11 +233,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: auth
+  name: auth-frontend
   namespace: egs-ridemate
 spec:
   selector:
-    app: auth
+    app: auth-frontend
   ports:
     - port: 3000
       targetPort: 3000
@@ -223,7 +265,7 @@ spec:
   selector:
     app: composer
   ports:
-    - port: 8080
+    - port: 80
       targetPort: 8080
 ---
 #Service payments
@@ -287,4 +329,4 @@ spec:
           service:
             name: composer
             port: 
-              number: 8080
+              number: 80

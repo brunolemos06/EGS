@@ -23,16 +23,27 @@ from db_func import *
 
 app = Flask(__name__)
 
-ip = '127.0.0.1'
+ip = '0.0.0.0'
 
-authip_backend = ''
-authip_frontend = '10.43.120.95'
-reviewip = ''
-chatip = ''
-tripip = ''
-paymentip = ''
+####################### IP/NAMES AND PORTS #######################
+auth_ip_backend = 'auth-backend'
+auth_port_backend = 5100
 
-auth_port = 5100
+auth_ip_frontend = 'auth-frontend'
+auth_port_frontend = 3000
+
+review_ip = 'reviews'
+review_port = 5005
+
+chat_ip = 'chat-api'
+chat_port = 5010
+
+trip_ip = 'trip'
+trip_port = 5015
+
+payment_ip = 'payments'
+payment_port = 8000
+##################################################################
 
 SWAGGER_URL = '/api/docs'   # URL for exposing Swagger UI (without trailing '/')
 API_URL = '/static/swagger.yml'  # Our API url (can of course be a local resource)
@@ -57,17 +68,14 @@ appendurl = '/service-review/v1/'
 def index():
     return 'Ridemate API',200
 
-# -
-# TRIP
-# -
+# ------------------ TRIP ------------------
 
 @app.route('/trip/', methods=['GET', 'POST', 'DELETE'])
 def trip():
     print('ON TRIP METHOD')
-    ip = tripip
     # print the received request url
     print(request.url)
-    url = f'http://{ip}:5015/directions/trip/'
+    url = f'http://{trip_ip}:{trip_port}/directions/trip/'
     if (request.method == 'GET'):
         trip_id = request.args.get('id')
         if (trip_id == None):
@@ -115,9 +123,8 @@ def trip():
 
 @app.route('/participant/', methods=['GET', 'POST', 'DELETE'])
 def participant():
-    ip = tripip
     print('ON PARTICIPANT METHOD')
-    url = f'http://{ip}:5015/directions/participant/'
+    url = f'http://{trip_ip}:{trip_port}/directions/participant/'
     if (request.method == 'GET'):
         print('ON GET')
         print(request.args)
@@ -147,8 +154,7 @@ def participant():
 
 @app.route('/owner/', methods=['GET'])
 def owner():
-    ip = tripip
-    url = f'http://{ip}:5015/directions/owner/'
+    url = f'http://{trip_ip}:{trip_port}/directions/owner/'
     owner_id = request.args.get('id')
     if (request.method == 'GET'):
         if (owner_id == None):
@@ -158,14 +164,12 @@ def owner():
             response = requests.get(url, data=params)
     return response.json(), response.status_code
 
-# -
-# REVIEW
-# -
+# ------------------ REVIEW ------------------
 
 @app.route(appendurl + 'review', methods=['GET', 'POST', 'DELETE', 'PUT'])
 def get_all_reviews():
-    ip = reviewip
-    url = f'http://{ip}:5005/api/v1/reviews'
+    url = f'http://{review_ip}:{review_port}/api/v1/reviews'
+    print(url)
     if (request.method == 'GET'):
         reviewid = request.args.get('reviewid')
         personid = request.args.get('personid')
@@ -208,9 +212,8 @@ def get_all_reviews():
 
 @app.route(appendurl+'/review/rating/', methods=['GET'])
 def rating_reviews():
-    ip = reviewip
     if request.method == 'GET':
-        url = f'http://{ip}:5005/api/v1/reviews/rating'
+        url = f'http://{review_ip}:{review_port}/api/v1/reviews/rating'
         personid = request.args.get('personid')
         if personid == None:
             response = requests.get(url)
@@ -221,14 +224,12 @@ def rating_reviews():
     return response.json(), response.status_code
 
 
-# ------------------------------
-
+# -------------------- AUTH --------------------
 
 @app.route(appendurl + 'auth/login', methods=['POST'])
 def login():
-    ip = authip_backend
     if request.method == 'POST':
-        url = f'http://{ip}:{auth_port}/login'
+        url = f'http://{auth_ip_backend}:{auth_port_backend}/login'
         data = request.get_json()
         response = requests.post(url, json=data)
         if response.status_code == 202:
@@ -240,14 +241,14 @@ def login():
                 "Content-Type": "application/json"
             }
             # send the new header to the info endpoint
-            url = f'http://{ip}:{auth_port}/info'
+            url = f'http://{auth_ip_backend}:{auth_port_backend}/info'
             response1 = requests.post(url, headers=headers)
             authid = response1.json()['id']
             email = response1.json()['email']
             print(authid)
             entry = get_entry(str(authid))
             if entry == None:
-                url = f'http://{ip}:5010/new_user?identity={email}'
+                url = f'http://{chat_ip}:{chat_port}/new_user?identity={email}'
                 response2 = requests.post(url)
                 jsonresponse = response2.json()
                 UID = jsonresponse['UID']
@@ -269,32 +270,32 @@ def login():
 
 @app.route(appendurl + 'auth/register', methods=['POST'])
 def register():
-    ip = authip_backend
     if request.method == 'POST':
-        url = f'http://{ip}:{auth_port}/register'
+        url = f'http://{auth_ip_backend}:{auth_port_backend}/register'
         data = request.get_json()
         response = requests.post(url, json=data)
         print(data)
     return response.json(), response.status_code
 
-@app.route(appendurl + 'auth/auth', methods=['POST'])
+@app.route(appendurl + 'auth/auth', methods=['POST', 'GET'])
 def auth():
-    ip = authip_backend
     # get token from header
+    print("AUTH/AUTH")
     if request.method == 'POST':
-        url = f'http://{ip}:{auth_port}/auth'
+        url = f'http://{auth_ip_backend}:{auth_port_backend}/auth'
         headers = request.headers
         response = requests.post(url, headers=headers)
         print(response.json())
+    else:
+        print("YOU?RE HERE")
     return response.json(), response.status_code
         
 
 @app.route(appendurl + 'auth/info', methods=['POST'])
 def info():
-    ip = authip_backend
     # get token from header
     if request.method == 'POST':
-        url = f'http://{ip}:{auth_port}/info'
+        url = f'http://{auth_ip_backend}:{auth_port_backend}/info'
         headers = request.headers
         response = requests.post(url, headers=headers)
         print(response.json())
@@ -302,8 +303,7 @@ def info():
 
 @app.route(appendurl + 'auth/github')
 def github():
-    ip = authip_backend
-    url = f'http://10.0.2.2:{auth_port}/github'
+    url = f'http://{auth_ip_backend}:{auth_port_backend}/github'
     if request.method == 'GET':
         return redirect(url)
 
@@ -317,8 +317,7 @@ def fetchdata():
     entry = get_entry(str(authid))
     try:
         if entry == None:
-            ip = chatip
-            url = f'http://{ip}:5010/new_user?identity={email}'
+            url = f'http://{chat_ip}:{chat_port}/new_user?identity={email}'
             response2 = requests.post(url)
             jsonresponse = response2.json()
             UID = jsonresponse['UID']
@@ -346,8 +345,7 @@ def fetchdata():
 
 @app.route(appendurl + 'auth/google', methods=['GET'])
 def google():
-    ip = authip_backend
-    url = f'http://{ip}:{auth_port}/google'
+    url = f'http://{auth_ip_backend}:{auth_port_backend}/google'
     if request.method == 'GET':
         response = requests.get(url)
 
@@ -357,60 +355,59 @@ def google():
 
     return redirect(response.url)
 
-@app.route("webdiv", methods=['GET'])
+@app.route("/webdiv", methods=['GET'])
 def webdiv():
-    ip = authip_frontend
-    url = f'http://{ip}:3000'
+    url = f'http://{auth_ip_frontend}:{auth_port_frontend}'
     if request.method == 'GET':
         response = requests.get(url)
     return redirect(response.url)
-#
-# CHAT
-# 
+
+# ------------------ CHAT ------------------
+
 @app.route(appendurl + '/conversations', methods=['POST','GET','DELETE'])
 def conversations():
-    ip = chatip
     if request.method == 'POST':
-        f_name=request.args.get("f_name");
-        author=request.args.get("author");
-        message=request.args.get("message");
-        member=request.args.get("member");
+        f_name=request.args.get("f_name")
+        author=request.args.get("author")
+        message=request.args.get("message")
+        member=request.args.get("member")
         if author == None and message == None:
-            url=f'http://{ip}:5010/conversations?f_name={f_name}&member={member}'
+            url=f'http://{chat_ip}:{chat_port}/conversations?f_name={f_name}&member={member}'
         elif member == None:
-            url=f'http://{ip}:5010/conversations?f_name={f_name}&author={author}&message={message}'
-        response = requests.post(url);
-        print(response.json());
+            url=f'http://{chat_ip}:{chat_port}/conversations?f_name={f_name}&author={author}&message={message}'
+        response = requests.post(url)
+        print(response.json())
     elif request.method == 'GET':
         #get conversations of one user
         
-        author=request.args.get("author");
-        url=f'http://{ip}:5010/conversations?author={author}'
-        response = requests.get(url);
-        print(response.json());
+        author=request.args.get("author")
+        url=f'http://{chat_ip}:{chat_port}/conversations?author={author}'
+        response = requests.get(url)
+        print(response.json())
     elif request.method == 'DELETE':
         #delete conversation
-        f_name=request.args.get("f_name");
-        member=request.args.get("member");
+        f_name=request.args.get("f_name")
+        member=request.args.get("member")
         if member == None:
-            url=f'http://{ip}:5010/conversations?f_name={f_name}'
+            url=f'http://{chat_ip}:{chat_port}/conversations?f_name={f_name}'
         else:
-            url=f'http://{ip}:5010/conversations?f_name={f_name}&member={member}'
-        response = requests.delete(url);
+            url=f'http://{chat_ip}:{chat_port}/conversations?f_name={f_name}&member={member}'
+        response = requests.delete(url)
         print("delete")
     return jsonify(response.json()), response.status_code
 
 @app.route(appendurl + '/new_conversation', methods=['POST'])
 def new_conversation():
-    ip = chatip
     if request.method == 'POST':
-        friendly_name=request.args.get("friendly_name");
-        url=f'http://{ip}:5010/new_conversation?friendly_name={friendly_name}'
-        response=requests.post(url);
+        friendly_name=request.args.get("friendly_name")
+        url=f'http://{chat_ip}:{chat_port}/new_conversation?friendly_name={friendly_name}'
+        response=requests.post(url)
 
     return jsonify(response.json()), response.status_code
-# pass
 
+
+# ------------------ PAYMENT ------------------
+#            MISSING PAYMENT METHODS
 
 
 if __name__ == "__main__":

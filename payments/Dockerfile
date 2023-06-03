@@ -24,11 +24,13 @@ EXPOSE 8000
 
 VOLUME /payments/volumes
 
-# Run django makemigrations
-CMD ["python3", "manage.py", "makemigrations"]
+RUN python3 manage.py makemigrations && python3 manage.py migrate
 
-# Run django migrate
-CMD ["python3", "manage.py", "migrate"]
+# # Run django makemigrations
+# CMD ["python3", "manage.py", "makemigrations"]
+
+# # Run django migrate
+# CMD ["python3", "manage.py", "migrate"]
 
 # Run django runserver
 CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"] 

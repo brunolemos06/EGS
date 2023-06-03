@@ -2,7 +2,7 @@ reg_port=5000
 
 #auth_backend
 cd auth/
-docker buildx build --platform linux/amd64 --network=host -t registry.deti:$reg_port/egs-ridemate/auth_backend:v1 .
+docker buildx build --platform linux/amd64 --network=host -t registry.deti:$reg_port/egs-ridemate/auth_backend:v2 .
 
 #auth_frontend
 cd frontend/
@@ -14,11 +14,11 @@ docker buildx build --platform linux/amd64 --network=host -t registry.deti:$reg_
 
 #composer
 cd ../composer/
-docker buildx build --platform linux/amd64 --network=host -t registry.deti:$reg_port/egs-ridemate/composer:v1 .
+docker buildx build --platform linux/amd64 --network=host -t registry.deti:$reg_port/egs-ridemate/composer:v5 .
 
 #payments
 cd ../payments/
-docker buildx build --platform linux/amd64 --network=host -t registry.deti:$reg_port/egs-ridemate/payments:v1 .
+docker buildx build --platform linux/amd64 --network=host -t registry.deti:$reg_port/egs-ridemate/payments:v2 .
 
 #reviews
 cd ../review/
@@ -26,4 +26,4 @@ docker buildx build --platform linux/amd64 --network=host -t registry.deti:$reg_
 
 #trip
 cd ../trip/
-docker buildx build --platform linux/amd64 --network=host -t registry.deti:$reg_port/egs-ridemate/trip:v1 .
+docker buildx build --platform linux/amd64 --network=host -t registry.deti:$reg_port/egs-ridemate/trip:v2 .
