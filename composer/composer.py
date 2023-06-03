@@ -407,7 +407,20 @@ def new_conversation():
 
 
 # ------------------ PAYMENT ------------------
-#            MISSING PAYMENT METHODS
+@app.route('paypal/create', methods=['POST'])
+def create_order():
+    url = f'http://{payment_ip}:{payment_port}/paypal/create/order'
+    data = request.get_json()
+    response = requests.post(url, json=data)
+    if response.status_code == 201:
+        return response.json(), 201
+    else:
+        return response.json(), response.status_code
+    
+# @app.route('paypal/finish', methods=['GET'])
+# def capture_order():
+
+
 
 
 if __name__ == "__main__":
