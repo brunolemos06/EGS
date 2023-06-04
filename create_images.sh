@@ -6,7 +6,7 @@ docker buildx build --platform linux/amd64 --network=host -t registry.deti:$reg_
 
 #auth_frontend
 cd frontend/
-docker buildx build --platform linux/amd64 --network=host -t registry.deti:$reg_port/egs-ridemate/auth_frontend:v1 .
+docker buildx build --platform linux/amd64 --network=host -t registry.deti:$reg_port/egs-ridemate/auth_frontend:v2 .
 
 #chat_api
 cd ../../chat_api/
@@ -14,7 +14,7 @@ docker buildx build --platform linux/amd64 --network=host -t registry.deti:$reg_
 
 #composer
 cd ../composer/
-docker buildx build --platform linux/amd64 --network=host -t registry.deti:$reg_port/egs-ridemate/composer:v5 .
+docker buildx build --platform linux/amd64 --network=host -t registry.deti:$reg_port/egs-ridemate/composer:v6 .
 
 #payments
 cd ../payments/

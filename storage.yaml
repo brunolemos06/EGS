@@ -1,4 +1,19 @@
-# Persistent Volume Claim for users-db (auth-backend)
+# PV for auth
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: users-db-pv
+spec:
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: standard
+  hostPath:
+    path: /auth_backend
+---
+# PVC for auth
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -7,12 +22,28 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: longhorn
+  storageClassName: standard
   resources:
     requests:
       storage: 100Mi
+
 ---
-# Persistent Volume Claim for composer-db (composer)
+# PV for composer-db (composer)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: composer-db-pv
+spec:
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: standard
+  hostPath:
+    path: /composer
+---
+# PVC for composer-db (composer)
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -21,12 +52,28 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: longhorn
+  storageClassName: standard
   resources:
     requests:
       storage: 100Mi
+
 ---
-# Persistent Volume Claim for reviews-db (reviews)
+# PV for reviews-db (reviews)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: reviews-db-pv
+spec:
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: standard
+  hostPath:
+    path: /review
+---
+# PVC for reviews-db (reviews)
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -35,12 +82,27 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: longhorn
+  storageClassName: standard
   resources:
     requests:
       storage: 100Mi
+
 ---
-# Persistent Volume Claim for payments-db (payments)
+# PV for payments-db (payments)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: payments-db-pv
+spec:
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: standard
+  hostPath:
+    path: /payments
+# PVC payments-db (payments)
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -49,12 +111,28 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: longhorn
+  storageClassName: standard
   resources:
     requests:
       storage: 100Mi
+
 ---
-# Persistent Volume Claim for trip-db (trip)
+# PV for trip-db (trip)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: trip-db-pv
+spec:
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: standard
+  hostPath:
+    path: /maps_api
+---
+# PVC for trip-db (trip)
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

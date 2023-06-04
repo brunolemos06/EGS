@@ -358,12 +358,12 @@ def google():
 @app.route("/webdiv", methods=['GET'])
 def webdiv():
     url = f'http://{auth_ip_frontend}:{auth_port_frontend}'
-    if request.method == 'GET':
-        response = requests.get(url)
-    return redirect(response.url)
+    # if request.method == 'GET':
+    #     response = requests.get(url)
+    # return redirect(response.url)
+    return redirect(url)
 
 # ------------------ CHAT ------------------
-
 @app.route(appendurl + '/conversations', methods=['POST','GET','DELETE'])
 def conversations():
     if request.method == 'POST':
@@ -407,7 +407,7 @@ def new_conversation():
 
 
 # ------------------ PAYMENT ------------------
-@app.route('paypal/create', methods=['POST'])
+@app.route('/paypal/create', methods=['POST'])
 def create_order():
     url = f'http://{payment_ip}:{payment_port}/paypal/create/order'
     data = request.get_json()

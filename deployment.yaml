@@ -23,6 +23,7 @@ spec:
           image: registry.deti:5000/egs-ridemate/auth_backend:v2 
           ports: 
             - containerPort: 5100
+          imagePullPolicy: Always
           volumeMounts:
             - name: users-db-volume
               mountPath: /auth_backend/volumes/
@@ -53,9 +54,10 @@ spec:
             value: "1"
       containers:
         - name: auth-frontend
-          image: registry.deti:5000/egs-ridemate/auth_frontend:v1
+          image: registry.deti:5000/egs-ridemate/auth_frontend:v2
           ports:
             - containerPort: 3000
+          imagePullPolicy: Always
       restartPolicy: Always
 ---
 #Deployment chat-api
@@ -82,6 +84,7 @@ spec:
           image: registry.deti:5000/egs-ridemate/chat_api:v1 
           ports: 
             - containerPort: 5010
+          imagePullPolicy: Always
       restartPolicy: Always
 ---
 #Deployment composer
@@ -105,9 +108,10 @@ spec:
             value: "1"
       containers:
         - name: composer
-          image: registry.deti:5000/egs-ridemate/composer:v5 
+          image: registry.deti:5000/egs-ridemate/composer:v6 
           ports: 
             - containerPort: 8080
+          imagePullPolicy: Always
           volumeMounts:
             - name: composer-db-volume
               mountPath: /composer/volumes/
@@ -141,6 +145,7 @@ spec:
           image: registry.deti:5000/egs-ridemate/payments:v2 
           ports: 
             - containerPort: 8000
+          imagePullPolicy: Always
           volumeMounts:
             - name: payments-db-volume
               mountPath: /payments/volumes/
@@ -174,6 +179,7 @@ spec:
           image: registry.deti:5000/egs-ridemate/reviews:v1 
           ports: 
             - containerPort: 5005
+          imagePullPolicy: Always
           volumeMounts:
             - name: reviews-db-volume
               mountPath: /review/volumes/
@@ -207,6 +213,7 @@ spec:
           image: registry.deti:5000/egs-ridemate/trip:v2 
           ports: 
             - containerPort: 5015
+          imagePullPolicy: Always
           volumeMounts:
             - name: trip-db-volume
               mountPath: /maps_api/volumes/
