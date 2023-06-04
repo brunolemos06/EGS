@@ -9,9 +9,6 @@ from flask_swagger_ui import get_swaggerui_blueprint
 from flask import jsonify
 from flask_swagger import swagger
 
-import urllib3
-
-http = urllib3.PoolManager(cert_reqs='CERT_NONE')
 
 account_sid="ACf8b3ce0eb04f21fe7ab30a6e0c58c7d9"
 auth_token= "4cb96b0112a701609a3b621bc403af76"
@@ -20,7 +17,7 @@ service_sid="ISec5512aaa2db4d6abaf1bd31a60fa474"
 # account_sid = os.getenv("TWILIO_ACCOUNT_SID")
 # auth_token = os.getenv("TWILIO_AUTH_TOKEN")
 # service_sid = os.getenv("TWILIO_SERVICE_SID")
-client = Client(account_sid, auth_token, http_client=http)
+client = Client(account_sid, auth_token)
 
 configuration = client.conversations \
                       .v1 \
