@@ -53,7 +53,7 @@ class CreateOrderViewRemote(APIView):
                 "reference_id": ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=random.randint(1, 265))),
                 "amount": {
                     "currency_code": "EUR",
-                    "value": request.data.get('amount'),
+                    "value": request.data['amount']
                 }
                 }
             ],
@@ -65,8 +65,8 @@ class CreateOrderViewRemote(APIView):
                     "brand_name": "RideMate",
                     "landing_page": "LOGIN",
                     "user_action": "PAY_NOW",
-                    "return_url": "http://10.0.2.2:8000/paypal/finish",  #change this later to the actual return url
-                    "cancel_url": "http://10.0.2.2:8000/paypal/finish"
+                    "return_url": "http://127.0.0.1:8080/paypal/finish",  #change this later to the actual return url
+                    "cancel_url": "http://127.0.0.1:8080/paypal/finish"
                 }
                 }
             }
@@ -92,10 +92,11 @@ class CaptureOrderView(APIView):
     @swagger_auto_schema(manual_parameters=[id_param], responses={201: '{status: success}', 400: '{error: error message}'})
     def post(self, request):
         #check if the id exists and payment is not payed
-        if payments.objects.filter(order_id=request.data.get('id'), payed=False).exists():
+        print("ODERID: " + str(request.data['id']))
+        if payments.objects.filter(order_id=request.data['id'], payed=False).exists():
             token = PaypalToken(CLIENT_ID, CLIENT_SECRET)  
-            captureurl = 'https://api.sandbox.paypal.com/v2/checkout/orders/' + request.data.get('id') + '/capture'   #see transaction status
-            headers = {"Content-Type": "application/json", "Authorization": "Bearer "+token, "PayPal-Request-Id": payments.objects.get(order_id=request.data.get('id'), payed=False).pp_id, "Prefer": "return=representation"}
+            captureurl = 'https://api.sandbox.paypal.com/v2/checkout/orders/' + request.data['id'] + '/capture'   #see transaction status
+            headers = {"Content-Type": "application/json", "Authorization": "Bearer "+token, "PayPal-Request-Id": payments.objects.get(order_id=request.data['id'], payed=False).pp_id, "Prefer": "return=representation"}
             response = requests.post(captureurl, headers=headers)
 
         else:
@@ -110,7 +111,7 @@ class CaptureOrderView(APIView):
             print('reference_id: ', response.json()['purchase_units'][0]['reference_id'])
             print('amount: ', response.json()['purchase_units'][0]['amount']['value'])
             
-            completed = payments.objects.get(order_id=request.data.get('id'), payed=False)
+            completed = payments.objects.get(order_id=request.data['id'], payed=False)
             completed.payed = True
             completed.save()
             return HttpResponse(json.dumps({'status': 'success'}), status=201)
