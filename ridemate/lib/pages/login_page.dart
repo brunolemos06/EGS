@@ -238,7 +238,11 @@ class _LoginPageState extends State<LoginPage> {
 
 
 
+<<<<<<< HEAD
                     final String url = 'http://ridemate.deti/service-review/v1/auth/info';
+=======
+                    final String url = 'http://ridemate.deti:80/service-review/v1/auth/info';
+>>>>>>> 49b9d9bfc5f6b90e2087df13d360427f54260975
                     final Map<String, String> headers = {
                       'Content-Type': 'application/json',
                       'Accept': 'application/json',
