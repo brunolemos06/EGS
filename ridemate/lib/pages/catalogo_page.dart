@@ -118,7 +118,7 @@ class _catalogoPageState extends State<catalogo_page> {
       if (url.contains('/paypal/finish')) {
         flutterWebviewPlugin.close();
         final token_url =
-            Uri.parse('http://10.0.2.2:8080/paypal/capture');
+            Uri.parse('http://ridemate.deti/paypal/capture');
         final token_headers = {'Content-Type': 'application/json'};
         final token_payload = {'id': order_id};
         http
@@ -613,7 +613,7 @@ class _catalogoPageState extends State<catalogo_page> {
                                                 wrapWidth: 1024);
 
                                             final url = Uri.parse(
-                                                'http://10.0.2.2:8080/paypal/create');
+                                                'http://ridemate.deti/paypal/create');
                                             final headers = {
                                               'Content-Type': 'application/json'
                                             };

@@ -96,11 +96,11 @@ def trip():
             origin_coords = response.json()['msg'][i]['info']['routes'][0]['bounds']['northeast']
             destination_coords = response.json()['msg'][i]['info']['routes'][0]['bounds']['southwest']
             response_short['msg'][i]['info'] = {'origin_coords': origin_coords, 'destination_coords': destination_coords, 'geocoded_waypoints': []}
-            if len(response.json()['msg'][i]['info']['geocoded_waypoints']) > 2:
-                print(len(response.json()['msg'][0]['info']['geocoded_waypoints']))
-                for w in range(2, len(response.json()['msg'][0]['info']['geocoded_waypoints'])):
-                    print("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww :" + str(w))
-                    response_short['msg'][i]['info']['geocoded_waypoints'].append(response.json()['msg'][i]['info']['geocoded_waypoints'][w]['place_id'])
+            # if len(response.json()['msg'][i]['info']['geocoded_waypoints']) > 2:
+            #     print(len(response.json()['msg'][0]['info']['geocoded_waypoints']))
+            #     for w in range(2, len(response.json()['msg'][0]['info']['geocoded_waypoints'])):
+            #         print("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww :" + str(w))
+            #         response_short['msg'][i]['info']['geocoded_waypoints'].append(response.json()['msg'][i]['info']['geocoded_waypoints'][w]['place_id'])
         print(response_short)
         return response_short, response.status_code
     elif (request.method == 'POST'):
