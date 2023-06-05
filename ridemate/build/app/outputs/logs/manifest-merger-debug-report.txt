@@ -1,0 +1,263 @@
+-- Merging decision tree log ---
+application
+INJECTED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/main/AndroidManifest.xml:3:4-34:19
+MERGED from [:url_launcher_android] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/url_launcher_android/intermediates/merged_manifest/debug/AndroidManifest.xml:9:5-14:19
+MERGED from [:url_launcher_android] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/url_launcher_android/intermediates/merged_manifest/debug/AndroidManifest.xml:9:5-14:19
+MERGED from [:flutter_webview_plugin] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/flutter_webview_plugin/intermediates/merged_manifest/debug/AndroidManifest.xml:10:5-21:19
+MERGED from [:flutter_webview_plugin] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/flutter_webview_plugin/intermediates/merged_manifest/debug/AndroidManifest.xml:10:5-21:19
+MERGED from [androidx.window:window:1.0.0-beta04] /home/bruno/.gradle/caches/transforms-3/dee59bb480020f42d53c2ea15e4501f7/transformed/jetified-window-1.0.0-beta04/AndroidManifest.xml:24:5-31:19
+MERGED from [androidx.window:window:1.0.0-beta04] /home/bruno/.gradle/caches/transforms-3/dee59bb480020f42d53c2ea15e4501f7/transformed/jetified-window-1.0.0-beta04/AndroidManifest.xml:24:5-31:19
+MERGED from [com.google.android.gms:play-services-auth:20.5.0] /home/bruno/.gradle/caches/transforms-3/2f242034b75eb25a4a42e0262b447777/transformed/jetified-play-services-auth-20.5.0/AndroidManifest.xml:22:5-38:19
+MERGED from [com.google.android.gms:play-services-auth:20.5.0] /home/bruno/.gradle/caches/transforms-3/2f242034b75eb25a4a42e0262b447777/transformed/jetified-play-services-auth-20.5.0/AndroidManifest.xml:22:5-38:19
+MERGED from [com.google.android.gms:play-services-fido:20.0.1] /home/bruno/.gradle/caches/transforms-3/04c816688db2a984be7b3694ea462c52/transformed/jetified-play-services-fido-20.0.1/AndroidManifest.xml:7:5-8:19
+MERGED from [com.google.android.gms:play-services-fido:20.0.1] /home/bruno/.gradle/caches/transforms-3/04c816688db2a984be7b3694ea462c52/transformed/jetified-play-services-fido-20.0.1/AndroidManifest.xml:7:5-8:19
+MERGED from [com.google.android.gms:play-services-base:18.0.1] /home/bruno/.gradle/caches/transforms-3/082fa8f1e076fd76c98f4d760b4e67b1/transformed/jetified-play-services-base-18.0.1/AndroidManifest.xml:19:5-23:19
+MERGED from [com.google.android.gms:play-services-base:18.0.1] /home/bruno/.gradle/caches/transforms-3/082fa8f1e076fd76c98f4d760b4e67b1/transformed/jetified-play-services-base-18.0.1/AndroidManifest.xml:19:5-23:19
+MERGED from [com.google.android.gms:play-services-tasks:18.0.1] /home/bruno/.gradle/caches/transforms-3/57179d0b86fc5e43e2f27bc922bf4a64/transformed/jetified-play-services-tasks-18.0.1/AndroidManifest.xml:5:5-20
+MERGED from [com.google.android.gms:play-services-tasks:18.0.1] /home/bruno/.gradle/caches/transforms-3/57179d0b86fc5e43e2f27bc922bf4a64/transformed/jetified-play-services-tasks-18.0.1/AndroidManifest.xml:5:5-20
+MERGED from [com.google.android.gms:play-services-basement:18.2.0] /home/bruno/.gradle/caches/transforms-3/10e411e408063a3ed7eb4e7e19983f6d/transformed/jetified-play-services-basement-18.2.0/AndroidManifest.xml:20:5-24:19
+MERGED from [com.google.android.gms:play-services-basement:18.2.0] /home/bruno/.gradle/caches/transforms-3/10e411e408063a3ed7eb4e7e19983f6d/transformed/jetified-play-services-basement-18.2.0/AndroidManifest.xml:20:5-24:19
+MERGED from [androidx.core:core:1.6.0] /home/bruno/.gradle/caches/transforms-3/4ca28c4a71705f8a687c69dda140a277/transformed/core-1.6.0/AndroidManifest.xml:24:5-89
+MERGED from [androidx.core:core:1.6.0] /home/bruno/.gradle/caches/transforms-3/4ca28c4a71705f8a687c69dda140a277/transformed/core-1.6.0/AndroidManifest.xml:24:5-89
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/bruno/.gradle/caches/transforms-3/5abdc06e026f2f7b9b89c25dcd7a6d7e/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/bruno/.gradle/caches/transforms-3/5abdc06e026f2f7b9b89c25dcd7a6d7e/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:24:5-25:19
+	android:appComponentFactory
+		ADDED from [androidx.core:core:1.6.0] /home/bruno/.gradle/caches/transforms-3/4ca28c4a71705f8a687c69dda140a277/transformed/core-1.6.0/AndroidManifest.xml:24:18-86
+	android:name
+		INJECTED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/main/AndroidManifest.xml
+manifest
+ADDED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/main/AndroidManifest.xml:1:1-35:12
+INJECTED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/main/AndroidManifest.xml:1:1-35:12
+INJECTED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/main/AndroidManifest.xml:1:1-35:12
+INJECTED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/main/AndroidManifest.xml:1:1-35:12
+MERGED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/main/AndroidManifest.xml:1:1-35:12
+MERGED from [:device_info] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/device_info/intermediates/merged_manifest/debug/AndroidManifest.xml:2:1-9:12
+MERGED from [:geocoding_android] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/geocoding_android/intermediates/merged_manifest/debug/AndroidManifest.xml:2:1-9:12
+MERGED from [:url_launcher_android] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/url_launcher_android/intermediates/merged_manifest/debug/AndroidManifest.xml:2:1-16:12
+MERGED from [:path_provider_android] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/path_provider_android/intermediates/merged_manifest/debug/AndroidManifest.xml:2:1-9:12
+MERGED from [:google_sign_in_android] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/google_sign_in_android/intermediates/merged_manifest/debug/AndroidManifest.xml:2:1-11:12
+MERGED from [:flutter_secure_storage] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/flutter_secure_storage/intermediates/merged_manifest/debug/AndroidManifest.xml:2:1-9:12
+MERGED from [:flutter_webview_plugin] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/flutter_webview_plugin/intermediates/merged_manifest/debug/AndroidManifest.xml:2:1-23:12
+MERGED from [:webview_flutter_android] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/webview_flutter_android/intermediates/merged_manifest/debug/AndroidManifest.xml:2:1-9:12
+MERGED from [androidx.multidex:multidex:2.0.1] /home/bruno/.gradle/caches/transforms-3/27d6445aec3fd80f08088200c301c43a/transformed/multidex-2.0.1/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.window:window-java:1.0.0-beta04] /home/bruno/.gradle/caches/transforms-3/006d93cd422dbc43e89591147c2de572/transformed/jetified-window-java-1.0.0-beta04/AndroidManifest.xml:17:1-23:12
+MERGED from [androidx.window:window:1.0.0-beta04] /home/bruno/.gradle/caches/transforms-3/dee59bb480020f42d53c2ea15e4501f7/transformed/jetified-window-1.0.0-beta04/AndroidManifest.xml:17:1-33:12
+MERGED from [androidx.appcompat:appcompat:1.1.0] /home/bruno/.gradle/caches/transforms-3/72c4169d30545cea2a946cd967d9d7f4/transformed/appcompat-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.webkit:webkit:1.5.0] /home/bruno/.gradle/caches/transforms-3/7a9e722f9cadd913a07709114ac94695/transformed/webkit-1.5.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.google.android.gms:play-services-auth:20.5.0] /home/bruno/.gradle/caches/transforms-3/2f242034b75eb25a4a42e0262b447777/transformed/jetified-play-services-auth-20.5.0/AndroidManifest.xml:17:1-40:12
+MERGED from [com.google.android.gms:play-services-auth-api-phone:18.0.1] /home/bruno/.gradle/caches/transforms-3/76525a7103e3342922a964ea8a16432b/transformed/jetified-play-services-auth-api-phone-18.0.1/AndroidManifest.xml:2:1-7:12
+MERGED from [com.google.android.gms:play-services-auth-base:18.0.4] /home/bruno/.gradle/caches/transforms-3/8651b3f6afdf425f526f6e7a6cd1196b/transformed/jetified-play-services-auth-base-18.0.4/AndroidManifest.xml:2:1-7:12
+MERGED from [com.google.android.gms:play-services-fido:20.0.1] /home/bruno/.gradle/caches/transforms-3/04c816688db2a984be7b3694ea462c52/transformed/jetified-play-services-fido-20.0.1/AndroidManifest.xml:2:1-10:12
+MERGED from [com.google.android.gms:play-services-base:18.0.1] /home/bruno/.gradle/caches/transforms-3/082fa8f1e076fd76c98f4d760b4e67b1/transformed/jetified-play-services-base-18.0.1/AndroidManifest.xml:16:1-24:12
+MERGED from [com.google.android.gms:play-services-tasks:18.0.1] /home/bruno/.gradle/caches/transforms-3/57179d0b86fc5e43e2f27bc922bf4a64/transformed/jetified-play-services-tasks-18.0.1/AndroidManifest.xml:2:1-6:12
+MERGED from [com.google.android.gms:play-services-basement:18.2.0] /home/bruno/.gradle/caches/transforms-3/10e411e408063a3ed7eb4e7e19983f6d/transformed/jetified-play-services-basement-18.2.0/AndroidManifest.xml:16:1-26:12
+MERGED from [androidx.fragment:fragment:1.1.0] /home/bruno/.gradle/caches/transforms-3/9354257804af8250f2ffb7c22e2892d5/transformed/fragment-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.loader:loader:1.0.0] /home/bruno/.gradle/caches/transforms-3/cf24d35e50a727536c7357721dc007c5/transformed/loader-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.appcompat:appcompat-resources:1.1.0] /home/bruno/.gradle/caches/transforms-3/5294cefc0598aa675e25aca4bb80a9e2/transformed/jetified-appcompat-resources-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.drawerlayout:drawerlayout:1.0.0] /home/bruno/.gradle/caches/transforms-3/dae15ab66459c7c814cfe9578e1706f3/transformed/drawerlayout-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.viewpager:viewpager:1.0.0] /home/bruno/.gradle/caches/transforms-3/f156363817d5f71529d60b6716392550/transformed/viewpager-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.activity:activity:1.0.0] /home/bruno/.gradle/caches/transforms-3/252fc848d5aa6e267df5e6907a023aed/transformed/jetified-activity-1.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] /home/bruno/.gradle/caches/transforms-3/f562cbc756445f17cad7fd8f06b07dbc/transformed/vectordrawable-animated-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] /home/bruno/.gradle/caches/transforms-3/3943378554826a83b044df13cc6da74b/transformed/vectordrawable-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.customview:customview:1.0.0] /home/bruno/.gradle/caches/transforms-3/f4c2d181f9683c57f8970b9ce7785060/transformed/customview-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.core:core:1.6.0] /home/bruno/.gradle/caches/transforms-3/4ca28c4a71705f8a687c69dda140a277/transformed/core-1.6.0/AndroidManifest.xml:17:1-26:12
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.2.0] /home/bruno/.gradle/caches/transforms-3/af4014bd5e02c19d06abc41b9651d21a/transformed/lifecycle-runtime-2.2.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.savedstate:savedstate:1.0.0] /home/bruno/.gradle/caches/transforms-3/95578c0d327ed1d1ac84d08493ede1cf/transformed/jetified-savedstate-1.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.0.0] /home/bruno/.gradle/caches/transforms-3/7f4e81502f72dd837dc1e0ddcbb11c26/transformed/lifecycle-livedata-2.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.0.0] /home/bruno/.gradle/caches/transforms-3/3343d1c6adfed9e861db7c3f7f2df83a/transformed/lifecycle-livedata-core-2.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.tracing:tracing:1.0.0] /home/bruno/.gradle/caches/transforms-3/5b75d2e6479f13c5aed7d8001da507c0/transformed/jetified-tracing-1.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] /home/bruno/.gradle/caches/transforms-3/a5e62b79c1b370c2c963eefe3a076316/transformed/cursoradapter-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.arch.core:core-runtime:2.0.0] /home/bruno/.gradle/caches/transforms-3/e5168ae1d5ab03fe8bf4ee87d623deae/transformed/core-runtime-2.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/bruno/.gradle/caches/transforms-3/5abdc06e026f2f7b9b89c25dcd7a6d7e/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:17:1-27:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.1.0] /home/bruno/.gradle/caches/transforms-3/282676124ae0776b5645a1cee909808d/transformed/lifecycle-viewmodel-2.1.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.interpolator:interpolator:1.0.0] /home/bruno/.gradle/caches/transforms-3/0ba9c48dd5ff84ca64a6f8c4dc29ae01/transformed/interpolator-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.annotation:annotation-experimental:1.1.0] /home/bruno/.gradle/caches/transforms-3/8965c941cf4bee4d72541b965c7c9d39/transformed/jetified-annotation-experimental-1.1.0/AndroidManifest.xml:17:1-24:12
+INJECTED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/debug/AndroidManifest.xml:1:1-8:12
+INJECTED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/debug/AndroidManifest.xml:1:1-8:12
+INJECTED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/debug/AndroidManifest.xml:1:1-8:12
+	package
+		ADDED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/main/AndroidManifest.xml:2:5-35
+		INJECTED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/main/AndroidManifest.xml
+		INJECTED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/debug/AndroidManifest.xml
+	android:versionName
+		INJECTED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/main/AndroidManifest.xml
+		ADDED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/main/AndroidManifest.xml:1:1-35:12
+		INJECTED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/debug/AndroidManifest.xml
+	android:versionCode
+		INJECTED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/main/AndroidManifest.xml
+		ADDED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/main/AndroidManifest.xml:1:1-35:12
+		INJECTED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/debug/AndroidManifest.xml
+	xmlns:android
+		ADDED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/main/AndroidManifest.xml:1:11-69
+uses-sdk
+INJECTED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/main/AndroidManifest.xml
+INJECTED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/main/AndroidManifest.xml
+MERGED from [:device_info] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/device_info/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
+MERGED from [:device_info] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/device_info/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
+MERGED from [:geocoding_android] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/geocoding_android/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
+MERGED from [:geocoding_android] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/geocoding_android/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
+MERGED from [:url_launcher_android] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/url_launcher_android/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
+MERGED from [:url_launcher_android] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/url_launcher_android/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
+MERGED from [:path_provider_android] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/path_provider_android/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
+MERGED from [:path_provider_android] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/path_provider_android/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
+MERGED from [:google_sign_in_android] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/google_sign_in_android/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
+MERGED from [:google_sign_in_android] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/google_sign_in_android/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
+MERGED from [:flutter_secure_storage] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/flutter_secure_storage/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
+MERGED from [:flutter_secure_storage] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/flutter_secure_storage/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
+MERGED from [:flutter_webview_plugin] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/flutter_webview_plugin/intermediates/merged_manifest/debug/AndroidManifest.xml:6:5-8:41
+MERGED from [:flutter_webview_plugin] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/flutter_webview_plugin/intermediates/merged_manifest/debug/AndroidManifest.xml:6:5-8:41
+MERGED from [:webview_flutter_android] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/webview_flutter_android/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
+MERGED from [:webview_flutter_android] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/webview_flutter_android/intermediates/merged_manifest/debug/AndroidManifest.xml:5:5-7:41
+MERGED from [androidx.multidex:multidex:2.0.1] /home/bruno/.gradle/caches/transforms-3/27d6445aec3fd80f08088200c301c43a/transformed/multidex-2.0.1/AndroidManifest.xml:20:5-43
+MERGED from [androidx.multidex:multidex:2.0.1] /home/bruno/.gradle/caches/transforms-3/27d6445aec3fd80f08088200c301c43a/transformed/multidex-2.0.1/AndroidManifest.xml:20:5-43
+MERGED from [androidx.window:window-java:1.0.0-beta04] /home/bruno/.gradle/caches/transforms-3/006d93cd422dbc43e89591147c2de572/transformed/jetified-window-java-1.0.0-beta04/AndroidManifest.xml:19:5-21:41
+MERGED from [androidx.window:window-java:1.0.0-beta04] /home/bruno/.gradle/caches/transforms-3/006d93cd422dbc43e89591147c2de572/transformed/jetified-window-java-1.0.0-beta04/AndroidManifest.xml:19:5-21:41
+MERGED from [androidx.window:window:1.0.0-beta04] /home/bruno/.gradle/caches/transforms-3/dee59bb480020f42d53c2ea15e4501f7/transformed/jetified-window-1.0.0-beta04/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.window:window:1.0.0-beta04] /home/bruno/.gradle/caches/transforms-3/dee59bb480020f42d53c2ea15e4501f7/transformed/jetified-window-1.0.0-beta04/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.appcompat:appcompat:1.1.0] /home/bruno/.gradle/caches/transforms-3/72c4169d30545cea2a946cd967d9d7f4/transformed/appcompat-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.appcompat:appcompat:1.1.0] /home/bruno/.gradle/caches/transforms-3/72c4169d30545cea2a946cd967d9d7f4/transformed/appcompat-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.webkit:webkit:1.5.0] /home/bruno/.gradle/caches/transforms-3/7a9e722f9cadd913a07709114ac94695/transformed/webkit-1.5.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.webkit:webkit:1.5.0] /home/bruno/.gradle/caches/transforms-3/7a9e722f9cadd913a07709114ac94695/transformed/webkit-1.5.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-auth:20.5.0] /home/bruno/.gradle/caches/transforms-3/2f242034b75eb25a4a42e0262b447777/transformed/jetified-play-services-auth-20.5.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-auth:20.5.0] /home/bruno/.gradle/caches/transforms-3/2f242034b75eb25a4a42e0262b447777/transformed/jetified-play-services-auth-20.5.0/AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-auth-api-phone:18.0.1] /home/bruno/.gradle/caches/transforms-3/76525a7103e3342922a964ea8a16432b/transformed/jetified-play-services-auth-api-phone-18.0.1/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-auth-api-phone:18.0.1] /home/bruno/.gradle/caches/transforms-3/76525a7103e3342922a964ea8a16432b/transformed/jetified-play-services-auth-api-phone-18.0.1/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-auth-base:18.0.4] /home/bruno/.gradle/caches/transforms-3/8651b3f6afdf425f526f6e7a6cd1196b/transformed/jetified-play-services-auth-base-18.0.4/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-auth-base:18.0.4] /home/bruno/.gradle/caches/transforms-3/8651b3f6afdf425f526f6e7a6cd1196b/transformed/jetified-play-services-auth-base-18.0.4/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-fido:20.0.1] /home/bruno/.gradle/caches/transforms-3/04c816688db2a984be7b3694ea462c52/transformed/jetified-play-services-fido-20.0.1/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-fido:20.0.1] /home/bruno/.gradle/caches/transforms-3/04c816688db2a984be7b3694ea462c52/transformed/jetified-play-services-fido-20.0.1/AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-base:18.0.1] /home/bruno/.gradle/caches/transforms-3/082fa8f1e076fd76c98f4d760b4e67b1/transformed/jetified-play-services-base-18.0.1/AndroidManifest.xml:18:5-43
+MERGED from [com.google.android.gms:play-services-base:18.0.1] /home/bruno/.gradle/caches/transforms-3/082fa8f1e076fd76c98f4d760b4e67b1/transformed/jetified-play-services-base-18.0.1/AndroidManifest.xml:18:5-43
+MERGED from [com.google.android.gms:play-services-tasks:18.0.1] /home/bruno/.gradle/caches/transforms-3/57179d0b86fc5e43e2f27bc922bf4a64/transformed/jetified-play-services-tasks-18.0.1/AndroidManifest.xml:4:5-43
+MERGED from [com.google.android.gms:play-services-tasks:18.0.1] /home/bruno/.gradle/caches/transforms-3/57179d0b86fc5e43e2f27bc922bf4a64/transformed/jetified-play-services-tasks-18.0.1/AndroidManifest.xml:4:5-43
+MERGED from [com.google.android.gms:play-services-basement:18.2.0] /home/bruno/.gradle/caches/transforms-3/10e411e408063a3ed7eb4e7e19983f6d/transformed/jetified-play-services-basement-18.2.0/AndroidManifest.xml:18:5-43
+MERGED from [com.google.android.gms:play-services-basement:18.2.0] /home/bruno/.gradle/caches/transforms-3/10e411e408063a3ed7eb4e7e19983f6d/transformed/jetified-play-services-basement-18.2.0/AndroidManifest.xml:18:5-43
+MERGED from [androidx.fragment:fragment:1.1.0] /home/bruno/.gradle/caches/transforms-3/9354257804af8250f2ffb7c22e2892d5/transformed/fragment-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.fragment:fragment:1.1.0] /home/bruno/.gradle/caches/transforms-3/9354257804af8250f2ffb7c22e2892d5/transformed/fragment-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.loader:loader:1.0.0] /home/bruno/.gradle/caches/transforms-3/cf24d35e50a727536c7357721dc007c5/transformed/loader-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] /home/bruno/.gradle/caches/transforms-3/cf24d35e50a727536c7357721dc007c5/transformed/loader-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.appcompat:appcompat-resources:1.1.0] /home/bruno/.gradle/caches/transforms-3/5294cefc0598aa675e25aca4bb80a9e2/transformed/jetified-appcompat-resources-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.appcompat:appcompat-resources:1.1.0] /home/bruno/.gradle/caches/transforms-3/5294cefc0598aa675e25aca4bb80a9e2/transformed/jetified-appcompat-resources-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.drawerlayout:drawerlayout:1.0.0] /home/bruno/.gradle/caches/transforms-3/dae15ab66459c7c814cfe9578e1706f3/transformed/drawerlayout-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.drawerlayout:drawerlayout:1.0.0] /home/bruno/.gradle/caches/transforms-3/dae15ab66459c7c814cfe9578e1706f3/transformed/drawerlayout-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] /home/bruno/.gradle/caches/transforms-3/f156363817d5f71529d60b6716392550/transformed/viewpager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] /home/bruno/.gradle/caches/transforms-3/f156363817d5f71529d60b6716392550/transformed/viewpager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.activity:activity:1.0.0] /home/bruno/.gradle/caches/transforms-3/252fc848d5aa6e267df5e6907a023aed/transformed/jetified-activity-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.activity:activity:1.0.0] /home/bruno/.gradle/caches/transforms-3/252fc848d5aa6e267df5e6907a023aed/transformed/jetified-activity-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] /home/bruno/.gradle/caches/transforms-3/f562cbc756445f17cad7fd8f06b07dbc/transformed/vectordrawable-animated-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] /home/bruno/.gradle/caches/transforms-3/f562cbc756445f17cad7fd8f06b07dbc/transformed/vectordrawable-animated-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] /home/bruno/.gradle/caches/transforms-3/3943378554826a83b044df13cc6da74b/transformed/vectordrawable-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] /home/bruno/.gradle/caches/transforms-3/3943378554826a83b044df13cc6da74b/transformed/vectordrawable-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.customview:customview:1.0.0] /home/bruno/.gradle/caches/transforms-3/f4c2d181f9683c57f8970b9ce7785060/transformed/customview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.customview:customview:1.0.0] /home/bruno/.gradle/caches/transforms-3/f4c2d181f9683c57f8970b9ce7785060/transformed/customview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.6.0] /home/bruno/.gradle/caches/transforms-3/4ca28c4a71705f8a687c69dda140a277/transformed/core-1.6.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.core:core:1.6.0] /home/bruno/.gradle/caches/transforms-3/4ca28c4a71705f8a687c69dda140a277/transformed/core-1.6.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.2.0] /home/bruno/.gradle/caches/transforms-3/af4014bd5e02c19d06abc41b9651d21a/transformed/lifecycle-runtime-2.2.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.2.0] /home/bruno/.gradle/caches/transforms-3/af4014bd5e02c19d06abc41b9651d21a/transformed/lifecycle-runtime-2.2.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.savedstate:savedstate:1.0.0] /home/bruno/.gradle/caches/transforms-3/95578c0d327ed1d1ac84d08493ede1cf/transformed/jetified-savedstate-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.savedstate:savedstate:1.0.0] /home/bruno/.gradle/caches/transforms-3/95578c0d327ed1d1ac84d08493ede1cf/transformed/jetified-savedstate-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.0.0] /home/bruno/.gradle/caches/transforms-3/7f4e81502f72dd837dc1e0ddcbb11c26/transformed/lifecycle-livedata-2.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.0.0] /home/bruno/.gradle/caches/transforms-3/7f4e81502f72dd837dc1e0ddcbb11c26/transformed/lifecycle-livedata-2.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.0.0] /home/bruno/.gradle/caches/transforms-3/3343d1c6adfed9e861db7c3f7f2df83a/transformed/lifecycle-livedata-core-2.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.0.0] /home/bruno/.gradle/caches/transforms-3/3343d1c6adfed9e861db7c3f7f2df83a/transformed/lifecycle-livedata-core-2.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.tracing:tracing:1.0.0] /home/bruno/.gradle/caches/transforms-3/5b75d2e6479f13c5aed7d8001da507c0/transformed/jetified-tracing-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.tracing:tracing:1.0.0] /home/bruno/.gradle/caches/transforms-3/5b75d2e6479f13c5aed7d8001da507c0/transformed/jetified-tracing-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] /home/bruno/.gradle/caches/transforms-3/a5e62b79c1b370c2c963eefe3a076316/transformed/cursoradapter-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] /home/bruno/.gradle/caches/transforms-3/a5e62b79c1b370c2c963eefe3a076316/transformed/cursoradapter-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.arch.core:core-runtime:2.0.0] /home/bruno/.gradle/caches/transforms-3/e5168ae1d5ab03fe8bf4ee87d623deae/transformed/core-runtime-2.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.arch.core:core-runtime:2.0.0] /home/bruno/.gradle/caches/transforms-3/e5168ae1d5ab03fe8bf4ee87d623deae/transformed/core-runtime-2.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/bruno/.gradle/caches/transforms-3/5abdc06e026f2f7b9b89c25dcd7a6d7e/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/bruno/.gradle/caches/transforms-3/5abdc06e026f2f7b9b89c25dcd7a6d7e/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.1.0] /home/bruno/.gradle/caches/transforms-3/282676124ae0776b5645a1cee909808d/transformed/lifecycle-viewmodel-2.1.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.1.0] /home/bruno/.gradle/caches/transforms-3/282676124ae0776b5645a1cee909808d/transformed/lifecycle-viewmodel-2.1.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] /home/bruno/.gradle/caches/transforms-3/0ba9c48dd5ff84ca64a6f8c4dc29ae01/transformed/interpolator-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] /home/bruno/.gradle/caches/transforms-3/0ba9c48dd5ff84ca64a6f8c4dc29ae01/transformed/interpolator-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.1.0] /home/bruno/.gradle/caches/transforms-3/8965c941cf4bee4d72541b965c7c9d39/transformed/jetified-annotation-experimental-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.annotation:annotation-experimental:1.1.0] /home/bruno/.gradle/caches/transforms-3/8965c941cf4bee4d72541b965c7c9d39/transformed/jetified-annotation-experimental-1.1.0/AndroidManifest.xml:20:5-22:41
+INJECTED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/debug/AndroidManifest.xml
+INJECTED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/debug/AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/main/AndroidManifest.xml
+		INJECTED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/debug/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/main/AndroidManifest.xml
+		INJECTED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/debug/AndroidManifest.xml
+uses-permission#android.permission.INTERNET
+ADDED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/debug/AndroidManifest.xml:7:5-66
+MERGED from [:google_sign_in_android] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/google_sign_in_android/intermediates/merged_manifest/debug/AndroidManifest.xml:9:5-67
+MERGED from [:google_sign_in_android] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/google_sign_in_android/intermediates/merged_manifest/debug/AndroidManifest.xml:9:5-67
+	android:name
+		ADDED from /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/android/app/src/debug/AndroidManifest.xml:7:22-64
+activity#io.flutter.plugins.urllauncher.WebViewActivity
+ADDED from [:url_launcher_android] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/url_launcher_android/intermediates/merged_manifest/debug/AndroidManifest.xml:10:9-13:74
+	android:exported
+		ADDED from [:url_launcher_android] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/url_launcher_android/intermediates/merged_manifest/debug/AndroidManifest.xml:12:13-37
+	android:theme
+		ADDED from [:url_launcher_android] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/url_launcher_android/intermediates/merged_manifest/debug/AndroidManifest.xml:13:13-71
+	android:name
+		ADDED from [:url_launcher_android] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/url_launcher_android/intermediates/merged_manifest/debug/AndroidManifest.xml:11:13-74
+provider#androidx.core.content.FileProvider
+ADDED from [:flutter_webview_plugin] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/flutter_webview_plugin/intermediates/merged_manifest/debug/AndroidManifest.xml:11:9-20:20
+	android:grantUriPermissions
+		ADDED from [:flutter_webview_plugin] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/flutter_webview_plugin/intermediates/merged_manifest/debug/AndroidManifest.xml:15:13-47
+	android:authorities
+		ADDED from [:flutter_webview_plugin] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/flutter_webview_plugin/intermediates/merged_manifest/debug/AndroidManifest.xml:13:13-64
+	android:exported
+		ADDED from [:flutter_webview_plugin] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/flutter_webview_plugin/intermediates/merged_manifest/debug/AndroidManifest.xml:14:13-37
+	tools:replace
+		ADDED from [:flutter_webview_plugin] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/flutter_webview_plugin/intermediates/merged_manifest/debug/AndroidManifest.xml:16:13-48
+	android:name
+		ADDED from [:flutter_webview_plugin] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/flutter_webview_plugin/intermediates/merged_manifest/debug/AndroidManifest.xml:12:13-62
+meta-data#android.support.FILE_PROVIDER_PATHS
+ADDED from [:flutter_webview_plugin] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/flutter_webview_plugin/intermediates/merged_manifest/debug/AndroidManifest.xml:17:13-19:53
+	android:resource
+		ADDED from [:flutter_webview_plugin] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/flutter_webview_plugin/intermediates/merged_manifest/debug/AndroidManifest.xml:19:17-50
+	android:name
+		ADDED from [:flutter_webview_plugin] /home/bruno/Projects/UA-ECT/4ano/EGS/EGS/ridemate/build/flutter_webview_plugin/intermediates/merged_manifest/debug/AndroidManifest.xml:18:17-67
+uses-library#androidx.window.extensions
+ADDED from [androidx.window:window:1.0.0-beta04] /home/bruno/.gradle/caches/transforms-3/dee59bb480020f42d53c2ea15e4501f7/transformed/jetified-window-1.0.0-beta04/AndroidManifest.xml:25:9-27:40
+	android:required
+		ADDED from [androidx.window:window:1.0.0-beta04] /home/bruno/.gradle/caches/transforms-3/dee59bb480020f42d53c2ea15e4501f7/transformed/jetified-window-1.0.0-beta04/AndroidManifest.xml:27:13-37
+	android:name
+		ADDED from [androidx.window:window:1.0.0-beta04] /home/bruno/.gradle/caches/transforms-3/dee59bb480020f42d53c2ea15e4501f7/transformed/jetified-window-1.0.0-beta04/AndroidManifest.xml:26:13-54
+uses-library#androidx.window.sidecar
+ADDED from [androidx.window:window:1.0.0-beta04] /home/bruno/.gradle/caches/transforms-3/dee59bb480020f42d53c2ea15e4501f7/transformed/jetified-window-1.0.0-beta04/AndroidManifest.xml:28:9-30:40
+	android:required
+		ADDED from [androidx.window:window:1.0.0-beta04] /home/bruno/.gradle/caches/transforms-3/dee59bb480020f42d53c2ea15e4501f7/transformed/jetified-window-1.0.0-beta04/AndroidManifest.xml:30:13-37
+	android:name
+		ADDED from [androidx.window:window:1.0.0-beta04] /home/bruno/.gradle/caches/transforms-3/dee59bb480020f42d53c2ea15e4501f7/transformed/jetified-window-1.0.0-beta04/AndroidManifest.xml:29:13-51
+activity#com.google.android.gms.auth.api.signin.internal.SignInHubActivity
+ADDED from [com.google.android.gms:play-services-auth:20.5.0] /home/bruno/.gradle/caches/transforms-3/2f242034b75eb25a4a42e0262b447777/transformed/jetified-play-services-auth-20.5.0/AndroidManifest.xml:23:9-27:75
+	android:excludeFromRecents
+		ADDED from [com.google.android.gms:play-services-auth:20.5.0] /home/bruno/.gradle/caches/transforms-3/2f242034b75eb25a4a42e0262b447777/transformed/jetified-play-services-auth-20.5.0/AndroidManifest.xml:25:13-46
+	android:exported
+		ADDED from [com.google.android.gms:play-services-auth:20.5.0] /home/bruno/.gradle/caches/transforms-3/2f242034b75eb25a4a42e0262b447777/transformed/jetified-play-services-auth-20.5.0/AndroidManifest.xml:26:13-37
+	android:theme
+		ADDED from [com.google.android.gms:play-services-auth:20.5.0] /home/bruno/.gradle/caches/transforms-3/2f242034b75eb25a4a42e0262b447777/transformed/jetified-play-services-auth-20.5.0/AndroidManifest.xml:27:13-72
+	android:name
+		ADDED from [com.google.android.gms:play-services-auth:20.5.0] /home/bruno/.gradle/caches/transforms-3/2f242034b75eb25a4a42e0262b447777/transformed/jetified-play-services-auth-20.5.0/AndroidManifest.xml:24:13-93
+service#com.google.android.gms.auth.api.signin.RevocationBoundService
+ADDED from [com.google.android.gms:play-services-auth:20.5.0] /home/bruno/.gradle/caches/transforms-3/2f242034b75eb25a4a42e0262b447777/transformed/jetified-play-services-auth-20.5.0/AndroidManifest.xml:33:9-37:51
+	android:exported
+		ADDED from [com.google.android.gms:play-services-auth:20.5.0] /home/bruno/.gradle/caches/transforms-3/2f242034b75eb25a4a42e0262b447777/transformed/jetified-play-services-auth-20.5.0/AndroidManifest.xml:35:13-36
+	android:visibleToInstantApps
+		ADDED from [com.google.android.gms:play-services-auth:20.5.0] /home/bruno/.gradle/caches/transforms-3/2f242034b75eb25a4a42e0262b447777/transformed/jetified-play-services-auth-20.5.0/AndroidManifest.xml:37:13-48
+	android:permission
+		ADDED from [com.google.android.gms:play-services-auth:20.5.0] /home/bruno/.gradle/caches/transforms-3/2f242034b75eb25a4a42e0262b447777/transformed/jetified-play-services-auth-20.5.0/AndroidManifest.xml:36:13-107
+	android:name
+		ADDED from [com.google.android.gms:play-services-auth:20.5.0] /home/bruno/.gradle/caches/transforms-3/2f242034b75eb25a4a42e0262b447777/transformed/jetified-play-services-auth-20.5.0/AndroidManifest.xml:34:13-89
+activity#com.google.android.gms.common.api.GoogleApiActivity
+ADDED from [com.google.android.gms:play-services-base:18.0.1] /home/bruno/.gradle/caches/transforms-3/082fa8f1e076fd76c98f4d760b4e67b1/transformed/jetified-play-services-base-18.0.1/AndroidManifest.xml:20:9-22:45
+	android:exported
+		ADDED from [com.google.android.gms:play-services-base:18.0.1] /home/bruno/.gradle/caches/transforms-3/082fa8f1e076fd76c98f4d760b4e67b1/transformed/jetified-play-services-base-18.0.1/AndroidManifest.xml:22:19-43
+	android:theme
+		ADDED from [com.google.android.gms:play-services-base:18.0.1] /home/bruno/.gradle/caches/transforms-3/082fa8f1e076fd76c98f4d760b4e67b1/transformed/jetified-play-services-base-18.0.1/AndroidManifest.xml:21:19-78
+	android:name
+		ADDED from [com.google.android.gms:play-services-base:18.0.1] /home/bruno/.gradle/caches/transforms-3/082fa8f1e076fd76c98f4d760b4e67b1/transformed/jetified-play-services-base-18.0.1/AndroidManifest.xml:20:19-85
+meta-data#com.google.android.gms.version
+ADDED from [com.google.android.gms:play-services-basement:18.2.0] /home/bruno/.gradle/caches/transforms-3/10e411e408063a3ed7eb4e7e19983f6d/transformed/jetified-play-services-basement-18.2.0/AndroidManifest.xml:21:9-23:69
+	android:value
+		ADDED from [com.google.android.gms:play-services-basement:18.2.0] /home/bruno/.gradle/caches/transforms-3/10e411e408063a3ed7eb4e7e19983f6d/transformed/jetified-play-services-basement-18.2.0/AndroidManifest.xml:23:13-66
+	android:name
+		ADDED from [com.google.android.gms:play-services-basement:18.2.0] /home/bruno/.gradle/caches/transforms-3/10e411e408063a3ed7eb4e7e19983f6d/transformed/jetified-play-services-basement-18.2.0/AndroidManifest.xml:22:13-58

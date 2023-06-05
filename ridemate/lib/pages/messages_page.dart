@@ -48,8 +48,8 @@ class _MessagePageState extends State<MessagePage> {
     final String tokenKey = 'token';
     final String? token = await storage.read(key: tokenKey);
     if (token != null) {
-      final String url = 'http://ridemate.deti:8080/service-review/v1/auth/info';
-      final String url2 = 'http://ridemate.deti:8080/service-review/v1/auth/auth';
+      final String url = 'http://ridemate.deti/service-review/v1/auth/info';
+      final String url2 = 'http://ridemate.deti/service-review/v1/auth/auth';
       final Map<String, String> headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -77,7 +77,7 @@ class _MessagePageState extends State<MessagePage> {
 
         // get id for chat
         final String url =
-            'http://ridemate.deti:8080/service-review/v1/auth/fetchdata';
+            'http://ridemate.deti/service-review/v1/auth/fetchdata';
         final responsefetch = await http.post(
           Uri.parse(url),
           headers: {
@@ -93,7 +93,7 @@ class _MessagePageState extends State<MessagePage> {
           final responseJson = json.decode(responsefetch.body);
           chatid = responseJson['chat_id'];
           final responsechat = await http.get(Uri.parse(
-              'http://ridemate.deti:8080/service-review/v1/conversations?author=$chatid'));
+              'http://ridemate.deti/service-review/v1/conversations?author=$chatid'));
           if (responsechat.statusCode == 200) {
             final responseJson = json.decode(responsechat.body);
             debugPrint('Response: ${responsechat.body}', wrapWidth: 1024);
@@ -127,7 +127,7 @@ class _MessagePageState extends State<MessagePage> {
             }
           }
           //request trip details
-          final String url = 'http://ridemate.deti:8080/trip?id=$c_name';
+          final String url = 'http://ridemate.deti/trip?id=$c_name';
           final response = await http.get(Uri.parse(url));
           final data = json.decode(response.body);
           trip_name =
@@ -300,7 +300,7 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
                     });
 
                     final response = await http.post(Uri.parse(
-                        'http://ridemate.deti:8080/service-review/v1/conversations?author=$chatid&f_name=$c_name&message=$value'));
+                        'http://ridemate.deti/service-review/v1/conversations?author=$chatid&f_name=$c_name&message=$value'));
                     if (response.statusCode == 200) {
                       debugPrint('Response send: ${response.body}',
                           wrapWidth: 1024);

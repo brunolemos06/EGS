@@ -81,7 +81,7 @@ class _LoginPageState extends State<LoginPage> {
                           }
 
                           // send request to server
-                          final String url = 'http://ridemate.deti:8080/service-review/v1/auth/login';
+                          final String url = 'http://ridemate.deti/service-review/v1/auth/login';
                           final response = await http.post(
                             Uri.parse(url),
                             headers: {
@@ -192,7 +192,7 @@ class _LoginPageState extends State<LoginPage> {
                     debugPrint("Token -> " + token, wrapWidth: 1024);
                     // save token to secure storage
                     
-                    final String url2 = 'http://ridemate.deti:8080/service-review/v1/auth/auth';
+                    final String url2 = 'http://ridemate.deti/service-review/v1/auth/auth';
                     final Map<String, String> headers2 = {
                       'Content-Type': 'application/json',
                       'Accept': 'application/json',
@@ -238,7 +238,7 @@ class _LoginPageState extends State<LoginPage> {
 
 
 
-                    final String url = 'http://ridemate.deti:8080/service-review/v1/auth/info';
+                    final String url = 'http://ridemate.deti/service-review/v1/auth/info';
                     final Map<String, String> headers = {
                       'Content-Type': 'application/json',
                       'Accept': 'application/json',
