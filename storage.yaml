@@ -102,6 +102,7 @@ spec:
   storageClassName: standard
   hostPath:
     path: /payments
+---
 # PVC payments-db (payments)
 apiVersion: v1
 kind: PersistentVolumeClaim

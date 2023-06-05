@@ -246,7 +246,7 @@ spec:
   selector:
     app: auth-frontend
   ports:
-    - port: 3000
+    - port: 80
       targetPort: 3000
 ---
 #Service chat-api
@@ -327,13 +327,30 @@ metadata:
     traefik.ingress.kubernetes.io/redirect-permanent: "true"
 spec:
   rules:
-  - host: ridemate.deti
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: composer
-            port: 
-              number: 80
+    - host: ridemate.deti
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: composer
+              port: 
+                number: 80
+    - host: ridemate.duckdns.org
+      http:
+        paths:
+        - path: /front
+          pathType: Prefix
+          backend:
+            service:
+              name: auth-frontend
+              port: 
+                number: 80
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: auth-backend
+              port: 
+                number: 5100
