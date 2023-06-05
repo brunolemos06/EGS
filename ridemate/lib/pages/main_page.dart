@@ -59,8 +59,8 @@ class _MainPageState extends State<MainPage> {
                 if (token != null) {
                   // Perform API request with token here
                     
-                  final String url = 'http://10.0.2.2:8080/service-review/v1/auth/info';
-                  final String url2 = 'http://10.0.2.2:8080/service-review/v1/auth/auth';
+                  final String url = 'http://ridemate.deti/service-review/v1/auth/info';
+                  final String url2 = 'http://ridemate.deti/service-review/v1/auth/auth';
                   final Map<String, String> headers = {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
