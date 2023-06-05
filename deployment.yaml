@@ -84,6 +84,13 @@ spec:
           image: registry.deti:5000/egs-ridemate/chat_api:v1 
           ports: 
             - containerPort: 5010
+          env:
+            - name: TWILIO_ACCOUNT_SID
+              value: "ACf8b3ce0eb04f21fe7ab30a6e0c58c7d9"
+            - name: TWILIO_AUTH_TOKEN
+              value: "4cb96b0112a701609a3b621bc403af76"
+            - name: TWILIO_SERVICE_SID
+              value: "ISec5512aaa2db4d6abaf1bd31a60fa474"
           imagePullPolicy: Always
       restartPolicy: Always
 ---
