@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-o!1q#ivn((5ih0*ucuq*=*ji&khrqc8b2p!+bre81c5-=_o1os
 DEBUG = True
 
 # add ALLOWED HSOT WITH 10.0.2.2
-ALLOWED_HOSTS = [ '10.0.2.2' ,'127.0.0.1', '0.0.0.0', 'payments'
+ALLOWED_HOSTS = [ '10.0.2.2' ,'127.0.0.1', '0.0.0.0', 'payments']
 
 
 # Application definition

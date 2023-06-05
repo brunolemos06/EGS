@@ -15,7 +15,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _url = 'http://ridemate.deti/webdiv'; // replace with your URL
+  final _url = 'http://10.0.2.2:8080/webdiv'; // replace with your URL
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _shouldShowLoginForm = true;

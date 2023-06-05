@@ -7,7 +7,7 @@
 
 # RIDE-MATE API [composer]  -> port     =   8080
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request , render_template
 from flask_restful import Api, Resource, reqparse
 import datetime
 import sqlite3
@@ -121,6 +121,7 @@ def trip():
         response = requests.delete(url, data=params)
 
     return response.json(), response.status_code
+
 
 @app.route('/participant/', methods=['GET', 'POST', 'DELETE'])
 def participant():
@@ -358,11 +359,9 @@ def google():
 
 @app.route("/webdiv", methods=['GET'])
 def webdiv():
-    url = f'http://{auth_ip_frontend}:{auth_port_frontend}'
-    # if request.method == 'GET':
-    #     response = requests.get(url)
-    # return redirect(response.url)
-    return redirect(url)
+    return render_template('login.html')
+
+
 
 # ------------------ CHAT ------------------
 @app.route(appendurl + '/conversations', methods=['POST','GET','DELETE'])
