@@ -349,13 +349,14 @@ def fetchdata():
 def google():
     url = f'http://{auth_ip_backend}:{auth_port_backend}/google'
     if request.method == 'GET':
-        response = requests.get(url)
+        return redirect(url)
+    #     response = requests.get(url)
 
-    # response is a redirect to google like this:
-    # https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=...
-    # so we need to redirect to that url
+    # # response is a redirect to google like this:
+    # # https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=...
+    # # so we need to redirect to that url
 
-    return redirect(response.url)
+    # return redirect(response.url)
 
 @app.route("/webdiv", methods=['GET'])
 def webdiv():
