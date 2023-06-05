@@ -107,7 +107,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             }
             else {
               // create account
-              final String url = 'http://ridemate.deti:80/service-review/v1/auth/register';
+              final String url = 'http://ridemate.deti/service-review/v1/auth/register';
               final response = await http.post(
                 Uri.parse(url),
                 headers: {

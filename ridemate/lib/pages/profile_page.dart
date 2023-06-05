@@ -67,8 +67,8 @@ class _ProfilePageState extends State<ProfilePage> {
     if (token != null) {
       // Perform API request with token here
 
-      final String url = 'http://ridemate.deti:80/service-review/v1/auth/info';
-      final String url2 = 'http://ridemate.deti:80/service-review/v1/auth/auth';
+      final String url = 'http://ridemate.deti/service-review/v1/auth/info';
+      final String url2 = 'http://ridemate.deti/service-review/v1/auth/auth';
       final Map<String, String> headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -95,7 +95,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
         // get id for reviews
         final String url =
-            'http://ridemate.deti:80/service-review/v1/auth/fetchdata';
+            'http://ridemate.deti/service-review/v1/auth/fetchdata';
         final responsefetch = await http.post(
           Uri.parse(url),
           headers: {
@@ -118,7 +118,7 @@ class _ProfilePageState extends State<ProfilePage> {
             chat_id = responseJson['chat_id'];
           });
           // get trips for loged user
-          final String url_owner = 'http://ridemate.deti:80/owner/';
+          final String url_owner = 'http://ridemate.deti/owner/';
           final response_owner = (await http.get(Uri.parse(url_owner)));
           final data = json.decode(response_owner.body);
           debugPrint("OWNER");
@@ -148,7 +148,7 @@ class _ProfilePageState extends State<ProfilePage> {
           debugPrint(responseJson['trip_id'].toString());
           user_id = responseJson['trip_id'];
           final String url_get_participating =
-              'http://ridemate.deti:80/participant?trip_id=$user_id';
+              'http://ridemate.deti/participant?trip_id=$user_id';
           final response_get_participating =
               await http.get(Uri.parse(url_get_participating));
           debugPrint(response_get_participating.body);
@@ -169,7 +169,7 @@ class _ProfilePageState extends State<ProfilePage> {
         // print _participating
         // debugPrint(_participating.toString());
 
-        final String urlTrips = 'http://ridemate.deti:80/trip/';
+        final String urlTrips = 'http://ridemate.deti/trip/';
         final responseTrips = await http.get(Uri.parse(urlTrips));
         final dataTrips = json.decode(responseTrips.body);
         debugPrint(dataTrips.toString(), wrapWidth: 1024);
@@ -240,9 +240,9 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     final response = await http.get(Uri.parse(
-        'http://ridemate.deti:80/service-review/v1/review/rating?personid=$_id'));
+        'http://ridemate.deti/service-review/v1/review/rating?personid=$_id'));
     final response2 = await http.get(Uri.parse(
-        'http://ridemate.deti:80/service-review/v1/review?personid=$_id'));
+        'http://ridemate.deti/service-review/v1/review?personid=$_id'));
 
     final data = json.decode(response.body);
     final data2 = json.decode(response2.body);
@@ -403,9 +403,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                   debugPrint(_trips[index].id.toString());
                                   final url_delete_conversation =
                                       await http.delete(Uri.parse(
-                                          'http://ridemate.deti:80/service-review/v1/conversations?f_name=$owner_id'));
+                                          'http://ridemate.deti/service-review/v1/conversations?f_name=$owner_id'));
                                   final String url =
-                                      'http://ridemate.deti:80/trip/';
+                                      'http://ridemate.deti/trip/';
                                   final response = await http.delete(
                                       Uri.parse(url),
                                       headers: {
@@ -593,7 +593,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                               var ownerid = _participating[index].owner_id;
                                               // find id in travel and return the owner id
                                               final url3 =
-                                                  'http://ridemate.deti:80/service-review/v1/review?trip_id=$ownerid';
+                                                  'http://ridemate.deti/service-review/v1/review?trip_id=$ownerid';
                                               final response3 = (await http
                                                   .get(Uri.parse(url3)));
                                               debugPrint(response3.statusCode
@@ -602,7 +602,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 final data = jsonDecode(response3.body);
                                                 _personid = int.parse(data.toString());
                                                 // post review
-                                                final url = 'http://ridemate.deti:80/service-review/v1/review';
+                                                final url = 'http://ridemate.deti/service-review/v1/review';
                                                 // get title and description from form
                                                 debugPrint(
                                                     "person id: $_personid",
@@ -709,7 +709,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             ElevatedButton(
                               onPressed: () async {
                                 final String url_delete_participant =
-                                    'http://ridemate.deti:80/participant/';
+                                    'http://ridemate.deti/participant/';
                                 final response_delete_participant =
                                     await http.delete(
                                   Uri.parse(url_delete_participant),

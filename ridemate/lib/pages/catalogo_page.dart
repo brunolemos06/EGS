@@ -115,10 +115,10 @@ class _catalogoPageState extends State<catalogo_page> {
     fetchData();
     _getLocation();
     flutterWebviewPlugin.onUrlChanged.listen((url) {
-      if (url.contains('http://ridemate.deti:8000/paypal/finish')) {
+      if (url.contains('/paypal/finish')) {
         flutterWebviewPlugin.close();
         final token_url =
-            Uri.parse('http://ridemate.deti:8000/paypal/capture/order');
+            Uri.parse('http://10.0.2.2:8080/paypal/capture');
         final token_headers = {'Content-Type': 'application/json'};
         final token_payload = {'id': order_id};
         http
@@ -613,7 +613,7 @@ class _catalogoPageState extends State<catalogo_page> {
                                                 wrapWidth: 1024);
 
                                             final url = Uri.parse(
-                                                'http://ridemate.deti:8000/paypal/create/order');
+                                                'http://10.0.2.2:8080/paypal/create');
                                             final headers = {
                                               'Content-Type': 'application/json'
                                             };
@@ -632,6 +632,8 @@ class _catalogoPageState extends State<catalogo_page> {
                                                 url,
                                                 headers: headers,
                                                 body: json.encode(payload));
+                                              debugPrint(
+                                                  'ola eu sou grande teste' + response.body,wrapWidth: 1024);
                                             final errorMessage =
                                                 'Status: ${response.statusCode.toString()}';
                                             debugPrint(errorMessage,

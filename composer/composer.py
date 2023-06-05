@@ -99,6 +99,7 @@ def trip():
             if len(response.json()['msg'][i]['info']['geocoded_waypoints']) > 2:
                 print(len(response.json()['msg'][0]['info']['geocoded_waypoints']))
                 for w in range(2, len(response.json()['msg'][0]['info']['geocoded_waypoints'])):
+                    print("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww :" + str(w))
                     response_short['msg'][i]['info']['geocoded_waypoints'].append(response.json()['msg'][i]['info']['geocoded_waypoints'][w]['place_id'])
         print(response_short)
         return response_short, response.status_code
@@ -409,19 +410,24 @@ def new_conversation():
 # ------------------ PAYMENT ------------------
 @app.route('/paypal/create', methods=['POST'])
 def create_order():
+    print("hello")
     url = f'http://{payment_ip}:{payment_port}/paypal/create/order'
-    data = request.get_json()
-    response = requests.post(url, json=data)
-    if response.status_code == 201:
-        return response.json(), 201
-    else:
-        return response.json(), response.status_code
+    data = request.get_json()  # Extract the request body as JSON
+    print(data)
     
-# @app.route('paypal/finish', methods=['GET'])
-# def capture_order():
+    headers = {'Content-Type': 'application/json'}
+    response = requests.post(url, json=data, headers=headers)
+    return response.json(), response.status_code
+    
 
-
-
+@app.route('/paypal/capture', methods=['POST'])
+def capture_order():
+    url = f'http://{payment_ip}:{payment_port}/paypal/capture/order'
+    data = request.get_json()  # Extract the request body as JSON
+    print(data)
+    headers = {'Content-Type': 'application/json'}
+    response = requests.post(url, json=data, headers=headers)
+    return response.json(), response.status_code
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0',debug=True, port=8080)
