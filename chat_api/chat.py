@@ -10,13 +10,13 @@ from flask import jsonify
 from flask_swagger import swagger
 
 
-# account_sid="ACf8b3ce0eb04f21fe7ab30a6e0c58c7d9"
-# auth_token= "4cb96b0112a701609a3b621bc403af76"
-# service_sid="ISec5512aaa2db4d6abaf1bd31a60fa474"
+account_sid="ACf8b3ce0eb04f21fe7ab30a6e0c58c7d9"
+auth_token= "4cb96b0112a701609a3b621bc403af76"
+service_sid="ISec5512aaa2db4d6abaf1bd31a60fa474"
 
-account_sid = os.getenv("TWILIO_ACCOUNT_SID")
-auth_token = os.getenv("TWILIO_AUTH_TOKEN")
-service_sid = os.getenv("TWILIO_SERVICE_SID")
+# account_sid = os.getenv("TWILIO_ACCOUNT_SID")
+# auth_token = os.getenv("TWILIO_AUTH_TOKEN")
+# service_sid = os.getenv("TWILIO_SERVICE_SID")
 client = Client(account_sid, auth_token)
 
 configuration = client.conversations \
@@ -56,7 +56,7 @@ api=Api(app)
 
 @app.route('/', methods=['GET'])
 def home():
-    return 'Welcome to the Twilio Conversations API'
+    return 'Welcome to the Chat API'
 
 
 @app.route('/conversations', methods=['GET'])
@@ -95,14 +95,6 @@ def conversations_info(): #create a new conversation
     c_id= flask.request.args.get('c_id')
     author= flask.request.args.get('author')
 
-
-
-    # data = flask.request.get_json()
-    # #args should be c_id or author
-
-    # c_id = data.get('c_id')
-    # author = data.get('author')
-
     if c_id is not None and author is None:
         # conversations = Conversation.query.all()
         conversation = client.conversations \
@@ -110,17 +102,6 @@ def conversations_info(): #create a new conversation
                             .conversations(c_id) \
                             .fetch()
         
-       
-        
-        # for message in messages:
-        #     print(message.sid)
-        #     print(message.body)
-        #     print(message.author)
-
-
-
-        if not conversation:
-            return {'message': 'No conversation found'}
         conversation_data = {}
         conversation_data['id'] = conversation.sid
         conversation_data['friendly_name'] = conversation.friendly_name
@@ -141,12 +122,10 @@ def conversations_info(): #create a new conversation
         return {'conversation': conversation_data}
         
     elif author is not None and c_id is None:
-        # conversations = Conversation.query.all()
         user=client.conversations \
                             .v1 \
-                            .users(author)\
+                            .users(author) \
                             .fetch()
-                
 
         conversations = client.conversations \
                             .v1 \
@@ -154,25 +133,11 @@ def conversations_info(): #create a new conversation
                             .list()
 
         output = []
+        conversation_data = {}
+
         for conversation in conversations:
         
-            conversation_data = {}
-            conversation_data['id'] = conversation.sid
-            conversation_data['friendly_name'] = conversation.friendly_name
-            messages=client.conversations \
-                            .v1 \
-                            .conversations(conversation.sid) \
-                            .messages\
-                            .list()
-            # messages = Message.query.filter_by(conversation_id=conversation.c_id).all()
-            print (messages)
-            conversation_data['messages'] = []
-            for message in messages:
-                message_data = {}
-                message_data['id'] = message.sid
-                message_data['body'] = message.body
-                message_data['author'] = client.conversations.v1.users(message.author).fetch().identity
-                conversation_data['messages'].append(message_data)
+            
             #check if that conversation has a participant with the name
 
             participants = client.conversations \
@@ -182,21 +147,31 @@ def conversations_info(): #create a new conversation
                             .list()
             
             #users of this conversation
-            user=client.conversations \
-                            .v1 \
-                            .users(author) \
-                            .fetch()
-                            
             
-            #check if the user is in the conversation
-
            
             for participant in participants:
-                print(participant.sid)
-                print(user.identity)
-                
                 if participant.identity == user.identity:
-                    output.append(conversation_data)
+                        conversation_data['id'] = conversation.sid
+                        conversation_data['friendly_name'] = conversation.friendly_name
+                        messages=client.conversations \
+                                        .v1 \
+                                        .conversations(conversation.sid) \
+                                        .messages\
+                                        .list()
+                        # messages = Message.query.filter_by(conversation_id=conversation.c_id).all()
+                        conversation_data['messages'] = []
+                        message_data = {}
+                for message in messages:
+                    message_data = {}
+                    for message in messages:
+                        message_data['id'] = message.sid
+                        message_data['body'] = message.body
+                        message_data['author'] = user.identity
+                    
+                    conversation_data['messages'].append(message_data)
+        
+        output.append(conversation_data)
+        
         return jsonify(output)
 
     else:
@@ -402,10 +377,8 @@ def new_user():
 def delete():
     member = flask.request.args.get('member')
     # c_id = flask.request.args.get('c_id')
-    c_id=''
+    c_id=None
     f_name = flask.request.args.get('f_name')
-    print(f_name)
-    print(member)
 
     ##get the c_id of the conversation from the friendly name
     if f_name is not None:
@@ -415,7 +388,6 @@ def delete():
                             .list()
         for c in conversations:
             if c.friendly_name == f_name:
-                print(c.sid)
                 c_id = c.sid
         
 
@@ -457,7 +429,8 @@ def delete():
                             .delete()
         # p = Participant(p_id=participant.sid, con_id=c_id, identity=participant.identity)
         return {'message': 'The member was removed from the conversation'}
-    else:
+    else: 
+        
         return {'message': 'Bad request'}
 
 

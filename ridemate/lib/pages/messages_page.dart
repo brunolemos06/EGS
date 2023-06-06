@@ -174,8 +174,7 @@ class _MessagePageState extends State<MessagePage> {
                   String sender = uniqueSenders.elementAt(index);
 
                   // Find the first message with the current sender
-                  Message firstMessage = _messages
-                      .firstWhere((message) => message.conversation == sender);
+                  Message firstMessage = _messages[0];
 
                   return ListTile(
                     title: Container(
@@ -254,7 +253,7 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
               alignment:
                   isSender ? Alignment.centerRight : Alignment.centerLeft,
               child: Text(
-                message.name,
+                message.sender,
                 style: TextStyle(
                   color: Colors.green, // Replace with desired color
                 ),
