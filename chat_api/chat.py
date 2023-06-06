@@ -54,130 +54,6 @@ app.register_blueprint(swaggerui_blueprint)
 api=Api(app)
 
 
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chat.db'
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# db = SQLAlchemy(app)
-
-
-
-
-
-
-
-# def get_data():
-   
-#     #get the list of conversations
-#     conversations = client.conversations \
-#                             .v1 \
-#                             .conversations \
-#                             .list()
-#     for record in conversations:
-#         #put the conversation in the db
-#         print(record.sid)
-#         print(record.friendly_name)
-
-#         c = Conversation(c_id=record.sid, friendly_name=record.friendly_name)
-#         db.session.add(c)
-#         db.session.commit()
-#         #get the list of participants
-    
-#     # user = client.conversations \
-#     #                     .v1 \
-#     #                     .users \
-#     #                     .create(identity="test"
-#     #                             )
-#     users = client.conversations \
-#                         .v1 \
-#                         .users \
-#                         .list()
-#     # for user in users:
-#     #     print(user.is_notifiable)
-#         # #make the user notifiable
-#         # user = client.conversations \
-#         #                 .v1 \
-#         #                 .users(user.identity) \
-#         #                 .update(is_online=True,is_notifiable=True)
-
-    
-    
-#     # user_conversation = client.conversations \
-#     #                         .v1 \
-#     #                         .users('USXXXXXXXXXXXXX') \
-#     #                         .user_conversations('CHXXXXXXXXXXXXX') \
-#     #                         .fetch()
-
-#     # print(user_conversation.friendly_name)
-
-    
-#     for record in users:
-#         #put the user in the db
-#         print(record.sid)
-#         print(record.identity)
-#         print(record.is_online)
-
-    
-        
-#         u=Participant(p_id=record.sid, identity=record.identity)
-#         convs=client.conversations \
-#                         .v1 \
-#                         .users(record.sid) \
-#                         .user_conversations\
-#                         .list()
-        
-#         if convs is not []:
-#             for conv in convs:
-#                 print(conv.notification_level)
-#                 u.con_id=conv.conversation_sid
-#                 conv.update(notification_level="default")
-        
-#         db.session.add(u)   
-#         db.session.commit()
-#         print("User "+u.identity+" added")
-
-#         # if convs is not []:
-#         #     for conv in convs:
-#         #         print(conv.sid)
-#         #         print(conv.conversation_sid)
-#         #         if conv.conversation_sid is not None:
-#         #             u = Participant(p_id=record.sid, identity=record.identity,con_id=conv.conversation_sid)
-#         #             db.session.add(u)
-#         #             db.session.commit()
-#         # else:
-#         #     u = Participant(p_id=record.sid, identity=record.identity)
-#         #     db.session.add(u)
-#         #     db.session.commit()
-#     #lets check  if any of the users are in any of the conversations
-
-    
-
-
-#     for record in conversations:
-#         #get the list of messages
-#         messages = client.conversations \
-#                             .v1 \
-#                             .conversations(record.sid) \
-#                             .messages \
-#                             .list()
-#         #store the conversation sid
-#         conversation_sid = record.sid
-#         for record in messages:
-#             #put the message in the db
-#             print(record.sid)
-#             print(record.body)
-#             print(record.author)
-
-#             m = Message(m_id=record.sid, body=record.body,conversation_id=conversation_sid,author=record.author)
-#             db.session.add(m)
-#             db.session.commit()
-#     #load the home page
-#     # return render_template('index.html')
-#     #update 1 user
-    
-#     db.session.commit()
-#     return {'message': 'hello'}
-# with app.app_context():
-#     get_data()
-
 @app.route('/', methods=['GET'])
 def home():
     return 'Welcome to the Twilio Conversations API'
@@ -260,7 +136,7 @@ def conversations_info(): #create a new conversation
             message_data = {}
             message_data['id'] = message.sid
             message_data['body'] = message.body
-            message_data['author'] = message.author
+            message_data['author'] = client.conversations.v1.users(message.author).fetch().identity
             conversation_data['messages'].append(message_data)
         return {'conversation': conversation_data}
         
@@ -295,7 +171,7 @@ def conversations_info(): #create a new conversation
                 message_data = {}
                 message_data['id'] = message.sid
                 message_data['body'] = message.body
-                message_data['author'] = message.author
+                message_data['author'] = client.conversations.v1.users(message.author).fetch().identity
                 conversation_data['messages'].append(message_data)
             #check if that conversation has a participant with the name
 
@@ -311,7 +187,6 @@ def conversations_info(): #create a new conversation
                             .users(author) \
                             .fetch()
                             
-          
             
             #check if the user is in the conversation
 
