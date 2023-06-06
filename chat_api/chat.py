@@ -128,7 +128,7 @@ def conversations_info(): #create a new conversation
             message_data['id'] = message.sid
             message_data['body'] = message.body
             message_data['author'] = message.author
-            message_data['author'] = client.conversations.v1.users(message.author).fetch().identity
+            message_data['auth_name'] = client.conversations.v1.users(message.author).fetch().identity
             conversation_data['messages'].append(message_data)
         return {'conversation': conversation_data}
 
@@ -162,7 +162,7 @@ def conversations_info(): #create a new conversation
                 message_data['id'] = message.sid
                 message_data['body'] = message.body
                 message_data['author'] = message.author
-                message_data['author'] = client.conversations.v1.users(message.author).fetch().identity
+                message_data['auth_name'] = client.conversations.v1.users(message.author).fetch().identity
                 conversation_data['messages'].append(message_data)
             #check if that conversation has a participant with the name
 
@@ -430,12 +430,16 @@ def delete():
         
         return {'message': 'The conversation was deleted'}
     elif member is not None:
-        #get participant from db and delete it
-        participant = client.conversations \
+        user = client.conversations.v1.users(member).fetch()
+        participants = client.conversations \
                             .v1 \
                             .conversations(c_id) \
-                            .participants(member) \
+                            .participants() \
                             .fetch()
+        for p in participants:
+            if p.identity == user.identity:
+                participant=p
+                member = p.sid
         if not participant:
             return {'message': 'No participant found'}
         
