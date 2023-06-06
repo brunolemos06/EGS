@@ -380,9 +380,12 @@ def conversations():
         print(response.json())
     elif request.method == 'GET':
         #get conversations of one user
-        
+        c_id = request.args.get("c_id")
         author=request.args.get("author")
-        url=f'http://{chat_ip}:{chat_port}/conversations?author={author}'
+        if c_id == None:
+            url=f'http://{chat_ip}:{chat_port}/conversations?author={author}'
+        elif author == None:
+            url=f'http://{chat_ip}:{chat_port}/conversations?c_id={c_id}'
         response = requests.get(url)
         print(response.json())
     elif request.method == 'DELETE':
