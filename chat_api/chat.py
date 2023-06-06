@@ -434,19 +434,18 @@ def delete():
         participants = client.conversations \
                             .v1 \
                             .conversations(c_id) \
-                            .participants() \
-                            .fetch()
+                            .participants \
+                            .list()
         for p in participants:
             if p.identity == user.identity:
                 participant=p
-                member = p.sid
         if not participant:
             return {'message': 'No participant found'}
         
         participant = client.conversations \
                             .v1 \
                             .conversations(c_id) \
-                            .participants(member) \
+                            .participants(participant.sid) \
                             .delete()
         # p = Participant(p_id=participant.sid, con_id=c_id, identity=participant.identity)
         return {'message': 'The member was removed from the conversation'}
