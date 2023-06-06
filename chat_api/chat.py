@@ -170,7 +170,7 @@ def conversations_info(): #create a new conversation
                     
                     conversation_data['messages'].append(message_data)
         
-        output.append(conversation_data)
+                output.append(conversation_data)
         
         return jsonify(output)
 
