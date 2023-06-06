@@ -394,7 +394,7 @@ def conversations():
         member=request.args.get("member")
         if member == None:
             url=f'http://{chat_ip}:{chat_port}/conversations?f_name={f_name}'
-        else:
+        elif member != None:
             url=f'http://{chat_ip}:{chat_port}/conversations?f_name={f_name}&member={member}'
         response = requests.delete(url)
         print("delete")
