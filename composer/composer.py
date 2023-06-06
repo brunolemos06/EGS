@@ -7,7 +7,7 @@
 
 # RIDE-MATE API [composer]  -> port     =   8080
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request , render_template
 from flask_restful import Api, Resource, reqparse
 import datetime
 import sqlite3
@@ -96,10 +96,11 @@ def trip():
             origin_coords = response.json()['msg'][i]['info']['routes'][0]['bounds']['northeast']
             destination_coords = response.json()['msg'][i]['info']['routes'][0]['bounds']['southwest']
             response_short['msg'][i]['info'] = {'origin_coords': origin_coords, 'destination_coords': destination_coords, 'geocoded_waypoints': []}
-            if len(response.json()['msg'][i]['info']['geocoded_waypoints']) > 2:
-                print(len(response.json()['msg'][0]['info']['geocoded_waypoints']))
-                for w in range(2, len(response.json()['msg'][0]['info']['geocoded_waypoints'])):
-                    response_short['msg'][i]['info']['geocoded_waypoints'].append(response.json()['msg'][i]['info']['geocoded_waypoints'][w]['place_id'])
+            # if len(response.json()['msg'][i]['info']['geocoded_waypoints']) > 2:
+            #     print(len(response.json()['msg'][0]['info']['geocoded_waypoints']))
+            #     for w in range(2, len(response.json()['msg'][0]['info']['geocoded_waypoints'])):
+            #         print("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww :" + str(w))
+            #         response_short['msg'][i]['info']['geocoded_waypoints'].append(response.json()['msg'][i]['info']['geocoded_waypoints'][w]['place_id'])
         print(response_short)
         return response_short, response.status_code
     elif (request.method == 'POST'):
@@ -120,6 +121,7 @@ def trip():
         response = requests.delete(url, data=params)
 
     return response.json(), response.status_code
+
 
 @app.route('/participant/', methods=['GET', 'POST', 'DELETE'])
 def participant():
@@ -347,21 +349,20 @@ def fetchdata():
 def google():
     url = f'http://{auth_ip_backend}:{auth_port_backend}/google'
     if request.method == 'GET':
-        response = requests.get(url)
+        return redirect(url)
+    #     response = requests.get(url)
 
-    # response is a redirect to google like this:
-    # https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=...
-    # so we need to redirect to that url
+    # # response is a redirect to google like this:
+    # # https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=...
+    # # so we need to redirect to that url
 
-    return redirect(response.url)
+    # return redirect(response.url)
 
 @app.route("/webdiv", methods=['GET'])
 def webdiv():
-    url = f'http://{auth_ip_frontend}:{auth_port_frontend}'
-    # if request.method == 'GET':
-    #     response = requests.get(url)
-    # return redirect(response.url)
-    return redirect(url)
+    return render_template('login.html')
+
+
 
 # ------------------ CHAT ------------------
 @app.route(appendurl + '/conversations', methods=['POST','GET','DELETE'])
@@ -409,19 +410,24 @@ def new_conversation():
 # ------------------ PAYMENT ------------------
 @app.route('/paypal/create', methods=['POST'])
 def create_order():
+    print("hello")
     url = f'http://{payment_ip}:{payment_port}/paypal/create/order'
-    data = request.get_json()
-    response = requests.post(url, json=data)
-    if response.status_code == 201:
-        return response.json(), 201
-    else:
-        return response.json(), response.status_code
+    data = request.get_json()  # Extract the request body as JSON
+    print(data)
     
-# @app.route('paypal/finish', methods=['GET'])
-# def capture_order():
+    headers = {'Content-Type': 'application/json'}
+    response = requests.post(url, json=data, headers=headers)
+    return response.json(), response.status_code
+    
 
-
-
+@app.route('/paypal/capture', methods=['POST'])
+def capture_order():
+    url = f'http://{payment_ip}:{payment_port}/paypal/capture/order'
+    data = request.get_json()  # Extract the request body as JSON
+    print(data)
+    headers = {'Content-Type': 'application/json'}
+    response = requests.post(url, json=data, headers=headers)
+    return response.json(), response.status_code
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0',debug=True, port=8080)

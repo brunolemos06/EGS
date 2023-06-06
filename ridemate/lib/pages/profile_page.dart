@@ -121,18 +121,18 @@ class _ProfilePageState extends State<ProfilePage> {
           final String url_owner = 'http://ridemate.deti/owner/';
           final response_owner = (await http.get(Uri.parse(url_owner)));
           final data = json.decode(response_owner.body);
-          debugPrint("OWNER");
+          debugPrint("OWNER ->");
           debugPrint(data.toString());
           setState(() {
             data['msg'].forEach((k, v) {
+              
               if (k == responseJson['trip_id'] && v != null) {
-                var trip_id = k;
                 for (var trip in data['msg'][k]) {
                   var trip_id = trip['id'];
                   var origin = trip['origin'];
                   var destination = trip['destination'];
                   var available_sits = trip['available_sits'];
-                  var owner_id = id;
+                  var owner_id = k;
                   var starting_date = trip['starting_date'];
                   _trips.add(Travel(
                       id: trip_id,
@@ -140,7 +140,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       destination: destination,
                       available_sits: available_sits,
                       starting_date: starting_date,
-                      owner_id: responseJson['trip_id']));
+                      owner_id: owner_id));
                 }
               }
             });
@@ -161,6 +161,10 @@ class _ProfilePageState extends State<ProfilePage> {
             for (var i = 0; i < data_get_participating['msg'].length; i++) {
               _participating.add(Participant(trip_id : data_get_participating['msg'][i]['trip_id_id'], owner_id : data_get_participating['msg'][i]['id']));
               // _participating.add(data_get_participating['msg'][i]['trip_id_id']);
+              debugPrint("OWNER IDAI: ${data_get_participating['msg'][i]['trip_id_id']}");
+              debugPrint("OWNER IDAI2: ${data_get_participating['msg'][i]['id']}");
+
+
             }
           });
         } else {
@@ -590,8 +594,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
                                               // Submit review
                                               // get owner id from trip HEREHERE
-                                              var ownerid = _participating[index].owner_id;
+                                              debugPrint("AIIIIIIIIIIIIIIIIIIIII" + _travels[0].owner_id);
+                                              var ownerid = _travels[0].owner_id;
                                               // find id in travel and return the owner id
+                                              debugPrint("owner id of trip i clicled: $ownerid");
                                               final url3 =
                                                   'http://ridemate.deti/service-review/v1/review?trip_id=$ownerid';
                                               final response3 = (await http
@@ -601,6 +607,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                               if (response3.statusCode == 200) {
                                                 final data = jsonDecode(response3.body);
                                                 _personid = int.parse(data.toString());
+                                                debugPrint("person id: $_personid");
                                                 // post review
                                                 final url = 'http://ridemate.deti/service-review/v1/review';
                                                 // get title and description from form

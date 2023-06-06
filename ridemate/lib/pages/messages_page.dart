@@ -48,13 +48,8 @@ class _MessagePageState extends State<MessagePage> {
     final String tokenKey = 'token';
     final String? token = await storage.read(key: tokenKey);
     if (token != null) {
-<<<<<<< HEAD
       final String url = 'http://ridemate.deti/service-review/v1/auth/info';
       final String url2 = 'http://ridemate.deti/service-review/v1/auth/auth';
-=======
-      final String url = 'http://ridemate.deti:80/service-review/v1/auth/info';
-      final String url2 = 'http://ridemate.deti:80/service-review/v1/auth/auth';
->>>>>>> 49b9d9bfc5f6b90e2087df13d360427f54260975
       final Map<String, String> headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -82,11 +77,7 @@ class _MessagePageState extends State<MessagePage> {
 
         // get id for chat
         final String url =
-<<<<<<< HEAD
             'http://ridemate.deti/service-review/v1/auth/fetchdata';
-=======
-            'http://ridemate.deti:80/service-review/v1/auth/fetchdata';
->>>>>>> 49b9d9bfc5f6b90e2087df13d360427f54260975
         final responsefetch = await http.post(
           Uri.parse(url),
           headers: {
@@ -136,11 +127,7 @@ class _MessagePageState extends State<MessagePage> {
             }
           }
           //request trip details
-<<<<<<< HEAD
           final String url = 'http://ridemate.deti/trip?id=$c_name';
-=======
-          final String url = 'http://ridemate.deti:80/trip?id=$c_name';
->>>>>>> 49b9d9bfc5f6b90e2087df13d360427f54260975
           final response = await http.get(Uri.parse(url));
           final data = json.decode(response.body);
           trip_name =
@@ -313,11 +300,7 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
                     });
 
                     final response = await http.post(Uri.parse(
-<<<<<<< HEAD
                         'http://ridemate.deti/service-review/v1/conversations?author=$chatid&f_name=$c_name&message=$value'));
-=======
-                        'http://ridemate.deti:80/service-review/v1/conversations?author=$chatid&f_name=$c_name&message=$value'));
->>>>>>> 49b9d9bfc5f6b90e2087df13d360427f54260975
                     if (response.statusCode == 200) {
                       debugPrint('Response send: ${response.body}',
                           wrapWidth: 1024);
