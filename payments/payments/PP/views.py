@@ -65,8 +65,8 @@ class CreateOrderViewRemote(APIView):
                     "brand_name": "RideMate",
                     "landing_page": "LOGIN",
                     "user_action": "PAY_NOW",
-                    "return_url": "http://127.0.0.1:8080/paypal/finish",  #change this later to the actual return url
-                    "cancel_url": "http://127.0.0.1:8080/paypal/finish"
+                    "return_url": "http://ridemate.deti/paypal/finish",  #change this later to the actual return url
+                    "cancel_url": "http://ridemate.deti/paypal/finish"
                 }
                 }
             }
