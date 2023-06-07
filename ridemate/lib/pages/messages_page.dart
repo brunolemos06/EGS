@@ -21,11 +21,14 @@ class Message {
   });
 }
 
+TextEditingController _controller = TextEditingController();
+
 final List<Message> _messages = [];
 String chatid = '';
 String c_name = '';
 String name = '';
 String trip_name = '';
+String c_id = '';
 
 class MessagePage extends StatefulWidget {
   const MessagePage({Key? key}) : super(key: key);
@@ -74,6 +77,7 @@ class _MessagePageState extends State<MessagePage> {
         final String lname = responseJson['lname'];
         final String email = responseJson['email'];
         final String id = responseJson['id'];
+        name = lname;
 
         // get id for chat
         final String url =
@@ -99,9 +103,12 @@ class _MessagePageState extends State<MessagePage> {
             debugPrint('Response: ${responsechat.body}', wrapWidth: 1024);
             //get the messages array in the jsonresponse;
             if (responseJson.length > 0) {
+              setState(() {
+                loading = false;
+              });
               final messages = responseJson[0]['messages'];
               debugPrint('Messages: ${messages.length}', wrapWidth: 1024);
-              final c_id = responseJson[0]['id'];
+              c_id = responseJson[0]['id'];
               c_name = responseJson[0]['friendly_name'];
               //add the messages to the list
               _messages.clear();
@@ -116,27 +123,33 @@ class _MessagePageState extends State<MessagePage> {
                   _messages.insert(
                       0,
                       Message(
-                          sender: message['author'],
+                          sender: message['auth_name'],
                           conversation: c_id,
                           conversation_name: c_name,
                           name: name,
                           message: message['body']));
                 }
+              });
+              //request trip details
+              final String url = 'http://ridemate.deti/trip?id=$c_name';
+              final response = await http.get(Uri.parse(url));
+              final data = json.decode(response.body);
+              debugPrint('Response: ${data}', wrapWidth: 1024);
+              for (var trip in data['msg']) {
+                if (trip['owner_id'] == c_name) {
+                  trip_name = trip['origin'] + ' - ' + trip['destination'];
+                }
+              }
+            } else {
+              setState(() {
                 loading = false;
+                _messages.clear();
               });
             }
           }
-          //request trip details
-          final String url = 'http://ridemate.deti/trip?id=$c_name';
-          final response = await http.get(Uri.parse(url));
-          final data = json.decode(response.body);
-          trip_name =
-              data['msg'][0]['origin'] + ' to ' + data['msg'][0]['destination'];
-
-          debugPrint('tripname: ${trip_name}', wrapWidth: 1024);
         } else {
           setState(() {
-            loading = false;
+            loading = true;
           });
         }
 
@@ -156,9 +169,19 @@ class _MessagePageState extends State<MessagePage> {
         uniqueSenders.add(message.conversation);
       }
     }
+
     return MaterialApp(
       home: loading
           ? LoadingScreen()
+          // ? Scaffold(
+          //     backgroundColor: const Color(0x808080),
+          //     appBar: AppBar(
+          //       title: const Text("Messages"),
+          //       backgroundColor: Colors.grey[800],
+          //       text color white
+          //       foregroundColor: Colors.white,
+          //     ),
+          //   )
           : Scaffold(
               backgroundColor: const Color(0x808080),
               appBar: AppBar(
@@ -237,7 +260,7 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
         itemCount: _messages.length,
         itemBuilder: (context, index) {
           final message = _messages[index];
-          final isSender = message.sender == chatid;
+          final isSender = message.sender == name;
           final textAlign = isSender ? TextAlign.start : TextAlign.end;
           return ListTile(
             title: Align(
@@ -270,6 +293,7 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
+                  controller: _controller,
                   style: TextStyle(
                     color: Colors.white,
                   ),
@@ -286,11 +310,14 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
                     ),
                   ),
                   onFieldSubmitted: (value) async {
+                    if (value.isEmpty) {
+                      return;
+                    }
                     setState(() {
                       _messages.insert(
                           0,
                           Message(
-                            sender: chatid,
+                            sender: name,
                             conversation: conversation_id,
                             conversation_name: c_name,
                             name: name,
@@ -304,14 +331,41 @@ class _MessageConversationPageState extends State<MessageConversationPage> {
                       debugPrint('Response send: ${response.body}',
                           wrapWidth: 1024);
                     }
+                    _controller.clear();
+                    value = '';
                   },
                 ),
               ),
             ),
             IconButton(
-              onPressed: () {
-                //field submitted
-                debugPrint('mensagem enviada', wrapWidth: 1024);
+              onPressed: () async {
+                String value = _controller.text;
+                if (value.isEmpty) {
+                  return;
+                }
+
+                setState(() {
+                  _messages.insert(
+                    0,
+                    Message(
+                      sender: name,
+                      conversation: conversation_id,
+                      conversation_name: c_name,
+                      name: name,
+                      message: value,
+                    ),
+                  );
+                });
+
+                final response = await http.post(Uri.parse(
+                    'http://ridemate.deti/service-review/v1/conversations?author=$chatid&f_name=$c_name&message=$value'));
+
+                if (response.statusCode == 200) {
+                  debugPrint('Response send: ${response.body}',
+                      wrapWidth: 1024);
+                }
+
+                _controller.clear();
               },
               icon: const Icon(Icons.send),
               color: Colors.green,
