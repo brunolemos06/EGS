@@ -125,7 +125,6 @@ class _ProfilePageState extends State<ProfilePage> {
           debugPrint(data.toString());
           setState(() {
             data['msg'].forEach((k, v) {
-              
               if (k == responseJson['trip_id'] && v != null) {
                 for (var trip in data['msg'][k]) {
                   var trip_id = trip['id'];
@@ -159,12 +158,14 @@ class _ProfilePageState extends State<ProfilePage> {
           setState(() {
             // add dict to _participating list => data_get_participating = {msg: [{id: 0e4aefcb-ab8a-415f-9731-32a1f4bd7705, pickup_location: 39.5572,-8.0317, price: 36.68, trip_id_id: 7ac6d883-aeec-42cd-a516-09bb7afd0d91}], v: true}, {id: 0e4aefcb-ab8a-415f-9731-32a1f4bd7705, pickup_location: 39.5572,-8.0317, price: 36.68, trip_id_id: 7ac6d883-aeec-42cd-a516-09bb7afd0d91}], v: true}]
             for (var i = 0; i < data_get_participating['msg'].length; i++) {
-              _participating.add(Participant(trip_id : data_get_participating['msg'][i]['trip_id_id'], owner_id : data_get_participating['msg'][i]['id']));
+              _participating.add(Participant(
+                  trip_id: data_get_participating['msg'][i]['trip_id_id'],
+                  owner_id: data_get_participating['msg'][i]['id']));
               // _participating.add(data_get_participating['msg'][i]['trip_id_id']);
-              debugPrint("OWNER IDAI: ${data_get_participating['msg'][i]['trip_id_id']}");
-              debugPrint("OWNER IDAI2: ${data_get_participating['msg'][i]['id']}");
-
-
+              debugPrint(
+                  "OWNER IDAI: ${data_get_participating['msg'][i]['trip_id_id']}");
+              debugPrint(
+                  "OWNER IDAI2: ${data_get_participating['msg'][i]['id']}");
             }
           });
         } else {
@@ -335,7 +336,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               const SizedBox(height: 20),
               Text(
-                'Number of Travels: 2',
+                'Number of Travels: ' + _trips.length.toString(),
                 style: Theme.of(context).textTheme.headline6,
               ),
               // rating
@@ -467,12 +468,14 @@ class _ProfilePageState extends State<ProfilePage> {
                     var origin = "";
                     var destination = "";
                     var date = "";
+                    var owner = "";
                     _travels.forEach((element) {
                       if (element.id == _participating[index].trip_id) {
                         trip_id = element.id.toString();
                         origin = element.origin;
                         destination = element.destination;
                         date = element.starting_date;
+                        owner = element.owner_id;
                       }
                     });
                     return Padding(
@@ -501,163 +504,201 @@ class _ProfilePageState extends State<ProfilePage> {
                                   width: 150,
                                 ),
                                 ElevatedButton(
-                                onPressed: () async {
-                                  // Show dialog with form to submit review
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: Text('Submit Review'),
-                                        content: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            TextFormField(
-                                              decoration: InputDecoration(
-                                                labelText: 'Title',
+                                  onPressed: () async {
+                                    // Show dialog with form to submit review
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text('Submit Review'),
+                                          content: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              TextFormField(
+                                                decoration: InputDecoration(
+                                                  labelText: 'Title',
+                                                ),
+                                                controller: _titleController,
+                                                validator: (value) {
+                                                  if (value == null ||
+                                                      value.isEmpty) {
+                                                    return 'Please enter a title';
+                                                  }
+                                                  return null;
+                                                },
                                               ),
-                                              controller: _titleController,
-                                              validator: (value) {
-                                                if (value == null ||
-                                                    value.isEmpty) {
-                                                  return 'Please enter a title';
-                                                }
-                                                return null;
-                                              },
-                                            ),
-                                            TextFormField(
-                                              decoration: InputDecoration(
-                                                labelText: 'Description',
+                                              TextFormField(
+                                                decoration: InputDecoration(
+                                                  labelText: 'Description',
+                                                ),
+                                                controller:
+                                                    _descriptionController,
+                                                maxLines: null,
+                                                validator: (value) {
+                                                  if (value == null ||
+                                                      value.isEmpty) {
+                                                    return 'Please enter a description';
+                                                  }
+                                                  return null;
+                                                },
                                               ),
-                                              controller:
-                                                  _descriptionController,
-                                              maxLines: null,
-                                              validator: (value) {
-                                                if (value == null ||
-                                                    value.isEmpty) {
-                                                  return 'Please enter a description';
-                                                }
-                                                return null;
-                                              },
-                                            ),
-                                            SizedBox(height: 16),
-                                            RatingBar.builder(
-                                              initialRating: 0,
-                                              minRating: 1,
-                                              direction: Axis.horizontal,
-                                              allowHalfRating: false,
-                                              itemCount: 5,
-                                              itemPadding: EdgeInsets.symmetric(
-                                                  horizontal: 4.0),
-                                              itemBuilder: (context, _) => Icon(
-                                                Icons.star,
-                                                color: Colors.amber,
+                                              SizedBox(height: 16),
+                                              RatingBar.builder(
+                                                initialRating: 0,
+                                                minRating: 1,
+                                                direction: Axis.horizontal,
+                                                allowHalfRating: false,
+                                                itemCount: 5,
+                                                itemPadding:
+                                                    EdgeInsets.symmetric(
+                                                        horizontal: 4.0),
+                                                itemBuilder: (context, _) =>
+                                                    Icon(
+                                                  Icons.star,
+                                                  color: Colors.amber,
+                                                ),
+                                                onRatingUpdate: (rating) {
+                                                  _publishrating =
+                                                      rating.toInt();
+                                                },
                                               ),
-                                              onRatingUpdate: (rating) {
-                                                _publishrating = rating.toInt();
-                                              },
-                                            ),
-                                          ],
-                                        ),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () {
-                                              // Dismiss dialog
-                                              Navigator.of(context).pop();
-                                            },
-                                            child: Text('Cancel'),
+                                            ],
                                           ),
-                                          ElevatedButton(
-                                            onPressed: () async {
-                                              debugPrint(
-                                                      "PAPI JOHNNNNNNNNNNNNNN",
-                                                      wrapWidth: 1024);
-                                              final description =
-                                                  _descriptionController.text;
-                                              final title =
-                                                  _titleController.text;
-                                              if (description.isEmpty ||
-                                                  title.isEmpty) {
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                  SnackBar(
-                                                    content: Text(
-                                                      "Fill required!",
-                                                      style: TextStyle(
-                                                          color: Colors.white),
-                                                    ),
-                                                    backgroundColor: Colors.red,
-                                                  ),
-                                                );
-                                                return;
-                                              }
-                                              // Dismiss dialog
-
-                                              // Submit review
-                                              // get owner id from trip HEREHERE
-                                              debugPrint("AIIIIIIIIIIIIIIIIIIIII" + _travels[0].owner_id);
-                                              var ownerid = _travels[0].owner_id;
-                                              // find id in travel and return the owner id
-                                              debugPrint("owner id of trip i clicled: $ownerid");
-                                              final url3 =
-                                                  'http://ridemate.deti/service-review/v1/review?trip_id=$ownerid';
-                                              final response3 = (await http
-                                                  .get(Uri.parse(url3)));
-                                              debugPrint(response3.statusCode
-                                                  .toString());
-                                              if (response3.statusCode == 200) {
-                                                final data = jsonDecode(response3.body);
-                                                _personid = int.parse(data.toString());
-                                                debugPrint("person id: $_personid");
-                                                // post review
-                                                final url = 'http://ridemate.deti/service-review/v1/review';
-                                                // get title and description from form
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                // Dismiss dialog
+                                                Navigator.of(context).pop();
+                                              },
+                                              child: Text('Cancel'),
+                                            ),
+                                            ElevatedButton(
+                                              onPressed: () async {
                                                 debugPrint(
-                                                    "person id: $_personid",
+                                                    "PAPI JOHNNNNNNNNNNNNNN",
                                                     wrapWidth: 1024);
-                                                debugPrint(
-                                                    "rating: $_publishrating",
-                                                    wrapWidth: 1024);
-                                                debugPrint(
-                                                    "title: ${_titleController.text}",
-                                                    wrapWidth: 1024);
-                                                debugPrint(
-                                                    "description: ${_descriptionController.text}",
-                                                    wrapWidth: 1024);
-                                                final response =
-                                                    await http.post(
-                                                  Uri.parse(url),
-                                                  headers: <String, String>{
-                                                    'Content-Type':
-                                                        'application/json; charset=UTF-8',
-                                                  },
-                                                  body: jsonEncode(<String,
-                                                      dynamic>{
-                                                    'title': title,
-                                                    'description': description,
-                                                    'rating': int.parse(
-                                                        _publishrating
-                                                            .toString()),
-                                                    'person_id': _personid,
-                                                  }),
-                                                );
-                                                if (response.statusCode ==
-                                                    200) {
-                                                  // pop
-                                                  Navigator.of(context).pop();
+                                                final description =
+                                                    _descriptionController.text;
+                                                final title =
+                                                    _titleController.text;
+                                                if (description.isEmpty ||
+                                                    title.isEmpty) {
                                                   ScaffoldMessenger.of(context)
                                                       .showSnackBar(
                                                     SnackBar(
                                                       content: Text(
-                                                        "Review submitted!",
+                                                        "Fill required!",
                                                         style: TextStyle(
                                                             color:
                                                                 Colors.white),
                                                       ),
                                                       backgroundColor:
-                                                          Colors.green,
+                                                          Colors.red,
                                                     ),
                                                   );
-                                                  fetchData();
+                                                  return;
+                                                }
+                                                // Dismiss dialog
+
+                                                // Submit review
+                                                // get owner id from trip HEREHERE
+                                                debugPrint(
+                                                    "AIIIIIIIIIIIIIIIIIIIII" +
+                                                        _travels[0].owner_id);
+                                                var ownerid =
+                                                    _travels[0].owner_id;
+                                                // find id in travel and return the owner id
+                                                debugPrint(
+                                                    "owner id of trip i clicled: $ownerid");
+                                                final url3 =
+                                                    'http://ridemate.deti/service-review/v1/review?trip_id=$ownerid';
+                                                final response3 = (await http
+                                                    .get(Uri.parse(url3)));
+                                                debugPrint(response3.statusCode
+                                                    .toString());
+                                                if (response3.statusCode ==
+                                                    200) {
+                                                  final data = jsonDecode(
+                                                      response3.body);
+                                                  _personid = int.parse(
+                                                      data.toString());
+                                                  debugPrint(
+                                                      "person id: $_personid");
+                                                  // post review
+                                                  final url =
+                                                      'http://ridemate.deti/service-review/v1/review';
+                                                  // get title and description from form
+                                                  debugPrint(
+                                                      "person id: $_personid",
+                                                      wrapWidth: 1024);
+                                                  debugPrint(
+                                                      "rating: $_publishrating",
+                                                      wrapWidth: 1024);
+                                                  debugPrint(
+                                                      "title: ${_titleController.text}",
+                                                      wrapWidth: 1024);
+                                                  debugPrint(
+                                                      "description: ${_descriptionController.text}",
+                                                      wrapWidth: 1024);
+                                                  final response =
+                                                      await http.post(
+                                                    Uri.parse(url),
+                                                    headers: <String, String>{
+                                                      'Content-Type':
+                                                          'application/json; charset=UTF-8',
+                                                    },
+                                                    body: jsonEncode(<String,
+                                                        dynamic>{
+                                                      'title': title,
+                                                      'description':
+                                                          description,
+                                                      'rating': int.parse(
+                                                          _publishrating
+                                                              .toString()),
+                                                      'person_id': _personid,
+                                                    }),
+                                                  );
+                                                  if (response.statusCode ==
+                                                      200) {
+                                                    // pop
+                                                    Navigator.of(context).pop();
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(
+                                                      SnackBar(
+                                                        content: Text(
+                                                          "Review submitted!",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white),
+                                                        ),
+                                                        backgroundColor:
+                                                            Colors.green,
+                                                      ),
+                                                    );
+                                                    fetchData();
+                                                  } else {
+                                                    // something went wrong
+                                                    // pop
+                                                    debugPrint(
+                                                        "something went wrong",
+                                                        wrapWidth: 1024);
+                                                    Navigator.of(context).pop();
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(
+                                                      SnackBar(
+                                                        content: Text(
+                                                          "Something went wrong with adding review!",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white),
+                                                        ),
+                                                        backgroundColor:
+                                                            Colors.red,
+                                                      ),
+                                                    );
+                                                  }
                                                 } else {
                                                   // something went wrong
                                                   // pop
@@ -669,7 +710,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                       .showSnackBar(
                                                     SnackBar(
                                                       content: Text(
-                                                        "Something went wrong with adding review!",
+                                                        "Something went wrong!",
                                                         style: TextStyle(
                                                             color:
                                                                 Colors.white),
@@ -679,83 +720,72 @@ class _ProfilePageState extends State<ProfilePage> {
                                                     ),
                                                   );
                                                 }
-                                              } else {
-                                                // something went wrong
-                                                // pop
-                                                debugPrint(
-                                                    "something went wrong",
-                                                    wrapWidth: 1024);
-                                                Navigator.of(context).pop();
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                  SnackBar(
-                                                    content: Text(
-                                                      "Something went wrong!",
-                                                      style: TextStyle(
-                                                          color: Colors.white),
-                                                    ),
-                                                    backgroundColor: Colors.red,
-                                                  ),
-                                                );
-                                              }
-                                            },
-                                            child: Text('Submit'),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                },
-                                style: ButtonStyle(
-                                  backgroundColor:
-                                      MaterialStateProperty.all<Color>(
-                                          Colors.blue),
-                                ),
-                                child: Text('Review'),
-                              ),
-                            ElevatedButton(
-                              onPressed: () async {
-                                final String url_delete_participant =
-                                    'http://ridemate.deti/participant/';
-                                final response_delete_participant =
-                                    await http.delete(
-                                  Uri.parse(url_delete_participant),
-                                  headers: {
-                                    'Content-Type': 'application/json',
+                                              },
+                                              child: Text('Submit'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
                                   },
-                                  body: jsonEncode({
-                                    'id': user_id,
-                                  }),
-                                );
-                                debugPrint("response_delete_participant");
-                                debugPrint(response_delete_participant.body,
-                                    wrapWidth: 1024);
-                                if (response_delete_participant.statusCode ==
-                                    200) {
-                                  fetchData();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        "Removed from trip successfully",
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                      backgroundColor: Colors.green,
-                                    ),
-                                  );
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        "Participant deletion failed!",
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                      backgroundColor: Colors.red,
-                                    ),
-                                  );
-                                }
-                              },
-                              child: Text('Exit Trip'),
-                            ),
+                                  style: ButtonStyle(
+                                    backgroundColor:
+                                        MaterialStateProperty.all<Color>(
+                                            Colors.blue),
+                                  ),
+                                  child: Text('Review'),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () async {
+                                    final String url_delete_participant =
+                                        'http://ridemate.deti/participant/';
+                                    final response_delete_participant =
+                                        await http.delete(
+                                      Uri.parse(url_delete_participant),
+                                      headers: {
+                                        'Content-Type': 'application/json',
+                                      },
+                                      body: jsonEncode({
+                                        'id': user_id,
+                                      }),
+                                    );
+                                    debugPrint("response_delete_participant");
+                                    debugPrint(response_delete_participant.body,
+                                        wrapWidth: 1024);
+                                    if (response_delete_participant
+                                            .statusCode ==
+                                        200) {
+                                      final url_delete_conversation =
+                                          await http.delete(Uri.parse(
+                                              'http://ridemate.deti/service-review/v1/conversations?f_name=$owner&member=$chat_id'));
+                                      fetchData();
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            "Removed from trip successfully",
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                          backgroundColor: Colors.green,
+                                        ),
+                                      );
+                                    } else {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            "Participant deletion failed!",
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  child: Text('Exit Trip'),
+                                ),
                               ],
                             ),
                           ],
@@ -878,8 +908,5 @@ class Participant {
   final String trip_id;
   final String owner_id;
 
-  Participant({
-    required this.trip_id,
-    required this.owner_id});
-
+  Participant({required this.trip_id, required this.owner_id});
 }
