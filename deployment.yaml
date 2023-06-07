@@ -32,33 +32,33 @@ spec:
         - name: users-db-volume
           persistentVolumeClaim:
             claimName: users-db-pvc
----
-#Deployment auth frontend
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: auth-frontend
-  namespace: egs-ridemate
-spec: 
-  selector:
-    matchLabels:
-      app: auth-frontend
-  template:
-    metadata:
-      labels:
-        app: auth-frontend
-    spec:
-      dnsConfig:
-        options:
-          - name: ndots
-            value: "1"
-      containers:
-        - name: auth-frontend
-          image: registry.deti:5000/egs-ridemate/auth_frontend:v2
-          ports:
-            - containerPort: 3000
-          imagePullPolicy: Always
-      restartPolicy: Always
+# ---
+# #Deployment auth frontend
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: auth-frontend
+#   namespace: egs-ridemate
+# spec: 
+#   selector:
+#     matchLabels:
+#       app: auth-frontend
+#   template:
+#     metadata:
+#       labels:
+#         app: auth-frontend
+#     spec:
+#       dnsConfig:
+#         options:
+#           - name: ndots
+#             value: "1"
+#       containers:
+#         - name: auth-frontend
+#           image: registry.deti:5000/egs-ridemate/auth_frontend:v2
+#           ports:
+#             - containerPort: 3000
+#           imagePullPolicy: Always
+#       restartPolicy: Always
 ---
 #Deployment chat-api
 apiVersion: apps/v1
@@ -242,19 +242,19 @@ spec:
   ports:
     - port: 5100
       targetPort: 5100
----
-#Service auth frontend
-apiVersion: v1
-kind: Service
-metadata:
-  name: auth-frontend
-  namespace: egs-ridemate
-spec:
-  selector:
-    app: auth-frontend
-  ports:
-    - port: 80
-      targetPort: 3000
+# ---
+# #Service auth frontend
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: auth-frontend
+#   namespace: egs-ridemate
+# spec:
+#   selector:
+#     app: auth-frontend
+#   ports:
+#     - port: 80
+#       targetPort: 3000
 ---
 #Service chat-api
 apiVersion: v1
@@ -347,13 +347,13 @@ spec:
     - host: ridemate.duckdns.org
       http:
         paths:
-        - path: /front
-          pathType: Prefix
-          backend:
-            service:
-              name: auth-frontend
-              port: 
-                number: 80
+        # - path: /front
+        #   pathType: Prefix
+        #   backend:
+        #     service:
+        #       name: auth-frontend
+        #       port: 
+        #         number: 80
         - path: /
           pathType: Prefix
           backend:

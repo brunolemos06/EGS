@@ -69,7 +69,10 @@ class TripView(APIView):
         print(id)
         if id is None:
             return JsonResponse({'v': False, 'error': 'Id not provided.'}, status = 404)
-        trip = Trip.objects.get(id=id)
+        try:
+            trip = Trip.objects.get(id=id)
+        except trip.DoesNotExist:
+            trip = None
         if trip is not None:
             trip.delete()
             
@@ -126,6 +129,8 @@ class ParticipantView(APIView):
         trip = Trip.objects.get(id=trip_id)
         if trip is None:
             return JsonResponse({'v': False, 'error': f'No Trip with id {trip_id}'}, status = 404)
+        if trip.owner_id == id:
+            return JsonResponse({'v': False, 'error': f'Owner cannot be a Participant.'}, status = 403)
         if trip.available_sits == 0:
             return JsonResponse({'v': False, 'error': f'No available sits in Trip {trip_id}'}, status = 404)
         

@@ -212,7 +212,7 @@ def get_all_reviews():
     return response.json(), response.status_code
 
 
-@app.route(appendurl+'/review/rating/', methods=['GET'])
+@app.route(appendurl+'/review/rating', methods=['GET'])
 def rating_reviews():
     if request.method == 'GET':
         url = f'http://{review_ip}:{review_port}/api/v1/reviews/rating'
