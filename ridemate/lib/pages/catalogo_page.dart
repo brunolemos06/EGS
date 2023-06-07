@@ -117,8 +117,7 @@ class _catalogoPageState extends State<catalogo_page> {
     flutterWebviewPlugin.onUrlChanged.listen((url) {
       if (url.contains('/paypal/finish')) {
         flutterWebviewPlugin.close();
-        final token_url =
-            Uri.parse('http://ridemate.deti/paypal/capture');
+        final token_url = Uri.parse('http://ridemate.deti/paypal/capture');
         final token_headers = {'Content-Type': 'application/json'};
         final token_payload = {'id': order_id};
         http
@@ -611,7 +610,29 @@ class _catalogoPageState extends State<catalogo_page> {
                                             debugPrint(
                                                 response_add_participant.body,
                                                 wrapWidth: 1024);
-
+                                            if (response_add_participant
+                                                    .statusCode ==
+                                                403) {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        catalogo_page()),
+                                              );
+                                              // message to user that to pay you need to be logged in
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    "Owner can't be a participant !!",
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                  backgroundColor: Colors.red,
+                                                ),
+                                              );
+                                              return;
+                                            }
                                             final url = Uri.parse(
                                                 'http://ridemate.deti/paypal/create');
                                             final headers = {
@@ -632,8 +653,10 @@ class _catalogoPageState extends State<catalogo_page> {
                                                 url,
                                                 headers: headers,
                                                 body: json.encode(payload));
-                                              debugPrint(
-                                                  'ola eu sou grande teste' + response.body,wrapWidth: 1024);
+                                            debugPrint(
+                                                'ola eu sou grande teste' +
+                                                    response.body,
+                                                wrapWidth: 1024);
                                             final errorMessage =
                                                 'Status: ${response.statusCode.toString()}';
                                             debugPrint(errorMessage,
