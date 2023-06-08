@@ -10,10 +10,6 @@ from flask import jsonify
 from flask_swagger import swagger
 
 
-# account_sid="ACf8b3ce0eb04f21fe7ab30a6e0c58c7d9"
-# auth_token= "4cb96b0112a701609a3b621bc403af76"
-# service_sid="ISec5512aaa2db4d6abaf1bd31a60fa474"
-
 account_sid = os.getenv("TWILIO_ACCOUNT_SID")
 auth_token = os.getenv("TWILIO_AUTH_TOKEN")
 service_sid = os.getenv("TWILIO_SERVICE_SID")
